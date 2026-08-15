@@ -4,7 +4,20 @@
 # 테스트 없이 구현 코드를 작성하려 하면 차단.
 
 INPUT=$(cat)
-FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
+# jq 에 의존하지 않는다 — 이 환경에 jq 가 없어 훅이 조용히 무력화된 적이 있다.
+# Node 는 Tier 0 가 이미 요구하므로 새 의존성이 아니다.
+FILE_PATH=$(printf '%s' "$INPUT" | node -e '
+  let s = "";
+  process.stdin.on("data", (d) => (s += d)).on("end", () => {
+    try {
+      const v = JSON.parse(s);
+      process.stdout.write((v.tool_input && v.tool_input.file_path) || "");
+    } catch (_) {}
+  });
+')
+
+# Windows 경로는 역슬래시로 들어온다. 아래 case 글로브가 전부 / 기준이므로 정규화한다.
+FILE_PATH=$(printf '%s' "$FILE_PATH" | tr '\\' '/')
 
 # 파일 경로가 없으면 통과
 if [ -z "$FILE_PATH" ]; then
@@ -18,36 +31,36 @@ case "$FILE_PATH" in
     ;;
 esac
 
-# 설정/타입/스타일 파일은 테스트 불필요 — 허용
+# 설정/마크업/스타일/문서 파일은 테스트 불필요 — 허용
 case "$FILE_PATH" in
-  *.json|*.css|*.scss|*.md|*.yml|*.yaml|*.env*|*.config.*|*tailwind*|*postcss*|*next.config*|*tsconfig*)
+  *.json|*.html|*.css|*.scss|*.md|*.yml|*.yaml|*.env*|*.config.*|*.code-snippets)
     exit 0
     ;;
 esac
 
-# types/ 폴더는 테스트 불필요 — 허용
+# 빌드/검증 도구는 테스트 대상 외 — 허용
 case "$FILE_PATH" in
-  */types/*|*/types.ts|*/types.d.ts)
+  tools/*|*/tools/*)
     exit 0
     ;;
 esac
 
-# Next.js 프레임워크 파일은 허용 (layout, page, loading, error, not-found, global styles)
+# assets/js/common/ 은 DOM 바인딩 레이어 — jsdom 없이는 유닛 테스트가 불가하므로 허용.
+# 순수 로직은 assets/js/util/ 에 두고 거기서만 TDD를 강제한다.
 case "$FILE_PATH" in
-  */layout.tsx|*/layout.ts|*/page.tsx|*/page.ts|*/loading.tsx|*/error.tsx|*/not-found.tsx|*/globals.css)
+  */assets/js/common/*|*/assets/js/pages/*)
     exit 0
     ;;
 esac
 
-# components/ 는 presentation 레이어(비즈니스 로직 없음) — 유닛 테스트 대상 외, 허용.
-# 로직은 lib/ 에 두고 거기서 TDD를 강제한다.
+# 엔트리 파일은 import + init 만 담당 — 허용
 case "$FILE_PATH" in
-  */components/*)
+  */assets/js/pc.js|*/assets/js/mo.js)
     exit 0
     ;;
 esac
 
-# lib/ 또는 소스 파일이면 테스트 파일 존재 여부 확인
+# 여기까지 왔으면 assets/js/util/ 의 순수 로직 — 테스트 파일 존재 여부 확인
 case "$FILE_PATH" in
   *.ts|*.tsx|*.js|*.jsx)
     # 파일명 추출
@@ -93,7 +106,7 @@ case "$FILE_PATH" in
   "hookSpecificOutput": {
     "hookEventName": "PreToolUse",
     "permissionDecision": "deny",
-    "permissionDecisionReason": "TDD GUARD: '${BASENAME}'에 대한 테스트 파일이 존재하지 않습니다. 구현 코드를 작성하기 전에 테스트를 먼저 작성하세요. (테스트 파일 예: ${BASENAME}.test.ts)"
+    "permissionDecisionReason": "TDD GUARD: '${BASENAME}'에 대한 테스트 파일이 존재하지 않습니다. 구현 코드를 작성하기 전에 테스트를 먼저 작성하세요. (테스트 파일 예: src/__tests__/${BASENAME}.test.js)"
   }
 }
 EOF
