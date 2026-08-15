@@ -1,0 +1,21 @@
+{
+  "project": "이커머스 퍼블리싱 보일러플레이트",
+  "phase": "3-guide",
+  "steps": [
+    {
+      "step": 0,
+      "name": "guide-generator",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "docs",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "handover",
+      "status": "pending"
+    }
+  ]
+}

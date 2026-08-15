@@ -108,7 +108,12 @@ class StepExecutor:
 
     def _run_git(self, *args) -> subprocess.CompletedProcess:
         cmd = ["git"] + list(args)
-        return subprocess.run(cmd, cwd=self._root, capture_output=True, text=True)
+        # encoding 을 명시하지 않으면 Windows 에서 locale(cp949)로 디코딩되어
+        # 한글 커밋 메시지·브랜치명이 깨진다.
+        return subprocess.run(
+            cmd, cwd=self._root, capture_output=True, text=True,
+            encoding="utf-8", errors="replace",
+        )
 
     def _checkout_branch(self):
         branch = f"feat-{self._phase_name}"
@@ -178,11 +183,13 @@ class StepExecutor:
         sections = []
         claude_md = ROOT / "CLAUDE.md"
         if claude_md.exists():
-            sections.append(f"## 프로젝트 규칙 (CLAUDE.md)\n\n{claude_md.read_text()}")
+            sections.append(
+                f"## 프로젝트 규칙 (CLAUDE.md)\n\n{claude_md.read_text(encoding='utf-8')}"
+            )
         docs_dir = ROOT / "docs"
         if docs_dir.is_dir():
             for doc in sorted(docs_dir.glob("*.md")):
-                sections.append(f"## {doc.stem}\n\n{doc.read_text()}")
+                sections.append(f"## {doc.stem}\n\n{doc.read_text(encoding='utf-8')}")
         return "\n\n---\n\n".join(sections) if sections else ""
 
     @staticmethod
@@ -234,10 +241,14 @@ class StepExecutor:
             print(f"  ERROR: {step_file} not found")
             sys.exit(1)
 
-        prompt = preamble + step_file.read_text()
+        prompt = preamble + step_file.read_text(encoding="utf-8")
+        # Claude CLI 는 UTF-8 로 출력한다. encoding 을 명시하지 않으면 Windows 에서
+        # locale(cp949)로 디코딩되어 한글이 깨지고, 그 깨진 문자열이 재시도 프롬프트의
+        # error_message 로 다시 들어가 오염이 누적된다.
         result = subprocess.run(
             ["claude", "-p", "--dangerously-skip-permissions", "--output-format", "json", prompt],
             cwd=self._root, capture_output=True, text=True, timeout=1800,
+            encoding="utf-8", errors="replace",
         )
 
         if result.returncode != 0:
@@ -251,7 +262,7 @@ class StepExecutor:
             "stdout": result.stdout, "stderr": result.stderr,
         }
         out_path = self._phase_dir / f"step{step_num}-output.json"
-        with open(out_path, "w") as f:
+        with open(out_path, "w", encoding="utf-8") as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
 
         return output
@@ -405,6 +416,12 @@ class StepExecutor:
 
 
 def main():
+    # 출력이 파이프로 리다이렉트되면 Windows 에서 locale(cp949)로 인코딩되어
+    # 한글 진행 메시지에서 UnicodeEncodeError 로 실행이 중단된다.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(encoding="utf-8", errors="replace")
+
     parser = argparse.ArgumentParser(description="Harness Step Executor")
     parser.add_argument("phase_dir", help="Phase directory name (e.g. 0-mvp)")
     parser.add_argument("--push", action="store_true", help="Push branch after completion")

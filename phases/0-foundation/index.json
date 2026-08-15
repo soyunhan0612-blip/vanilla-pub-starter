@@ -1,0 +1,21 @@
+{
+  "project": "이커머스 퍼블리싱 보일러플레이트",
+  "phase": "0-foundation",
+  "steps": [
+    {
+      "step": 0,
+      "name": "skeleton",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "design-tokens",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "js-core",
+      "status": "pending"
+    }
+  ]
+}
