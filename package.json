@@ -1,0 +1,26 @@
+{
+  "name": "ecommerce-publishing-boilerplate",
+  "version": "0.1.0",
+  "private": true,
+  "description": "이커머스 퍼블리싱 보일러플레이트 — Tier 1(선택) 진입점. 이 파일이 없어도 모든 것이 동작한다.",
+  "scripts": {
+    "check": "node tools/check.js",
+    "build": "node tools/build.js",
+    "serve": "node tools/serve.js",
+    "test": "node --test src/__tests__",
+    "lint:js": "eslint src/assets/js",
+    "lint:css": "stylelint \"src/assets/scss/**/*.scss\"",
+    "lint:html": "html-validate \"src/**/*.html\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "html-validate": "^9.0.0",
+    "sass": "^1.102.0",
+    "stylelint": "^16.0.0",
+    "stylelint-config-standard-scss": "^14.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

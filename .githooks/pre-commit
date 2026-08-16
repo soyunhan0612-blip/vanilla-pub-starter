@@ -1,0 +1,8 @@
+#!/bin/sh
+# pre-commit — 커밋 전에 tools/check.js 를 돌린다.
+#
+# husky 를 쓰지 않는다. npm 의존이라 폐쇄망에서 무력화된다.
+# 이 훅은 클론만으로는 켜지지 않는다. 저장소마다 한 번 실행해야 한다:
+#   git config core.hooksPath .githooks
+
+exec node "$(git rev-parse --show-toplevel)/tools/check.js"

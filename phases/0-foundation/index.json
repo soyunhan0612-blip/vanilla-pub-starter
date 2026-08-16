@@ -5,7 +5,9 @@
     {
       "step": 0,
       "name": "skeleton",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-08-16T13:33:05+0900",
+      "summary": "ARCHITECTURE.md 디렉토리 스켈레톤(.gitkeep) + src/package.json(ESM 스코프 격리) 생성, Tier 0 도구 3종 신규 작성 — include.js(중첩·순환감지·@component 제거·경로이탈 차단), serve.js(--port/--smoke, .html 실시간 include 해소), build.js(sass 탐색 3단계·엔트리 부재시 경고, dist/ 생성), .githooks/pre-commit·README.md·root package.json(type:module 없음). AC 3커맨드 모두 exit 0 (node_modules 없는 상태)"
     },
     {
       "step": 1,
@@ -17,5 +19,6 @@
       "name": "js-core",
       "status": "pending"
     }
-  ]
+  ],
+  "created_at": "2026-08-16T13:33:05+0900"
 }
