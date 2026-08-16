@@ -420,6 +420,58 @@ class TestCommitStep:
         assert len(commit_msgs) == 1
         assert "chore" in commit_msgs[0]
 
+    def test_foreign_paths_are_unstaged(self, executor):
+        """step 시작 전부터 더러웠던 경로는 커밋에 담기지 않는다."""
+        calls = []
+        def fake_git(*args):
+            calls.append(args)
+            if args[:2] == ("diff", "--cached"):
+                return MagicMock(returncode=1)
+            return MagicMock(returncode=0, stdout="", stderr="")
+        executor._run_git = fake_git
+
+        executor._commit_step(2, "ui", {"scripts/execute.py", "scratch.tmp"})
+
+        resets = [c for c in calls if c[0] == "reset"]
+        assert resets, "reset 이 호출되지 않았다"
+        unstaged = {a for c in resets for a in c if a.startswith(":(literal)")}
+        assert ":(literal)scripts/execute.py" in unstaged
+        assert ":(literal)scratch.tmp" in unstaged
+
+    def test_phase_outputs_never_treated_as_foreign(self, executor):
+        """산출물 2종은 foreign 으로 들어와도 하네스가 계속 커밋한다."""
+        calls = []
+        def fake_git(*args):
+            calls.append(args)
+            if args[:2] == ("diff", "--cached"):
+                return MagicMock(returncode=1)
+            return MagicMock(returncode=0, stdout="", stderr="")
+        executor._run_git = fake_git
+
+        index_rel = f"phases/{executor._phase_dir_name}/index.json"
+        executor._commit_step(2, "ui", {index_rel})
+
+        # chore 커밋용 2차 스테이징(2번째 add 이후)에서는 index 를 빼지 않아야 한다
+        add_positions = [i for i, c in enumerate(calls) if c[0] == "add"]
+        assert len(add_positions) == 2
+        second_round = calls[add_positions[1]:]
+        assert not any(f":(literal){index_rel}" in c for c in second_round if c[0] == "reset")
+
+
+class TestDirtyPaths:
+    def test_parses_porcelain_z(self, executor):
+        entries = " M src/app.js\0?? scratch.tmp\0R  new.js\0old.js\0"
+        executor._run_git = lambda *a: MagicMock(returncode=0, stdout=entries)
+        assert executor._dirty_paths() == {"src/app.js", "scratch.tmp", "new.js", "old.js"}
+
+    def test_empty_worktree(self, executor):
+        executor._run_git = lambda *a: MagicMock(returncode=0, stdout="")
+        assert executor._dirty_paths() == set()
+
+    def test_git_failure_returns_empty(self, executor):
+        executor._run_git = lambda *a: MagicMock(returncode=128, stdout="")
+        assert executor._dirty_paths() == set()
+
 
 # ---------------------------------------------------------------------------
 # _invoke_claude (mocked)

@@ -231,6 +231,37 @@ class StepExecutor:
             encoding="utf-8", errors="replace",
         )
 
+    def _dirty_paths(self) -> set:
+        """워킹트리에서 변경·미추적 상태인 경로 집합.
+
+        step 실행 직전에 찍어 두면, step 이 만든 변경과 원래부터 더러웠던
+        파일(사람이 편집 중인 파일 등)을 구분할 수 있다.
+        """
+        r = self._run_git("status", "--porcelain", "-z", "--untracked-files=all")
+        if r.returncode != 0:
+            return set()
+
+        paths, fields, i = set(), r.stdout.split("\0"), 0
+        while i < len(fields):
+            entry = fields[i]
+            i += 1
+            if len(entry) < 4:  # 마지막 빈 필드
+                continue
+            xy, path = entry[:2], entry[3:]
+            paths.add(path)
+            if xy[0] in ("R", "C") and i < len(fields):
+                paths.add(fields[i])  # rename/copy 는 원본 경로가 뒤따른다
+                i += 1
+        return paths
+
+    def _stage_all_except(self, exclude: set):
+        """워킹트리 전체를 스테이징하되 exclude 경로는 인덱스에서 도로 뺀다."""
+        self._run_git("add", "-A")
+        if not exclude:
+            return
+        # 파일명의 glob 문자가 pathspec 으로 해석되지 않도록 :(literal) 사용
+        self._run_git("reset", "-q", "HEAD", "--", *(f":(literal){p}" for p in sorted(exclude)))
+
     def _checkout_branch(self):
         branch = f"feat-{self._phase_name}"
 
@@ -254,13 +285,25 @@ class StepExecutor:
 
         print(f"  Branch: {branch}")
 
-    def _commit_step(self, step_num: int, step_name: str):
+    def _commit_step(self, step_num: int, step_name: str, foreign: Optional[set] = None):
+        """step 산출물을 커밋한다.
+
+        foreign 은 step 실행 전부터 이미 더러웠던 경로 — step 의 작업물이 아니므로
+        커밋에 넣지 않는다. 하네스가 도는 동안 사람이 다른 파일을 편집하면
+        `git add -A` 가 그것까지 쓸어 담던 문제를 막는다.
+        """
         output_rel = f"phases/{self._phase_dir_name}/step{step_num}-output.json"
         index_rel = f"phases/{self._phase_dir_name}/index.json"
 
-        self._run_git("add", "-A")
-        self._run_git("reset", "HEAD", "--", output_rel)
-        self._run_git("reset", "HEAD", "--", index_rel)
+        foreign = set(foreign or ())
+        # 산출물 2종은 step 이 직접 쓰므로 foreign 이더라도 하네스가 관리한다
+        foreign -= {output_rel, index_rel}
+        if foreign:
+            print(f"  · 커밋 제외 (step 시작 전부터 수정돼 있던 경로 {len(foreign)}개):")
+            for p in sorted(foreign):
+                print(f"      {p}")
+
+        self._stage_all_except(foreign | {output_rel, index_rel})
 
         if self._run_git("diff", "--cached", "--quiet").returncode != 0:
             msg = self.FEAT_MSG.format(phase=self._phase_name, num=step_num, name=step_name)
@@ -270,7 +313,7 @@ class StepExecutor:
             else:
                 print(f"  WARN: 코드 커밋 실패: {r.stderr.strip()}")
 
-        self._run_git("add", "-A")
+        self._stage_all_except(foreign)
         if self._run_git("diff", "--cached", "--quiet").returncode != 0:
             msg = self.CHORE_MSG.format(phase=self._phase_name, num=step_num)
             r = self._run_git("commit", "-m", msg)
@@ -430,6 +473,8 @@ class StepExecutor:
         step_num, step_name = step["step"], step["name"]
         done = sum(1 for s in self._read_json(self._index_file)["steps"] if s["status"] == "completed")
         prev_error = None
+        # step 이 손대기 전의 dirty 목록. 재시도는 같은 step 의 일부이므로 루프 밖에서 찍는다.
+        foreign = self._dirty_paths()
 
         for attempt in range(1, self.MAX_RETRIES + 1):
             index = self._read_json(self._index_file)
@@ -453,7 +498,7 @@ class StepExecutor:
                     if s["step"] == step_num:
                         s["completed_at"] = ts
                 self._write_json(self._index_file, index)
-                self._commit_step(step_num, step_name)
+                self._commit_step(step_num, step_name, foreign)
                 print(f"  ✓ Step {step_num}: {step_name} [{elapsed}s]")
                 return True
 
@@ -561,7 +606,12 @@ class StepExecutor:
         self._write_json(self._index_file, index)
         self._update_top_index("completed")
 
-        self._run_git("add", "-A")
+        # 방금 쓴 index 2개만 담는다. add -A 로 워킹트리 전체를 쓸면
+        # 하네스와 무관하게 편집 중이던 파일까지 이 커밋에 섞인다.
+        for f in (self._index_file, self._top_index_file):
+            if Path(f).exists():
+                rel = Path(f).relative_to(self._root).as_posix()
+                self._run_git("add", "--", f":(literal){rel}")
         if self._run_git("diff", "--cached", "--quiet").returncode != 0:
             msg = f"chore({self._phase_name}): mark phase completed"
             r = self._run_git("commit", "-m", msg)
