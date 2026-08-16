@@ -58,13 +58,17 @@ class StepExecutor:
     CHORE_MSG = "chore({phase}): step {num} output"
     TZ = timezone(timedelta(hours=9))
 
-    def __init__(self, phase_dir_name: str, *, auto_push: bool = False):
+    def __init__(self, phase_dir_name: str, *, auto_push: bool = False,
+                 only_step: Optional[int] = None, single: bool = False):
         self._root = str(ROOT)
         self._phases_dir = ROOT / "phases"
         self._phase_dir = self._phases_dir / phase_dir_name
         self._phase_dir_name = phase_dir_name
         self._top_index_file = self._phases_dir / "index.json"
         self._auto_push = auto_push
+        # --step N / --one: step 하나만 실행하고 멈춘다.
+        self._only_step = only_step
+        self._single = single or only_step is not None
 
         if not self._phase_dir.is_dir():
             print(f"ERROR: {self._phase_dir} not found")
@@ -86,8 +90,8 @@ class StepExecutor:
         self._checkout_branch()
         guardrails = self._load_guardrails()
         self._ensure_created_at()
-        self._execute_all_steps(guardrails)
-        self._finalize()
+        # 단일 step 모드로 조기 종료하면 phase 완료로 표시해서는 안 된다.
+        self._finalize(self._execute_all_steps(guardrails))
 
     # --- timestamps ---
 
@@ -273,6 +277,10 @@ class StepExecutor:
         print(f"\n{'='*60}")
         print(f"  Harness Step Executor")
         print(f"  Phase: {self._phase_name} | Steps: {self._total}")
+        if self._only_step is not None:
+            print(f"  Mode: 단일 step ({self._only_step}) 만 실행")
+        elif self._single:
+            print(f"  Mode: 다음 pending step 1개만 실행")
         if self._auto_push:
             print(f"  Auto-push: enabled")
         print(f"{'='*60}")
@@ -372,13 +380,28 @@ class StepExecutor:
 
         return False  # unreachable
 
-    def _execute_all_steps(self, guardrails: str):
+    def _execute_all_steps(self, guardrails: str) -> bool:
+        """step 들을 순차 실행한다.
+
+        Returns:
+            True  — 모든 step 을 소진했다 (phase 완료).
+            False — 단일 step 모드로 1개만 실행하고 조기 종료했다 (phase 미완료).
+        """
         while True:
             index = self._read_json(self._index_file)
             pending = next((s for s in index["steps"] if s["status"] == "pending"), None)
             if pending is None:
                 print("\n  All steps completed!")
-                return
+                return True
+
+            # --step N 은 순서를 건너뛰지 못한다. step 문서가 이전 step 산출물을
+            # 전제로 작성되어 있어, 건너뛰면 세션이 없는 파일을 읽으려다 실패한다.
+            if self._only_step is not None and pending["step"] != self._only_step:
+                print(f"\n  ERROR: --step {self._only_step} 을 요청했으나 앞선 "
+                      f"step {pending['step']} ({pending['name']}) 이 아직 pending 입니다.")
+                print(f"  step 문서는 이전 step 의 산출물을 전제로 작성되어 있어 건너뛸 수 없습니다.")
+                print(f"  먼저 --step {pending['step']} 을 실행하세요.")
+                sys.exit(1)
 
             step_num = pending["step"]
             for s in index["steps"]:
@@ -389,7 +412,28 @@ class StepExecutor:
 
             self._execute_single_step(pending, guardrails)
 
-    def _finalize(self):
+            if self._single:
+                remaining = [
+                    s for s in self._read_json(self._index_file)["steps"]
+                    if s["status"] == "pending"
+                ]
+                if not remaining:
+                    print("\n  All steps completed!")
+                    return True
+                nxt = remaining[0]
+                print(f"\n  단일 step 모드 — 여기서 멈춥니다.")
+                print(f"  다음: python scripts/execute.py {self._phase_dir_name} --step {nxt['step']}  ({nxt['name']})")
+                return False
+
+    def _finalize(self, phase_done: bool = True):
+        # 단일 step 모드로 조기 종료한 경우, 남은 step 이 pending 인데도 phase 전체가
+        # completed 로 기록되는 것을 막는다. 거짓 완료는 top-level index 까지 오염시킨다.
+        if not phase_done:
+            print(f"\n{'='*60}")
+            print(f"  Step 완료 — phase '{self._phase_name}' 는 아직 진행 중입니다")
+            print(f"{'='*60}")
+            return
+
         index = self._read_json(self._index_file)
         index["completed_at"] = self._stamp()
         self._write_json(self._index_file, index)
@@ -425,9 +469,16 @@ def main():
     parser = argparse.ArgumentParser(description="Harness Step Executor")
     parser.add_argument("phase_dir", help="Phase directory name (e.g. 0-mvp)")
     parser.add_argument("--push", action="store_true", help="Push branch after completion")
+    parser.add_argument("--step", type=int, default=None,
+                        help="이 번호의 step 하나만 실행하고 종료 (앞선 step 이 pending 이면 에러)")
+    parser.add_argument("--one", action="store_true",
+                        help="다음 pending step 하나만 실행하고 종료")
     args = parser.parse_args()
 
-    StepExecutor(args.phase_dir, auto_push=args.push).run()
+    StepExecutor(
+        args.phase_dir, auto_push=args.push,
+        only_step=args.step, single=args.one,
+    ).run()
 
 
 if __name__ == "__main__":
