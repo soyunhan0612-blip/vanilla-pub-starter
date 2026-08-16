@@ -4,7 +4,7 @@
 
 - `/docs/UI_GUIDE.md` — 색상 토큰, 애니메이션 규칙(opacity/transform만, 200ms, prefers-reduced-motion 대응)
 - `/docs/ARCHITECTURE.md` — 레이어 규칙: `util/`(순수 로직) → `common/`(DOM 바인딩) → 엔트리
-- `/CLAUDE.md` — CRITICAL 규칙 전체
+- `/AGENTS.md` — CRITICAL 규칙 전체
 - `src/assets/js/util/focus-trap.js` — **이 step의 핵심.** `nextFocusIndex`, `isFocusableSelector` 를 읽고 그 위에 DOM 바인딩을 얹는다. 로직을 다시 구현하지 마라
 - `src/assets/components/common/button.html` — 이전 step의 마크업 규약과 클래스 네이밍을 맞춰라
 - `src/assets/scss/abstracts/_mixins.scss`, `src/assets/scss/tokens/`

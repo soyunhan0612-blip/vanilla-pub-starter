@@ -3,9 +3,10 @@
 ## 읽어야 할 파일
 
 - `/docs/ARCHITECTURE.md` — 레이어 규칙(`util/` → `common/` → 엔트리), 데이터 흐름
-- `/CLAUDE.md` — CRITICAL: `util/` 은 DOM에 의존하지 않는다
+- `/AGENTS.md` — CRITICAL: `util/` 은 DOM에 의존하지 않는다
 - `/tools/check.js` — `checkTddGuard()` 를 읽어라. `util/` 의 `document`·`window` 참조를 검출해 **에러로 처리**하며, 테스트 파일이 없어도 에러다
 - `/scripts/hooks/tdd-guard.js` — 이 훅이 `src/assets/js/util/` 에 대해 테스트 선작성을 강제한다. 테스트 없이 구현 파일을 쓰려 하면 **차단된다**. 범위는 `check.js` 의 `checkTddGuard()` 와 동일하며, 그 밖의 경로는 건드리지 않는다
+- `/src/package.json` — 이전 step 산출물. `{ "type": "module" }` 한 줄이며, `src/` 아래를 ESM 스코프로 만드는 근거다
 - 이전 step 산출물: `src/assets/scss/tokens/`, `tools/build.js`
 
 ## 작업
@@ -14,12 +15,27 @@
 
 테스트는 Node 내장 러너를 쓴다. **vitest·jest를 쓰지 마라.**
 
+### 모듈 형식 — 이미 확정되어 있다. 다시 판단하지 마라
+
+이전 step에서 `src/package.json` 에 `{ "type": "module" }` 이 만들어졌다. Node는 모듈 파일에서 위로 올라가며 가장 가까운 `package.json` 을 찾으므로, **`src/` 아래는 구현·테스트 모두 ESM이고 `tools/` 는 CommonJS로 남는다.** 이 분리가 있어야 CommonJS로 작성된 `tools/check.js` 가 계속 동작한다.
+
+따라서 구현과 테스트를 모두 아래 형식으로 쓴다:
+
 ```js
-const { test } = require('node:test');
-const assert = require('node:assert/strict');
+// src/__tests__/validate.test.js
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { validateEmail } from '../assets/js/util/validate.js';
 ```
 
-> 구현 파일은 브라우저에서 `<script type="module">` 로 로드되므로 ESM(`export`)이어야 하고, 테스트는 `node --test` 로 돌아야 한다. 두 세계를 잇는 방법(파일 확장자 `.mjs`, `package.json` 의 `type`, 또는 동적 `import()`)은 네가 판단해서 일관되게 정하고 README에 기록하라. **선택한 방식이 `npm install` 없이 동작해야 한다.**
+```js
+// src/assets/js/util/validate.js
+export function validateEmail(value) { /* ... */ }
+```
+
+**상대 import 경로에 `.js` 확장자를 반드시 붙여라.** Node의 ESM 로더는 CommonJS와 달리 확장자 생략을 허용하지 않는다. `from '../assets/js/util/validate'` 는 `ERR_MODULE_NOT_FOUND` 로 실패한다.
+
+이 방식은 `npm install` 없이 동작하며, 브라우저의 `<script type="module">` 로딩과도 무관하게 성립한다.
 
 ### 1. `src/assets/js/util/dom.js`
 
@@ -104,5 +120,8 @@ node tools/check.js
 - **`util/` 에서 `document`·`window` 를 참조하지 마라.** 이유: jsdom 없이 `node --test` 로 검증해야 하며, 그것이 폐쇄망에서 테스트를 유지하는 유일한 조건이다. `check.js` 가 에러로 차단한다.
 - **테스트보다 구현을 먼저 쓰지 마라.** `tdd-guard.js` 훅이 파일 쓰기를 차단한다.
 - **vitest·jest·jsdom 을 도입하지 마라.** 이유: npm 의존이며 폐쇄망에서 동작하지 않는다. `node --test` 만 쓴다.
+- **`.mjs` 확장자를 쓰지 마라.** 전부 `.js` 다. 이유: `tools/check.js` 의 `checkTddGuard()` 가 `walk(utilDir, ['.js'])` 로 `.js` 만 순회한다. `.mjs` 로 두면 테스트 파일 존재 강제와 `document`/`window` 참조 검출이 **둘 다 조용히 무력화**되어, 검사를 통과했는데 실제로는 아무것도 검사되지 않은 상태가 된다.
+- **root `package.json` 에 `"type": "module"` 을 넣지 마라.** ESM 선언은 `src/package.json` 에만 있다. 이유: root에 넣으면 `tools/*.js` 의 CommonJS 스코프를 덮어써 `node tools/check.js` 가 `require is not defined in ES module scope` 로 죽는다. 이 파일은 Stop 훅·pre-commit·모든 step의 AC가 호출하는 단일 진입점이다.
+- **`require()` 로 테스트를 작성하지 마라.** `src/` 아래는 ESM이므로 `import` 를 쓴다.
 - **`data-bind` 의 실제 바인딩 로직을 구현하지 마라.** 이유: 퍼블리싱 산출물은 데이터를 갖지 않으며, 이는 개발사 몫이다. 규약과 마커까지만.
 - 추측으로 유틸 함수를 늘리지 마라. 위에 명시된 것만 만든다.
