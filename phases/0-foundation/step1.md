@@ -52,6 +52,19 @@ UI_GUIDE.md 의 색상 표에 있는 값을 그대로 쓴다. **`--color-text-di
 
 간격은 4px 배수로 `--space-1`(4px) ~ `--space-10`(40px), 반경은 `--radius-sm`/`--radius-md`/`--radius-lg`.
 
+`_typography.scss` 에는 크기·굵기뿐 아니라 **폰트 스택도 CSS 변수로 출력한다**:
+
+```scss
+:root {
+  /* 시안 확정 후 웹폰트를 도입할 때 이 한 줄만 교체한다.
+     @font-face 선언은 base/_fonts.scss 에 따로 모은다. */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+                      "Malgun Gothic", "맑은 고딕", sans-serif;
+}
+```
+
+이유: 지금은 시스템 폰트만 쓰지만 시안 수령 후 웹폰트가 확정될 수 있다. 폰트 패밀리를 CSS 변수로 두면 교체 지점이 한 곳이고, 개발사도 SCSS 컴파일 없이 바꿀 수 있다 (ADR-004). `_base.scss` 의 `body` 는 이 변수를 참조한다.
+
 ### 4. `src/assets/scss/base/_reset.scss` — iOS Safari 대응이 핵심
 
 일반적인 리셋에 더해 **아래 항목을 반드시 포함한다.** 이것들이 없으면 실기기에서 즉시 문제가 드러난다:

@@ -132,8 +132,8 @@ npm test        # 테스트 통과
 ### E. 실행
 
 ```bash
-python3 scripts/execute.py {task-name}        # 순차 실행
-python3 scripts/execute.py {task-name} --push  # 실행 후 push
+python scripts/execute.py {task-name}        # 순차 실행
+python scripts/execute.py {task-name} --push  # 실행 후 push
 ```
 
 execute.py가 자동으로 처리하는 것:
