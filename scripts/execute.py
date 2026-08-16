@@ -3,7 +3,10 @@
 Harness Step Executor — phase 내 step을 순차 실행하고 자가 교정한다.
 
 Usage:
-    python3 scripts/execute.py <phase-dir> [--push]
+    python3 scripts/execute.py <phase-dir> [--push] [--yes]
+
+기본적으로 phase 시작 전과 매 step 실행 전에 진행 여부를 묻는다.
+--yes 로 끄거나, stdin 이 tty 가 아니면(백그라운드·CI·파이프) 자동 진행한다.
 """
 
 import argparse
@@ -58,8 +61,14 @@ class StepExecutor:
     CHORE_MSG = "chore({phase}): step {num} output"
     TZ = timezone(timedelta(hours=9))
 
+    # 확인 게이트 해제 여부. 인스턴스 속성이 아니라 클래스 속성 기본값으로 둔다.
+    # test_execute.py 가 StepExecutor.__new__ 로 __init__ 을 우회해 인스턴스를
+    # 만드는 경로가 있어, __init__ 에서만 설정하면 거기서 AttributeError 가 난다.
+    _assume_yes = False
+
     def __init__(self, phase_dir_name: str, *, auto_push: bool = False,
-                 only_step: Optional[int] = None, single: bool = False):
+                 only_step: Optional[int] = None, single: bool = False,
+                 assume_yes: bool = False):
         self._root = str(ROOT)
         self._phases_dir = ROOT / "phases"
         self._phase_dir = self._phases_dir / phase_dir_name
@@ -69,6 +78,7 @@ class StepExecutor:
         # --step N / --one: step 하나만 실행하고 멈춘다.
         self._only_step = only_step
         self._single = single or only_step is not None
+        self._assume_yes = assume_yes
 
         if not self._phase_dir.is_dir():
             print(f"ERROR: {self._phase_dir} not found")
@@ -90,8 +100,83 @@ class StepExecutor:
         self._checkout_branch()
         guardrails = self._load_guardrails()
         self._ensure_created_at()
+
+        # phase 를 시작하지 않기로 했다면 _finalize 를 호출해서는 안 된다.
+        # 여기서 _finalize(True) 가 불리면 step 을 하나도 돌리지 않은 phase 가
+        # completed 로 기록되고 top-level index 까지 오염된다.
+        if not self._confirm_phase_start():
+            print(f"\n  중단합니다 — phase '{self._phase_name}' 는 시작되지 않았습니다.\n")
+            return
+
         # 단일 step 모드로 조기 종료하면 phase 완료로 표시해서는 안 된다.
         self._finalize(self._execute_all_steps(guardrails))
+
+    # --- 확인 게이트 ---
+
+    def _ask(self, question: str) -> str:
+        """진행 여부를 묻는다. 'y'(진행) 또는 'n'(중단) 을 돌려준다.
+
+        --yes 이거나 stdin 이 tty 가 아니면(백그라운드·CI·파이프) 묻지 않고 진행한다.
+        'a' 를 받으면 이후 게이트를 전부 해제한다.
+        """
+        if self._assume_yes:
+            return "y"
+        if not sys.stdin.isatty():
+            print("  (비대화형 입력 — 확인 없이 진행합니다. 게이트를 쓰려면 터미널에서 실행하세요)")
+            self._assume_yes = True
+            return "y"
+
+        while True:
+            try:
+                ans = input(f"  {question} (Y/n/a) ").strip().lower()
+            except EOFError:
+                print()
+                return "y"
+            except KeyboardInterrupt:
+                print()
+                return "n"
+
+            if ans in ("", "y", "yes"):
+                return "y"
+            if ans in ("n", "no", "q", "quit"):
+                return "n"
+            if ans in ("a", "all"):
+                self._assume_yes = True
+                print("  이후 확인 없이 끝까지 진행합니다.")
+                return "y"
+            print("  y = 진행 · n = 중단 · a = 이후 전부 자동")
+
+    def _confirm_phase_start(self) -> bool:
+        index = self._read_json(self._index_file)
+        steps = index["steps"]
+        pending = [s for s in steps if s["status"] == "pending"]
+
+        mark = {"completed": "✓", "pending": "·", "error": "✗", "blocked": "⏸"}
+        print(f"\n  Phase '{self._phase_name}' — step {len(steps)}개 (pending {len(pending)}개)")
+        for s in steps:
+            print(f"    {mark.get(s['status'], '?')} {s['step']}. {s['name']}  [{s['status']}]")
+        print()
+
+        if not pending:
+            return True
+        return self._ask(f"phase '{self._phase_name}' 를 시작할까요?") == "y"
+
+    def _confirm_step(self, step: dict) -> bool:
+        """step 실행 직전 게이트. 직전 완료 step 의 summary 를 함께 보여준다."""
+        index = self._read_json(self._index_file)
+        done = [s for s in index["steps"] if s["status"] == "completed"]
+
+        print()
+        if done:
+            last = done[-1]
+            summary = last.get("summary")
+            if summary:
+                print(f"  직전 step {last['step']} ({last['name']}) 산출물:")
+                print(f"    {summary}")
+                print()
+
+        print(f"  ▶ Step {step['step']}/{self._total - 1}: {step['name']}")
+        return self._ask("실행할까요?") == "y"
 
     # --- timestamps ---
 
@@ -249,10 +334,13 @@ class StepExecutor:
         # Claude CLI 는 UTF-8 로 출력한다. encoding 을 명시하지 않으면 Windows 에서
         # locale(cp949)로 디코딩되어 한글이 깨지고, 그 깨진 문자열이 재시도 프롬프트의
         # error_message 로 다시 들어가 오염이 누적된다.
+        # stdin 을 끊는다. -p 모드는 프롬프트를 argv 로 받으므로 stdin 이 필요 없는데,
+        # 상속시키면 Claude CLI 가 터미널 입력 버퍼를 비워 확인 게이트에 미리
+        # 타이핑해 둔 응답이 사라진다.
         result = subprocess.run(
             ["claude", "-p", "--dangerously-skip-permissions", "--output-format", "json", prompt],
             cwd=self._root, capture_output=True, text=True, timeout=1800,
-            encoding="utf-8", errors="replace",
+            encoding="utf-8", errors="replace", stdin=subprocess.DEVNULL,
         )
 
         if result.returncode != 0:
@@ -283,6 +371,7 @@ class StepExecutor:
             print(f"  Mode: 다음 pending step 1개만 실행")
         if self._auto_push:
             print(f"  Auto-push: enabled")
+        print(f"  확인 게이트: {'off (--yes)' if self._assume_yes else 'on — phase 시작 · 매 step 전'}")
         print(f"{'='*60}")
 
     def _check_blockers(self):
@@ -403,6 +492,12 @@ class StepExecutor:
                 print(f"  먼저 --step {pending['step']} 을 실행하세요.")
                 sys.exit(1)
 
+            # 게이트는 started_at 기록 앞에 둔다. 실행하지 않기로 한 step 에
+            # 시작 시각이 남으면 나중에 이력을 읽을 때 거짓 신호가 된다.
+            if not self._confirm_step(pending):
+                print(f"\n  중단합니다 — step {pending['step']} ({pending['name']}) 은 실행하지 않았습니다.")
+                return False
+
             step_num = pending["step"]
             for s in index["steps"]:
                 if s["step"] == step_num and "started_at" not in s:
@@ -473,11 +568,14 @@ def main():
                         help="이 번호의 step 하나만 실행하고 종료 (앞선 step 이 pending 이면 에러)")
     parser.add_argument("--one", action="store_true",
                         help="다음 pending step 하나만 실행하고 종료")
+    parser.add_argument("--yes", "-y", action="store_true",
+                        help="확인 게이트를 끄고 끝까지 자동 진행")
     args = parser.parse_args()
 
     StepExecutor(
         args.phase_dir, auto_push=args.push,
         only_step=args.step, single=args.one,
+        assume_yes=args.yes,
     ).run()
 
 
