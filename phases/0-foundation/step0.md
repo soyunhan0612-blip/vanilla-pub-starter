@@ -7,6 +7,7 @@
 - `/docs/ARCHITECTURE.md` — 2-tier 원칙, 디렉토리 구조, 빌드 파이프라인
 - `/docs/ADR.md` — ADR-002(번들러 선택화), ADR-003(SCSS 바이너리 동봉)
 - `/tools/check.js` — **이미 존재한다.** 단일 검증 경로의 전체 구현이 들어 있으므로 반드시 읽고, 이 step에서 만들 도구들이 check.js의 검사 항목과 어긋나지 않게 하라
+- `/tools/check.test.js` — **이미 존재한다.** 아래 8번에서 만들 도구 테스트의 본보기다. `--root=` 인자로 임시 픽스처 저장소를 만들어 실제 프로세스를 돌리는 방식을 그대로 따른다 (환경변수를 쓰지 않는 이유는 `check.js` 의 `ROOT` 주석에 있다 — 환경변수는 자식 프로세스로 상속되어 유일한 관문을 조용히 갈아끼울 수 있다)
 
 ## 현재 상태 (이미 완료된 것)
 
@@ -104,6 +105,28 @@ SCSS 컴파일러 탐색 순서 (**이 순서를 지켜라**):
 
 **이 root `package.json` 에 `"type": "module"` 을 넣지 마라.** ESM 선언은 위 1번의 `src/package.json` 에만 둔다. root에 넣으면 `tools/*.js` 의 CommonJS 스코프를 덮어써 `node tools/check.js` 가 `require is not defined in ES module scope` 로 즉사한다.
 
+### 8. 도구 테스트 — `tools/*.test.js`
+
+위에서 만든 도구 3개에 각각 테스트를 붙인다. **파일 3개를 만드는 것 자체가 이 step 의 산출물이다.**
+
+```
+tools/include.test.js
+tools/serve.test.js
+tools/build.test.js
+```
+
+`tools/check.js` 가 강제한다. `tools/` 의 `.js` 파일에 대응하는 `tools/<name>.test.js` (또는 `tools/__tests__/<name>.test.js`) 가 없으면 **오류로 막는다.** 면제는 `tools/vendor/` 의 서드파티뿐이다. 즉 도구를 만들고 테스트를 빠뜨리면 **이 step 의 AC 두 번째 줄에서 즉시 실패한다.**
+
+최소한 아래를 덮는다. 전부 이 step 에서 실제로 판단이 갈리는 지점이고, 틀리면 다음 phase 가 통째로 막힌다:
+
+- `include.js` — 중첩 include 해소 · **순환 참조 시 throw**(무한 루프로 서버가 멈추면 안 된다) · 대상 파일 부재 시 throw · `@component` 주석 블록이 결과물에서 제거되는가
+- `build.js` — 컴파일러 탐색 순서(`node_modules/.bin/sass` → 동봉 바이너리 → 없으면 **경고 후 건너뜀**) · **SCSS 엔트리가 없어도 종료 코드 0**
+- `serve.js` — MIME 매핑 · 디렉토리 요청의 `index.html` 폴백 · `--smoke` 가 **404 를 실패로 보지 않는가**
+
+테스트 가능한 형태로 설계하라. `serve.js` · `build.js` 는 실행 스크립트지만 판정 로직(MIME 결정, 컴파일러 탐색, 경로 해석)은 **`module.exports` 로 꺼내 순수 함수로 만든다.** 프로세스를 띄워야만 검증되는 부분만 `spawnSync` 로 돌린다. `util/` 과 `common/` 을 가르는 것과 같은 이유다.
+
+`tools/` 는 CommonJS다 (`require`/`module.exports`). `src/` 의 ESM 규칙을 여기에 적용하지 마라.
+
 ## Acceptance Criteria
 
 ```bash
@@ -123,6 +146,7 @@ node tools/serve.js --smoke
 3. 아키텍처 체크리스트:
    - ARCHITECTURE.md 디렉토리 구조를 따르는가?
    - 모든 도구가 Node 내장 모듈 + 동봉 바이너리만 쓰는가? `require` 로 외부 패키지를 부르지 않았는가?
+   - `tools/include.test.js` · `serve.test.js` · `build.test.js` 3개가 실재하는가? (없으면 `check.js` 가 `테스트 파일이 없다` 로 막으므로 AC 가 통과했다면 이미 충족된 것이다)
    - AGENTS.md CRITICAL 규칙을 위반하지 않았는가?
 4. 결과에 따라 `phases/0-foundation/index.json` 의 해당 step을 업데이트한다:
    - 성공 → `"status": "completed"`, `"summary": "산출물 한 줄 요약"`
@@ -132,9 +156,13 @@ node tools/serve.js --smoke
 ## 금지사항
 
 - **`tools/check.js` 를 다시 작성하지 마라.** 이미 완성되어 있다. 읽고 맞추기만 하라. 버그를 발견하면 최소한으로 수정하고 summary에 남겨라.
-- **`git config core.hooksPath .githooks` 를 실행하지 마라.** README에 안내만 적는다. 이유: 이 저장소는 자동화 스크립트가 각 step 종료 시 커밋한다. hooksPath가 켜져 있으면 pre-commit이 커밋을 거부할 수 있는데, 그 실패가 경고 한 줄로만 처리되어 **코드가 커밋되지 않은 채 step이 성공으로 기록된다.** 조용한 유실이라 나중에 발견하기 어렵다.
+- **`git config core.hooksPath .githooks` 를 실행하지 마라.** README에 안내만 적는다. 이유: 이 저장소는 자동화 스크립트가 각 step 종료 시 커밋한다. hooksPath가 켜져 있으면 pre-commit이 커밋을 거부할 수 있는데, 그러면 **코드가 커밋되지 않은 채 다음 step으로 넘어간다.** 조용한 유실이라 나중에 발견하기 어렵다.
+  - 이미 켜져 있다면 하네스를 돌리기 전에 끈다: `git config --local --unset core.hooksPath`
+  - `execute.py` 는 이제 커밋 실패를 경고가 아니라 **중단**으로 처리하므로(`_abort_on_commit_failure`) step이 성공으로 기록되지는 않는다. 그래도 하네스가 통째로 멈추므로 설정은 꺼두는 편이 낫다.
 - **root `package.json` 에 `"type": "module"` 을 넣지 마라.** ESM 선언은 `src/package.json` 에만 둔다. 이유: `tools/*.js` 가 CommonJS이며, root 선언이 그 스코프를 덮어쓰면 `node tools/check.js` 가 즉시 죽고 이 프로젝트의 모든 검증 경로가 함께 끊긴다.
 - **외부 npm 패키지를 `require` 하지 마라.** 이유: Tier 0는 `npm install` 이 막힌 환경에서 동작해야 하며, 이것이 이 프로젝트의 최종 합격 기준이다.
 - **`fs.readdirSync(dir, { recursive: true })` 를 쓰지 마라.** 이유: Node 18.17 미만에서 동작하지 않는다. 현업 Node 버전이 확인되지 않았으므로 재귀를 직접 구현하라.
 - SCSS 컴파일러를 찾지 못했을 때 프로세스를 실패시키지 마라. 이유: 커밋된 CSS가 안전망이므로 컴파일 불가는 경고 사유이지 실패 사유가 아니다.
+- **도구를 테스트 없이 남기지 마라.** `check.js` 가 막으므로 AC 가 통과하지 않는다. 이유: 훅의 TDD 가드는 `src/assets/js/util/` 만 보므로 `tools/` 는 빠뜨려도 훅이 잡지 못한다. 그런데 이 도구들이 이후 모든 phase 의 빌드·서빙·검증 경로다 — 여기가 조용히 깨지면 뒤 step 들은 원인을 알 수 없는 실패만 보게 된다.
+- **테스트를 통과시키려고 도구를 단순화하지 마라.** 순환 참조 감지처럼 검증이 까다로운 요구사항을 빼고 테스트를 맞추면 목적이 뒤집힌다.
 - 기존 테스트를 깨뜨리지 마라.

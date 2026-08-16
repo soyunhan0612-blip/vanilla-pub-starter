@@ -40,6 +40,8 @@ src/
 │   └── img/
 └── __tests__/              # node --test 대상
 tools/                      # serve include build check ua-redirect + vendor/
+                            # *.test.js — 도구마다 필수. check.js 가 존재를 강제하고
+                            #             src/ 유무와 무관하게 항상 실행 (vendor/ 면제)
 .githooks/pre-commit
 ```
 
