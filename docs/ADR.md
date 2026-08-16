@@ -53,3 +53,21 @@
 **결정**: `scripts/execute.py` 는 `codex exec --sandbox workspace-write --dangerously-bypass-hook-trust` 로 step 을 돌린다. 승인 우회(`--dangerously-bypass-approvals-and-sandbox`)는 쓰지 않는다.
 **이유**: 하네스는 무인으로 20개 step 을 도는데, 샌드박스까지 해제하면 작업 트리 밖을 건드리는 사고를 막을 장치가 없다. 훅 신뢰만 우회하는 이유는 별개다 — Codex 는 신뢰 등록이 안 된 훅을 실행하지 않고 `exec` 는 비대화형이라 신뢰를 물을 수 없어서, 이 플래그가 없으면 **안전 훅이 통째로 빠진 채** step 이 돈다. 훅 소스는 저장소 안에 있고 테스트로 검증되므로 우회 대상으로 적절하다.
 **트레이드오프**: `workspace-write` 는 **네트워크가 기본 차단**이다. `npm install` 이 필요한 step 은 실패한다. Tier 0 원칙상 그런 step 이 있으면 안 되므로, 이 실패는 버그가 아니라 신호로 취급한다.
+
+### ADR-009: 훅 명령을 셸 인용에 의존하지 않는 형태로 쓴다
+
+**결정**: `.codex/hooks.json` 의 `commandWindows` 는 `node scripts/hooks/codex-hook.js <mode>` 처럼 **따옴표도 변수 확장도 없는 한 줄**로 적는다. PowerShell 래퍼와 `$(git rev-parse --show-toplevel)` 같은 경로 계산을 넣지 않는다.
+
+**이유**: 이 저장소가 같은 사고를 **세 번** 겪었다. ①`jq` 부재로 TDD 가드 무력화 ②셸 도구가 `command` 를 argv 배열로 보내는데 문자열만 받아 검사 통과 ③`commandWindows` 의 중첩 이스케이프(`\\\"`)가 cmd.exe 를 거치며 깨져 **훅 프로세스가 아예 실행되지 않음**. 세 번째가 특히 나쁘다 — Codex 는 훅 실행 실패를 `hook: PreToolUse Failed` 로 찍고 **그대로 작업을 진행**한다. 차단 로직이 정확해도(단독 실행 시 exit 0 에 올바른 deny JSON) 아무것도 막지 못했다. 훅이 붙었는지는 로그의 `Blocked`/`Completed` 로만 판별할 수 있고 `Failed` 는 조용한 무력화를 뜻한다.
+
+경로 계산이 필요 없는 이유는 Codex 가 훅을 저장소 루트를 cwd 로 실행하기 때문이고, 판정 스크립트 자신이 `findRepoRoot(cwd)` 로 다시 위치를 잡으므로 상대 경로로 충분하다.
+
+**트레이드오프**: cwd 가 저장소 루트라는 전제에 기댄다. 그 전제가 깨지면 훅이 다시 조용히 빠지므로, 훅 배선을 바꾼 뒤에는 반드시 프로브로 `Blocked` 를 눈으로 확인한다.
+
+### ADR-010: Windows 에서 codex 샌드박스를 unelevated 로 고정
+
+**결정**: `sys.platform == "win32"` 일 때 `execute.py` 가 `-c windows.sandbox="unelevated"` 를 붙인다. 사용자의 `~/.codex/config.toml` 은 건드리지 않는다.
+
+**이유**: 기본값 `elevated` 는 `CreateProcessWithLogonW` 로 다른 사용자 컨텍스트에서 프로세스를 띄우는데, 이게 실패하면(`failed: 2`) codex 의 **파일 쓰기와 셸 실행이 전부** 죽는다. step 은 아무것도 만들지 못한 채 3회 재시도만 돌다 `error` 로 끝난다. 증상이 "codex 가 일을 안 한다" 로만 보여 원인 추적이 비싸다. `unelevated` 도 샌드박스는 그대로 유지하므로 ADR-008 의 "승인 우회는 쓰지 않는다" 와 충돌하지 않는다.
+
+**트레이드오프**: 사용자 전역 설정을 덮어쓰므로, 의도적으로 `elevated` 를 쓰는 환경에서도 하네스 실행 중에는 무시된다. 저장소 밖 설정에 하네스가 좌우되지 않는 편이 낫다고 판단했다.

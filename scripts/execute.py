@@ -399,6 +399,27 @@ class StepExecutor:
 
     TIMEOUT = 1800
 
+    @staticmethod
+    def _codex_argv() -> list:
+        """codex exec 호출 argv.
+
+        Windows 에서 `windows.sandbox` 를 unelevated 로 고정한다. 기본값 elevated 는
+        CreateProcessWithLogonW 로 다른 사용자 컨텍스트에서 프로세스를 띄우는데,
+        그게 실패하면 codex 의 파일 쓰기와 셸 실행이 **전부** 죽는다
+        (`windows sandbox: CreateProcessWithLogonW failed: 2`). step 은 아무것도
+        만들지 못한 채 재시도만 3회 돌다 error 로 끝난다. 샌드박스 자체는 유지되므로
+        ADR-008 의 "승인 우회는 쓰지 않는다" 와 충돌하지 않는다.
+        """
+        argv = ["codex", "exec"]
+        if sys.platform == "win32":
+            argv += ["-c", 'windows.sandbox="unelevated"']
+        argv += [
+            "--sandbox", "workspace-write",
+            "--dangerously-bypass-hook-trust",
+            "--json", "-",
+        ]
+        return argv
+
     def _invoke_codex(self, step: dict, preamble: str) -> dict:
         step_num, step_name = step["step"], step["name"]
         step_file = self._phase_dir / f"step{step_num}.md"
@@ -426,12 +447,7 @@ class StepExecutor:
         # 미리 타이핑해 둔 응답이 CLI 에 먹히지 않는다는 목적은 그대로 달성된다.
         try:
             result = subprocess.run(
-                [
-                    "codex", "exec",
-                    "--sandbox", "workspace-write",
-                    "--dangerously-bypass-hook-trust",
-                    "--json", "-",
-                ],
+                self._codex_argv(),
                 cwd=self._root, capture_output=True, text=True, timeout=self.TIMEOUT,
                 input=prompt, encoding="utf-8", errors="replace",
             )

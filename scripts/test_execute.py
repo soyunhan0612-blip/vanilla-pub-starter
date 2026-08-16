@@ -514,6 +514,29 @@ class TestInvokeCodex:
         assert "--json" in cmd
         assert cmd[-1] == "-"
 
+    def test_windows_pins_unelevated_sandbox(self):
+        """elevated 기본값은 CreateProcessWithLogonW 로 죽어 쓰기·실행이 전부 막힌다."""
+        with patch.object(ex.sys, "platform", "win32"):
+            argv = ex.StepExecutor._codex_argv()
+        assert "-c" in argv
+        assert 'windows.sandbox="unelevated"' in argv
+
+    def test_non_windows_omits_windows_config(self):
+        """windows.* 키는 다른 OS 에서 의미가 없다."""
+        with patch.object(ex.sys, "platform", "linux"):
+            argv = ex.StepExecutor._codex_argv()
+        assert not any("windows.sandbox" in a for a in argv)
+
+    def test_argv_shape_is_stable(self):
+        """프롬프트는 항상 마지막 `-` 로 stdin 에서 읽는다."""
+        for platform in ("win32", "linux"):
+            with patch.object(ex.sys, "platform", platform):
+                argv = ex.StepExecutor._codex_argv()
+            assert argv[:2] == ["codex", "exec"]
+            assert argv[-1] == "-"
+            assert "--dangerously-bypass-hook-trust" in argv
+            assert argv[argv.index("--sandbox") + 1] == "workspace-write"
+
     def test_hook_trust_bypass_is_passed(self, executor):
         """이 플래그가 빠지면 .codex/hooks.json 의 훅이 경고 없이 통째로 빠진다."""
         mock_result = MagicMock(returncode=0, stdout="{}", stderr="")
