@@ -458,6 +458,46 @@ class TestCommitStep:
         assert ":(literal)scripts/execute.py" in unstaged
         assert ":(literal)scratch.tmp" in unstaged
 
+    def test_commit_failure_aborts_instead_of_warning(self, executor, capsys):
+        """커밋 실패는 경고가 아니라 중단이다.
+
+        경고 한 줄로 흘리면 step 산출물이 커밋되지 않은 채 completed 로 기록된다.
+        pre-commit 훅이 거부할 때가 정확히 이 형태이므로 조용히 지나가면 안 된다.
+        """
+        def fake_git(*args):
+            if args[:2] == ("diff", "--cached"):
+                return MagicMock(returncode=1)
+            if args[0] == "commit":
+                return MagicMock(returncode=1, stdout="", stderr="check 실패로 거부됨")
+            return MagicMock(returncode=0, stdout="", stderr="")
+        executor._run_git = fake_git
+
+        with pytest.raises(SystemExit) as exc_info:
+            executor._commit_step(2, "ui")
+
+        assert exc_info.value.code == 1
+        out = capsys.readouterr().out
+        assert "커밋 실패" in out
+        assert "check 실패로 거부됨" in out
+
+    def test_housekeeping_commit_failure_also_aborts(self, executor):
+        """chore 커밋이 거부돼도 index.json 만 미커밋 상태로 남는다 — 같은 유실이다."""
+        call_count = {"commit": 0}
+        def fake_git(*args):
+            if args[:2] == ("diff", "--cached"):
+                return MagicMock(returncode=1)
+            if args[0] == "commit":
+                call_count["commit"] += 1
+                ok = call_count["commit"] == 1  # feat 는 통과, chore 만 실패
+                return MagicMock(returncode=0 if ok else 1, stdout="", stderr="rejected")
+            return MagicMock(returncode=0, stdout="", stderr="")
+        executor._run_git = fake_git
+
+        with pytest.raises(SystemExit) as exc_info:
+            executor._commit_step(2, "ui")
+
+        assert exc_info.value.code == 1
+
     def test_phase_outputs_never_treated_as_foreign(self, executor):
         """산출물 2종은 foreign 으로 들어와도 하네스가 계속 커밋한다."""
         calls = []

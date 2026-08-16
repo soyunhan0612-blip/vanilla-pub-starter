@@ -311,14 +311,31 @@ class StepExecutor:
             if r.returncode == 0:
                 print(f"  Commit: {msg}")
             else:
-                print(f"  WARN: 코드 커밋 실패: {r.stderr.strip()}")
+                self._abort_on_commit_failure(msg, r)
 
         self._stage_all_except(foreign)
         if self._run_git("diff", "--cached", "--quiet").returncode != 0:
             msg = self.CHORE_MSG.format(phase=self._phase_name, num=step_num)
             r = self._run_git("commit", "-m", msg)
             if r.returncode != 0:
-                print(f"  WARN: housekeeping 커밋 실패: {r.stderr.strip()}")
+                self._abort_on_commit_failure(msg, r)
+
+    def _abort_on_commit_failure(self, msg: str, r: subprocess.CompletedProcess):
+        """커밋 실패는 경고가 아니라 중단 사유다.
+
+        경고 한 줄로 흘리면 step 산출물이 커밋되지 않은 채 step 은 completed 로
+        기록된다. 조용한 유실이라 나중에 발견하기 어렵다. `core.hooksPath` 가
+        켜진 상태에서 `.githooks/pre-commit` 이 커밋을 거부하는 경우가 정확히
+        이 형태다 (phases/0-foundation/step0.md 의 금지사항).
+        """
+        detail = (r.stderr or "").strip() or (r.stdout or "").strip()
+        print(f"  ✗ 커밋 실패: {msg}")
+        for line in detail.splitlines():
+            print(f"    {line}")
+        print("    step 산출물이 커밋되지 않았다 — 작업 트리를 확인한 뒤 다시 실행하라.")
+        print("    pre-commit 훅이 거부했다면: git config --local --unset core.hooksPath")
+        self._update_top_index("error")
+        sys.exit(1)
 
     # --- top-level index ---
 

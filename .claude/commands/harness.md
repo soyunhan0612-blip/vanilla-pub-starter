@@ -136,6 +136,9 @@ python scripts/execute.py {task-name}        # 순차 실행
 python scripts/execute.py {task-name} --push  # 실행 후 push
 ```
 
+Windows 기준이다. macOS·Linux 에는 `python` 이 없거나 Python 2 일 수 있으므로
+`python3` 으로 바꿔 실행한다.
+
 execute.py가 자동으로 처리하는 것:
 
 - `feat-{task-name}` 브랜치 생성/checkout
