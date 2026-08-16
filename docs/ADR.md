@@ -71,3 +71,19 @@
 **이유**: 기본값 `elevated` 는 `CreateProcessWithLogonW` 로 다른 사용자 컨텍스트에서 프로세스를 띄우는데, 이게 실패하면(`failed: 2`) codex 의 **파일 쓰기와 셸 실행이 전부** 죽는다. step 은 아무것도 만들지 못한 채 3회 재시도만 돌다 `error` 로 끝난다. 증상이 "codex 가 일을 안 한다" 로만 보여 원인 추적이 비싸다. `unelevated` 도 샌드박스는 그대로 유지하므로 ADR-008 의 "승인 우회는 쓰지 않는다" 와 충돌하지 않는다.
 
 **트레이드오프**: 사용자 전역 설정을 덮어쓰므로, 의도적으로 `elevated` 를 쓰는 환경에서도 하네스 실행 중에는 무시된다. 저장소 밖 설정에 하네스가 좌우되지 않는 편이 낫다고 판단했다.
+
+### ADR-011: 두 에이전트가 같은 훅 스크립트를 부르고, 배선 자체를 테스트한다
+
+**결정**: `.claude/settings.json` 도 `.codex/hooks.json` 과 똑같이 `scripts/hooks/` 스크립트만 부른다. 인라인 셸 판정을 두지 않고, TDD 범위 판정은 `tdd-guard.js` 한 벌만 두며(`codex-hook.js` 가 그것을 재사용한다), 배선 문자열 자체를 `scripts/hooks/wiring.test.js` 가 검사한다.
+
+**이유**: ADR-007 이 "배선만 한다" 고 정해놓고 Claude 쪽만 예외로 남아 있었고, 그 예외가 그대로 **네 번째 조용한 무력화**가 됐다.
+
+- 위험 명령 훅이 `$CLAUDE_TOOL_INPUT` 을 읽었다. **그런 환경변수는 없다** — 도구 입력은 stdin JSON 으로 온다. 빈 문자열이 `grep` 에 들어가 항상 통과했고, `rm -rf` 를 포함한 명령이 프로브에서 그대로 실행됐다. `grep` 의존은 ①번 `jq` 사고와 같은 형태이기도 하다.
+- Stop 게이트가 `check.js` 를 직접 불렀다. `check.js` 는 실패 시 exit 1 인데 두 에이전트 모두 **exit 2 만 차단**으로 취급하고 그 외 non-zero 는 비차단 오류로 흘린다. `2>&1` 은 차단 사유가 담긴 stderr 까지 stdout 으로 합쳐 없앴다.
+- TDD 범위가 두 벌이었다. `codex-hook.js` 는 저장소 전체를, `tdd-guard.js` 는 `util/` 만 봤다. 같은 파일이 에이전트에 따라 차단/통과로 갈렸고 어느 쪽도 정본(`checkTddGuard`)과 일치하지 않았다.
+
+네 사고의 공통점은 **판정 로직이 아니라 배선이 깨졌다**는 것이다. 로직 테스트는 넷 중 하나도 잡지 못했다. 그래서 배선을 데이터로 읽어 검사한다 — 명령이 `node scripts/hooks/…` 형태인지, 부르는 모드가 `codex-hook.js` 의 `MODES` 에 실재하는지, 과거 훅을 죽인 표현(`$(`·PowerShell 래퍼·`grep`·`CLAUDE_TOOL_INPUT`·`2>&1`·중첩 이스케이프)이 없는지.
+
+**예외 하나**: `.claude/settings.json` 은 `$CLAUDE_PROJECT_DIR` 과 그것을 감싸는 따옴표를 쓴다. ADR-009 의 "변수 확장 없는 한 줄" 은 `.codex/hooks.json` 에 대한 규칙이고, Claude 는 훅의 cwd 를 보장하지 않아 이 변수 없이는 경로가 깨진다. `wiring.test.js` 의 `CLAUDE_COMMAND` 정규식이 이 형태만 허용하고 다른 변수는 막는다.
+
+**트레이드오프**: 배선 형태가 정규식으로 고정되어 훅을 새로 추가할 때 테스트도 함께 고쳐야 한다. 그 마찰이 네 번째 재발보다 싸다.

@@ -7,7 +7,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/codex-hook.js\" dangerous-command",
+            "command": "node scripts/hooks/codex-hook.js dangerous-command",
             "commandWindows": "node scripts/hooks/codex-hook.js dangerous-command",
             "timeout": 15,
             "statusMessage": "위험 명령 검사"
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/codex-hook.js\" tdd-guard",
+            "command": "node scripts/hooks/codex-hook.js tdd-guard",
             "commandWindows": "node scripts/hooks/codex-hook.js tdd-guard",
             "timeout": 15,
             "statusMessage": "TDD 가드 검사"
@@ -32,7 +32,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/codex-hook.js\" stop-check",
+            "command": "node scripts/hooks/codex-hook.js stop-check",
             "commandWindows": "node scripts/hooks/codex-hook.js stop-check",
             "timeout": 360,
             "statusMessage": "tools/check.js 게이트"

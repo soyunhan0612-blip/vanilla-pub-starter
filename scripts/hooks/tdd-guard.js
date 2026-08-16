@@ -42,7 +42,8 @@ function shouldRequireTest(filePath, repoRoot) {
   return isInside(filePath, path.join(repoRoot, ...UTIL_SEGMENTS));
 }
 
-// tools/check.js:290 의 candidates 와 동일하게 유지할 것.
+// tools/check.js 의 checkTddGuard() 가 쓰는 candidates 와 동일하게 유지할 것.
+// (행 번호로 가리키면 check.js 가 자랄 때마다 어긋난다)
 function testCandidates(filePath, repoRoot) {
   const base = path.basename(filePath, '.js');
   return [

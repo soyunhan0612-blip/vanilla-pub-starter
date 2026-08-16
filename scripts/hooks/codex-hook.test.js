@@ -10,10 +10,13 @@ const {
   commandText,
   dangerousCommandDecision,
   extractChangedFiles,
+  findRepoRoot,
   shouldRequireTest,
   stopCheckDecision,
   tddGuardDecision,
+  testCandidates,
 } = require('./codex-hook');
+const tddGuard = require('./tdd-guard');
 
 /** 훅이 실제로 받는 페이로드는 임시 저장소 기준으로 만든다. */
 function withTempRepo(run) {
@@ -64,6 +67,83 @@ test('dangerous command hook allows ordinary commands', () => {
   );
 });
 
+/** 주 셸이 PowerShell 인 환경에서 `rm -rf` 패턴만 두면 삭제가 그대로 통과한다. */
+test('dangerous command hook blocks PowerShell recursive force deletes', () => {
+  for (const command of [
+    'Remove-Item -Recurse -Force C:\\sample\\src',
+    'Remove-Item C:\\sample\\src -Force -Recurse',
+    'Get-ChildItem x | Remove-Item -rec -for',
+  ]) {
+    const result = dangerousCommandDecision({ tool_input: { command } });
+    assert.equal(result.hookSpecificOutput?.permissionDecision, 'deny', command);
+  }
+});
+
+/**
+ * rm·rd·rmdir·del·erase 는 전부 Remove-Item 의 별칭이고, PowerShell 은 스위치를
+ * 고유 접두사까지 줄여 받는다. Remove-Item 과 3글자 스위치만 보면 아래가 전부
+ * 통과한다 — 실제로 통과했다.
+ */
+test('dangerous command hook blocks Remove-Item aliases and abbreviated switches', () => {
+  for (const command of [
+    'Remove-Item -r -fo C:\\sample\\src',
+    'rm -r -fo C:\\sample\\src',
+    'rd -r -fo C:\\sample\\src',
+    'del -Recurse -Force C:\\sample\\src',
+    'erase -r -fo C:\\sample\\src',
+    'rmdir /s /q C:\\sample\\src',
+  ]) {
+    const result = dangerousCommandDecision({ tool_input: { command } });
+    assert.equal(result.hookSpecificOutput?.permissionDecision, 'deny', command);
+  }
+});
+
+test('dangerous command hook blocks git push -f but allows --force-with-lease', () => {
+  // -f 는 --force 와 같은 일을 한다. 반대로 --force-with-lease 는 안전한 대체재이므로
+  // 막으면 남는 선택지가 없어져 우회를 부른다.
+  assert.equal(
+    dangerousCommandDecision({ tool_input: { command: 'git push -f origin master' } })
+      .hookSpecificOutput?.permissionDecision,
+    'deny'
+  );
+  assert.deepEqual(
+    dangerousCommandDecision({ tool_input: { command: 'git push --force-with-lease' } }),
+    {}
+  );
+});
+
+test('dangerous command hook leaves non-destructive Remove-Item alone', () => {
+  // 스위치 하나만으로는 위험하다고 단정할 수 없다. 과잉 차단은 우회를 부른다.
+  for (const command of [
+    'Remove-Item C:\\sample\\tmp\\one.txt',
+    'Remove-Item C:\\sample\\tmp -Recurse',
+    'Remove-Item C:\\sample\\tmp\\one.txt -Force',
+  ]) {
+    assert.deepEqual(dangerousCommandDecision({ tool_input: { command } }), {}, command);
+  }
+});
+
+// ---------------------------------------------------------------------------
+// findRepoRoot — 훅마다 새 프로세스로 뜨므로 git 을 또 띄우지 않는다
+// ---------------------------------------------------------------------------
+
+test('findRepoRoot walks up to the directory that owns .git', () => {
+  withTempRepo((repoRoot) => {
+    const nested = path.join(repoRoot, 'src', 'assets', 'js');
+    fs.mkdirSync(nested, { recursive: true });
+    fs.writeFileSync(path.join(repoRoot, '.git'), 'gitdir: elsewhere\n'); // worktree 형태
+    assert.equal(fs.realpathSync(findRepoRoot(nested)), fs.realpathSync(repoRoot));
+  });
+});
+
+test('findRepoRoot falls back to cwd outside a repository', () => {
+  withTempRepo((repoRoot) => {
+    // .git 이 없으면 위로 끝까지 올라가지 않고 cwd 를 그대로 쓴다.
+    const result = findRepoRoot(repoRoot);
+    assert.ok(result === repoRoot || fs.existsSync(path.join(result, '.git')));
+  });
+});
+
 // ---------------------------------------------------------------------------
 // extractChangedFiles
 // ---------------------------------------------------------------------------
@@ -80,11 +160,11 @@ test('patch parser ignores deletes and returns added or updated files', () => {
 });
 
 // ---------------------------------------------------------------------------
-// shouldRequireTest — CLAUDE.md 레이어 규칙을 코드로 옮긴 지점
+// shouldRequireTest — AGENTS.md 레이어 규칙을 코드로 옮긴 지점
 // ---------------------------------------------------------------------------
 
 test('shouldRequireTest demands a test for util/ logic', () => {
-  assert.equal(shouldRequireTest('/repo/src/assets/js/util/format.js'), true);
+  assert.equal(shouldRequireTest('/repo/src/assets/js/util/format.js', '/repo'), true);
 });
 
 test('shouldRequireTest exempts the layers that cannot be unit-tested without a DOM', () => {
@@ -96,12 +176,24 @@ test('shouldRequireTest exempts the layers that cannot be unit-tested without a 
     '/repo/src/assets/js/pages/main.js',
     '/repo/src/assets/js/pc.js',
     '/repo/src/assets/js/mo.js',
+    '/repo/src/assets/js/lib/helper.js',
+    '/repo/dist/assets/js/util/format.js',
     '/repo/src/assets/js/util/format.test.js',
     '/repo/src/assets/scss/_tokens.scss',
     '/repo/README.md',
   ]) {
-    assert.equal(shouldRequireTest(exempt), false, exempt);
+    assert.equal(shouldRequireTest(exempt, '/repo'), false, exempt);
   }
+});
+
+/**
+ * 범위 판정을 두 벌 갖지 않는다. 두 벌이 되면 같은 파일이 Codex 에서는 차단,
+ * Claude 에서는 통과가 되고 어느 쪽도 tools/check.js 의 checkTddGuard 와
+ * 일치하지 않는다 — 실제로 그런 드리프트가 있었다.
+ */
+test('TDD 범위 판정은 tdd-guard.js 를 그대로 재사용한다 (두 벌 금지)', () => {
+  assert.equal(shouldRequireTest, tddGuard.shouldRequireTest);
+  assert.equal(testCandidates, tddGuard.testCandidates);
 });
 
 // ---------------------------------------------------------------------------

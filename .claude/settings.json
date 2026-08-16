@@ -6,18 +6,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/tools/check.js\" 2>&1"
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/hooks/codex-hook.js\" stop-check",
+            "timeout": 360
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|PowerShell",
         "hooks": [
           {
             "type": "command",
-            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | grep -qE 'rm\\s+-rf|git\\s+push\\s+--force|git\\s+reset\\s+--hard|DROP\\s+TABLE'; then echo 'BLOCKED: 위험한 명령어가 감지되었습니다.' >&2; exit 1; fi"
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/hooks/codex-hook.js\" dangerous-command"
           }
         ]
       },

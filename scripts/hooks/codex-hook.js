@@ -6,7 +6,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { spawnSync } = require('node:child_process');
 
-const SCRIPT_EXTENSIONS = ['ts', 'tsx', 'js', 'jsx'];
+// TDD 가드의 범위 판정은 tdd-guard.js 하나만 갖는다. Codex 가 Claude 보다 넓은
+// 범위를 막으면 같은 파일이 에이전트에 따라 통과/차단으로 갈리고, 어느 쪽도
+// 정본(tools/check.js 의 checkTddGuard)과 일치하지 않게 된다.
+const { shouldRequireTest, testCandidates } = require('./tdd-guard');
 
 function blockPreToolUse(reason) {
   return {
@@ -33,9 +36,21 @@ function dangerousCommandDecision(input) {
 
   const blockedPatterns = [
     /\brm\s+-rf\b/i,
-    /\bgit\s+push\s+--force\b/i,
+    // `--force-with-lease` 는 --force 의 안전한 대체재다. 그것까지 막으면 남는
+    // 선택지가 없어져 우회를 부른다. 반대로 `-f` 단축형은 막는 쪽과 같은 일을 한다.
+    /\bgit\s+push\s+(?:-f\b|--force(?!-with-lease))/i,
     /\bgit\s+reset\s+--hard\b/i,
     /\bdrop\s+table\b/i,
+    // PowerShell 의 재귀 강제 삭제. `rm -rf` 와 같은 일을 하지만 표현이 다르다.
+    //
+    // rm·rd·rmdir·del·erase·ri 는 **전부 Remove-Item 의 별칭**이고, 스위치는
+    // 고유 접두사까지 줄여 쓸 수 있다 (-r 은 -Recurse, -fo 는 -Force 의 유일 접두사).
+    // Remove-Item 과 -rec/-for 만 보면 `rm -r -fo` 가 그대로 통과한다.
+    // 두 스위치가 **모두** 있을 때만 잡는다 — 하나만으로는 위험하다고 단정할 수 없다.
+    /\b(?:remove-item|rm|rd|rmdir|del|erase|ri)\b(?=[^|;]*\s-r(?:ec[a-z]*)?\b)(?=[^|;]*\s-fo(?:r[a-z]*)?\b)/i,
+    // cmd.exe 형태. PowerShell 안에서도 그대로 실행된다.
+    /\brmdir\s+\/s\b/i,
+    /\bdel\s+\/s\b/i,
   ];
 
   if (!blockedPatterns.some((pattern) => pattern.test(command))) return {};
@@ -62,55 +77,20 @@ function normalizeForComparison(filePath) {
   return process.platform === 'win32' ? normalized.toLowerCase() : normalized;
 }
 
-function isTestFile(filePath) {
-  const normalized = filePath.replace(/\\/g, '/').toLowerCase();
-  return (
-    normalized.includes('/__tests__/') ||
-    /(^|\/)[^/]*(?:test|spec)[^/]*\.(?:ts|tsx|js|jsx)$/.test(normalized)
-  );
-}
-
-function shouldRequireTest(filePath) {
-  const normalized = filePath.replace(/\\/g, '/').toLowerCase();
-  const extension = path.extname(normalized).slice(1);
-
-  if (!SCRIPT_EXTENSIONS.includes(extension) || isTestFile(normalized)) return false;
-  if (/(^|\/)tools\//.test(normalized) || /(^|\/)scripts\/hooks\//.test(normalized)) {
-    return false;
-  }
-  if (/\.config\.(?:ts|tsx|js|jsx)$/.test(normalized)) return false;
-  if (/\/assets\/js\/(?:common|pages)\//.test(normalized)) return false;
-  if (/\/assets\/js\/(?:pc|mo)\.(?:js|jsx)$/.test(normalized)) return false;
-
-  return true;
-}
-
-function testCandidates(sourcePath, repoRoot) {
-  const directory = path.dirname(sourcePath);
-  const parent = path.dirname(directory);
-  const basename = path.basename(sourcePath, path.extname(sourcePath));
-  const candidates = [];
-
-  for (const testExtension of SCRIPT_EXTENSIONS) {
-    candidates.push(path.join(directory, `${basename}.test.${testExtension}`));
-    candidates.push(path.join(directory, `${basename}.spec.${testExtension}`));
-    candidates.push(path.join(directory, '__tests__', `${basename}.test.${testExtension}`));
-    candidates.push(path.join(parent, '__tests__', `${basename}.test.${testExtension}`));
-    candidates.push(path.join(repoRoot, 'src', '__tests__', `${basename}.test.${testExtension}`));
-  }
-
-  return candidates;
-}
-
+/**
+ * `.git` 을 찾아 위로 올라간다. `git rev-parse` 를 띄우지 않는 이유는 이 훅이
+ * 모든 Edit·Write·셸 호출마다 새 프로세스로 뜨기 때문이다 — 그 안에서 다시
+ * 프로세스를 하나 더 띄우면 비용이 도구 호출 수만큼 곱해진다.
+ * worktree·submodule 은 `.git` 이 디렉토리가 아니라 파일이므로 존재만 본다.
+ */
 function findRepoRoot(cwd) {
-  const result = spawnSync('git', ['rev-parse', '--show-toplevel'], {
-    cwd,
-    encoding: 'utf8',
-    windowsHide: true,
-  });
-  return result.status === 0 && result.stdout.trim()
-    ? path.resolve(result.stdout.trim())
-    : path.resolve(cwd);
+  let dir = path.resolve(cwd);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, '.git'))) return dir;
+    const parent = path.dirname(dir);
+    if (parent === dir) return path.resolve(cwd);
+    dir = parent;
+  }
 }
 
 /**
@@ -134,7 +114,7 @@ function tddGuardDecision(input, options = {}) {
 
   for (const changedFile of changedFiles) {
     const sourcePath = path.resolve(cwd, changedFile);
-    if (!shouldRequireTest(sourcePath)) continue;
+    if (!shouldRequireTest(sourcePath, repoRoot)) continue;
 
     const hasTest = testCandidates(sourcePath, repoRoot).some(
       (candidate) =>
@@ -199,17 +179,24 @@ function readStdin() {
   });
 }
 
+/**
+ * 배선(.codex/hooks.json · .claude/settings.json)이 부를 수 있는 모드 전부.
+ * 테이블로 두는 이유: wiring.test.js 가 배선 문자열의 모드 이름을 이 키 목록과
+ * 대조한다. 오타 난 모드는 throw → exit 1 이고, 두 에이전트 모두 exit 1 을
+ * "차단"이 아니라 "훅 실패"로 처리해 그대로 작업을 진행한다 (ADR-009).
+ */
+const MODES = {
+  'dangerous-command': dangerousCommandDecision,
+  'tdd-guard': tddGuardDecision,
+  'stop-check': stopCheckDecision,
+};
+
 async function main() {
   const mode = process.argv[2];
-  const input = await readStdin();
-  let output;
+  const decide = Object.prototype.hasOwnProperty.call(MODES, mode) ? MODES[mode] : null;
+  if (!decide) throw new Error(`Unknown Codex hook mode: ${mode || '(missing)'}`);
 
-  if (mode === 'dangerous-command') output = dangerousCommandDecision(input);
-  else if (mode === 'tdd-guard') output = tddGuardDecision(input);
-  else if (mode === 'stop-check') output = stopCheckDecision(input);
-  else throw new Error(`Unknown Codex hook mode: ${mode || '(missing)'}`);
-
-  process.stdout.write(`${JSON.stringify(output)}\n`);
+  process.stdout.write(`${JSON.stringify(decide(await readStdin()))}\n`);
 }
 
 if (require.main === module) {
@@ -220,10 +207,12 @@ if (require.main === module) {
 }
 
 module.exports = {
+  MODES,
   commandText,
   dangerousCommandDecision,
   editedPaths,
   extractChangedFiles,
+  findRepoRoot,
   shouldRequireTest,
   stopCheckDecision,
   tddGuardDecision,
