@@ -1,0 +1,54 @@
+// -----------------------------------------------------------------------------
+// tokens/_color.scss — 색상 토큰
+//
+// 시안 부재 상태의 플레이스홀더다. Figma 수령 시 **이 파일의 값만 교체**하면
+// 전체가 따라온다. 값은 docs/UI_GUIDE.md 의 색상 표 그대로다.
+//
+// CRITICAL: SCSS 변수($color-...)로 정의하지 않는다. CSS 변수로 출력해야
+// 개발사가 SCSS 컴파일 체인 없이 색을 바꿀 수 있다(ADR-004).
+//
+// `@contrast <전경> on <배경> [최소비]` 주석은 tools/check.js 가 파싱해
+// 명도 대비를 계산하고 기준 미만이면 빌드를 실패시킨다(ADR-005).
+// 값을 교체할 때 대비가 깨지면 그 자리에서 드러난다.
+// -----------------------------------------------------------------------------
+
+:root {
+  /* @contrast --color-text-strong on --color-bg-page */
+  /* @contrast --color-text-body on --color-bg-page */
+  /* @contrast --color-text-weak on --color-bg-page */
+  /* @contrast --color-danger on --color-bg-page */
+  /* @contrast --color-success on --color-bg-page */
+  /* @contrast --color-info on --color-bg-page */
+  /* @contrast --color-text-inverse on --color-text-strong */
+  /* 포커스 링은 비텍스트 대비 기준을 쓴다 (WCAG 1.4.11) */
+  /* @contrast --color-focus on --color-bg-page 3 */
+
+  /* 배경 */
+  --color-bg-page: #ffffff;
+  --color-bg-surface: #fafafa;
+  --color-bg-muted: #f5f5f5;
+
+  /* 텍스트 */
+  --color-text-strong: #171717;
+  --color-text-body: #404040;
+  --color-text-weak: #737373;
+  /* 비활성 컨트롤은 WCAG 1.4.3 이 대비 요건을 명시적으로 면제한다.
+     그래서 @contrast 선언에서 제외한다. 활성 텍스트에 쓰지 마라. */
+  --color-text-disabled: #a3a3a3;
+  /* 어두운 배경(Primary 버튼 · 스킵 네비) 위의 텍스트 */
+  --color-text-inverse: #ffffff;
+
+  /* 경계 */
+  --color-border: #e5e5e5;
+  --color-border-strong: #d4d4d4;
+
+  /* 시맨틱 — 포인트 색은 할인 레드 하나뿐이다.
+     보라/인디고는 "AI = 보라색" 클리셰라 UI_GUIDE.md 안티패턴 목록에 있다. */
+  --color-danger: #d92d20;
+  --color-success: #067647;
+  --color-info: #175cd3;
+
+  /* 포커스 링. 링크색과 같은 계열을 쓰되 토큰을 따로 두어
+     포커스 표시만 독립적으로 조정할 수 있게 한다. */
+  --color-focus: #175cd3;
+}

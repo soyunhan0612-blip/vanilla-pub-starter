@@ -1,0 +1,27 @@
+// -----------------------------------------------------------------------------
+// mo.scss — MO 엔트리 (360~1023px). 산출물: src/assets/css/mo.css
+//
+// 적응형이지만 갈라지는 것은 HTML 뿐이고 SCSS 는 단일 소스를 공유한다(ADR-001).
+// 이 파일이 하는 일은 공유 레이어를 조합하고 MO 값을 확정하는 것뿐이다.
+//
+// 레이어 순서: abstracts → tokens → base (→ 컴포넌트는 이후 step 에서 추가)
+// -----------------------------------------------------------------------------
+
+@use 'abstracts/variables';
+@use 'abstracts/mixins';
+
+@use 'tokens/color';
+@use 'tokens/typography';
+@use 'tokens/spacing';
+@use 'tokens/layout';
+
+@use 'base/reset';
+@use 'base/base';
+
+:root {
+  /* 360~767 은 100%, 768~1023 은 767px 중앙정렬(ADR-001).
+     태블릿 전용 시안이 없으므로 구간을 새로 만들지 않고 상한만 건다.
+     중앙정렬은 컨테이너가 생길 때 margin-inline:auto 로 붙인다. */
+  --layout-content: min(var(--layout-content-mo), 100%);
+  --layout-gutter: var(--layout-gutter-mo);
+}

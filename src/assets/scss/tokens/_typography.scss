@@ -1,0 +1,44 @@
+// -----------------------------------------------------------------------------
+// tokens/_typography.scss — 타이포그래피 토큰
+//
+// 값은 docs/UI_GUIDE.md 의 타이포그래피 표 그대로다.
+// PC/MO 로 크기가 갈리는 것은 제목 2종뿐이라 미디어쿼리 한 블록으로 처리한다.
+// SCSS·CSS 는 PC/MO 단일 소스이므로 이 파일이 두 엔트리 모두에 들어간다.
+// -----------------------------------------------------------------------------
+
+@use '../abstracts/variables' as *;
+
+:root {
+  /* 웹폰트 없이 시스템 폰트로 한글까지 커버한다.
+     시안 확정 후 웹폰트를 도입할 때 이 한 줄만 교체한다.
+     @font-face 선언은 base/_fonts.scss 에 따로 모은다. */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+    'Malgun Gothic', '맑은 고딕', sans-serif;
+
+  /* 크기 — PC 기준값. MO 오버라이드는 아래 미디어쿼리에 있다. */
+  --font-size-title: 28px; /* 페이지 제목 */
+  --font-size-section: 20px; /* 섹션 제목 */
+  --font-size-price: 17px; /* 가격 */
+  --font-size-body: 15px; /* 본문 · 상품명 */
+  --font-size-caption: 13px; /* 캡션 */
+
+  /* CRITICAL: 16px 미만으로 내리지 마라. iOS Safari 가 16px 미만 입력에
+     포커스하면 화면을 확대해 레이아웃이 깨진다. base/_reset.scss 가 이 값을 쓴다. */
+  --font-size-input: 16px;
+
+  /* 굵기 */
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* 행간 */
+  --line-height-base: 1.6; /* 본문 */
+  --line-height-tight: 1.3; /* 제목 */
+}
+
+@media (max-width: $bp-mo-max) {
+  :root {
+    --font-size-title: 22px;
+    --font-size-section: 18px;
+  }
+}

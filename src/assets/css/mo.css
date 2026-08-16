@@ -1,0 +1,373 @@
+@charset "UTF-8";
+:root {
+  /* @contrast --color-text-strong on --color-bg-page */
+  /* @contrast --color-text-body on --color-bg-page */
+  /* @contrast --color-text-weak on --color-bg-page */
+  /* @contrast --color-danger on --color-bg-page */
+  /* @contrast --color-success on --color-bg-page */
+  /* @contrast --color-info on --color-bg-page */
+  /* @contrast --color-text-inverse on --color-text-strong */
+  /* 포커스 링은 비텍스트 대비 기준을 쓴다 (WCAG 1.4.11) */
+  /* @contrast --color-focus on --color-bg-page 3 */
+  /* 배경 */
+  --color-bg-page: #ffffff;
+  --color-bg-surface: #fafafa;
+  --color-bg-muted: #f5f5f5;
+  /* 텍스트 */
+  --color-text-strong: #171717;
+  --color-text-body: #404040;
+  --color-text-weak: #737373;
+  /* 비활성 컨트롤은 WCAG 1.4.3 이 대비 요건을 명시적으로 면제한다.
+     그래서 @contrast 선언에서 제외한다. 활성 텍스트에 쓰지 마라. */
+  --color-text-disabled: #a3a3a3;
+  /* 어두운 배경(Primary 버튼 · 스킵 네비) 위의 텍스트 */
+  --color-text-inverse: #ffffff;
+  /* 경계 */
+  --color-border: #e5e5e5;
+  --color-border-strong: #d4d4d4;
+  /* 시맨틱 — 포인트 색은 할인 레드 하나뿐이다.
+     보라/인디고는 "AI = 보라색" 클리셰라 UI_GUIDE.md 안티패턴 목록에 있다. */
+  --color-danger: #d92d20;
+  --color-success: #067647;
+  --color-info: #175cd3;
+  /* 포커스 링. 링크색과 같은 계열을 쓰되 토큰을 따로 두어
+     포커스 표시만 독립적으로 조정할 수 있게 한다. */
+  --color-focus: #175cd3;
+}
+
+:root {
+  /* 웹폰트 없이 시스템 폰트로 한글까지 커버한다.
+     시안 확정 후 웹폰트를 도입할 때 이 한 줄만 교체한다.
+     @font-face 선언은 base/_fonts.scss 에 따로 모은다. */
+  --font-family-base: -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo',
+    'Malgun Gothic', '맑은 고딕', sans-serif;
+  /* 크기 — PC 기준값. MO 오버라이드는 아래 미디어쿼리에 있다. */
+  --font-size-title: 28px; /* 페이지 제목 */
+  --font-size-section: 20px; /* 섹션 제목 */
+  --font-size-price: 17px; /* 가격 */
+  --font-size-body: 15px; /* 본문 · 상품명 */
+  --font-size-caption: 13px; /* 캡션 */
+  /* CRITICAL: 16px 미만으로 내리지 마라. iOS Safari 가 16px 미만 입력에
+     포커스하면 화면을 확대해 레이아웃이 깨진다. base/_reset.scss 가 이 값을 쓴다. */
+  --font-size-input: 16px;
+  /* 굵기 */
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  /* 행간 */
+  --line-height-base: 1.6; /* 본문 */
+  --line-height-tight: 1.3; /* 제목 */
+}
+
+@media (max-width: 1023px) {
+  :root {
+    --font-size-title: 22px;
+    --font-size-section: 18px;
+  }
+}
+:root {
+  /* 간격 스케일 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-9: 36px;
+  --space-10: 40px;
+  /* 모서리 반경.
+     모든 카드에 같은 반경을 쓰지 마라 — 균일한 둥근 모서리는 템플릿 느낌을 준다
+     (UI_GUIDE.md 안티패턴). 요소 크기에 맞춰 sm/md/lg 를 골라 쓴다. */
+  --radius-sm: 4px; /* 입력 필드 · 배지 */
+  --radius-md: 8px; /* 카드 · 버튼 */
+  --radius-lg: 16px; /* 모달 · 바텀시트 */
+}
+
+:root {
+  /* 컨텐츠 폭 */
+  --layout-content-pc: 1280px;
+  --layout-content-mo: 767px;
+  /* 좌우 여백 */
+  --layout-gutter-pc: var(--space-10);
+  --layout-gutter-mo: var(--space-4);
+  /* 최소 터치 영역 (WCAG 2.5.5) */
+  --touch-target-min: 44px;
+  /* 포커스 링 — abstracts/_mixins.scss 의 focus-ring 이 참조한다 */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  /* z-index. 지금 필요한 것만 둔다. 컴포넌트가 생기면 여기에 추가한다.
+     스킵 네비는 포커스 시 무엇보다 위에 있어야 하므로 최상단이다. */
+  --z-skip-nav: 1000;
+}
+
+:root {
+  /* ② 노치 · 홈 인디케이터.
+     MO 하단 고정 네비가 홈 인디케이터에 가리는 것을 막는다.
+     env() 가 0 이 아니려면 HTML 의 viewport 메타에 `viewport-fit=cover` 가 있어야 한다. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  /* ③ 뷰포트 높이. iOS 는 주소창 때문에 100vh 가 실제 화면보다 크다.
+     커스텀 속성은 값을 파싱하지 않아 `100dvh` 폴백 병기가 통하지 않는다.
+     그래서 @supports 로 갈라야 한다. */
+  --viewport-height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --viewport-height: 100dvh;
+  }
+}
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* 사용자 확대 설정을 존중해야 하므로 px 로 고정하지 않는다 */
+  font-size: 100%;
+  /* 기기 회전 시 iOS 가 임의로 글자를 키우는 것을 막는다 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* ④ 터치 시 뜨는 회색 박스 제거. 상태 표시는 :active / :focus-visible 로 한다 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: var(--viewport-height);
+  -webkit-overflow-scrolling: touch;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+address {
+  font-style: normal;
+}
+
+/* 폭 고정 요소가 뷰포트를 넘지 않게 한다. 축소 대응(WCAG 1.4.10)의 최소 보험이다. */
+img,
+picture,
+svg,
+video,
+canvas,
+table,
+pre {
+  max-width: 100%;
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+  height: auto;
+  vertical-align: middle;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  font-family: inherit;
+  color: inherit;
+}
+
+/* ① 입력 자동 확대 방지.
+   CRITICAL: iOS Safari 는 16px 미만 입력에 포커스하면 화면을 확대한다.
+   토큰이 사라지더라도 16px 이 남도록 var() 폴백을 함께 적는다. */
+input,
+select,
+textarea {
+  font-size: var(--font-size-input, 16px);
+}
+
+textarea {
+  resize: vertical;
+}
+
+button,
+[type=button],
+[type=reset],
+[type=submit] {
+  padding: 0;
+  background: none;
+  border: 0;
+  /* iOS 의 기본 버튼 외형(둥근 모서리·그라데이션) 제거 */
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+button:disabled,
+[type=button]:disabled,
+[type=submit]:disabled {
+  cursor: default;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ⑤ 모션 감소 (WCAG 2.3.3).
+   전정기관 장애 사용자에게 애니메이션은 실제 신체 반응을 유발한다.
+   0 이 아니라 0.01ms 인 것은 transitionend / animationend 를 기다리는
+   JS 가 멈추지 않게 하기 위해서다. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-base);
+  color: var(--color-text-body);
+  background-color: var(--color-bg-page);
+  /* 한글 가독성. 자간을 임의로 벌리지 않는다 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-strong);
+}
+
+h1 {
+  font-size: var(--font-size-title);
+}
+
+h2 {
+  font-size: var(--font-size-section);
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size-body);
+}
+
+small {
+  font-size: var(--font-size-caption);
+}
+
+strong,
+b {
+  font-weight: var(--font-weight-bold);
+}
+
+/* 링크. 본문 안의 링크는 색만으로 구분하지 않는다 (WCAG 1.4.1) */
+a {
+  color: var(--color-info);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* 키보드 포커스 (WCAG 2.4.7).
+   :focus-visible 이라 마우스 클릭에는 링이 뜨지 않는다. 어디에서도
+   `outline: none` 을 단독으로 쓰지 마라 — 키보드 사용자가 현재 위치를 잃는다. */
+:focus-visible {
+  outline: var(--focus-ring-width) solid var(--color-focus);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* 스크린리더 전용 텍스트 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 스킵 네비 — 키보드 사용자가 반복되는 헤더/GNB 를 건너뛴다 (WCAG 2.4.1).
+   평소에는 화면 밖에 있다가 포커스를 받으면 좌상단에 나타난다. */
+.skip-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--z-skip-nav);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-inverse);
+  background-color: var(--color-text-strong);
+  border-bottom-right-radius: var(--radius-sm);
+  /* display:none 이 아니라 화면 밖으로 밀어야 포커스를 받을 수 있다 */
+  transform: translateY(-100%);
+}
+
+.skip-nav:focus {
+  transform: translateY(0);
+}
+
+:root {
+  /* 360~767 은 100%, 768~1023 은 767px 중앙정렬(ADR-001).
+     태블릿 전용 시안이 없으므로 구간을 새로 만들지 않고 상한만 건다.
+     중앙정렬은 컨테이너가 생길 때 margin-inline:auto 로 붙인다. */
+  --layout-content: min(var(--layout-content-mo), 100%);
+  --layout-gutter: var(--layout-gutter-mo);
+}

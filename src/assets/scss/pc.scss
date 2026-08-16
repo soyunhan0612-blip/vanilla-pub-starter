@@ -1,0 +1,30 @@
+// -----------------------------------------------------------------------------
+// pc.scss — PC 엔트리 (1024px~). 산출물: src/assets/css/pc.css
+//
+// 적응형이지만 갈라지는 것은 HTML 뿐이고 SCSS 는 단일 소스를 공유한다(ADR-001).
+// 이 파일이 하는 일은 공유 레이어를 조합하고 PC 값을 확정하는 것뿐이다.
+// 여기에 PC 전용 컴포넌트 스타일을 쓰지 마라 — 그러면 단일 소스가 무너진다.
+//
+// 레이어 순서: abstracts → tokens → base (→ 컴포넌트는 이후 step 에서 추가)
+// -----------------------------------------------------------------------------
+
+@use 'abstracts/variables';
+@use 'abstracts/mixins';
+
+@use 'tokens/color';
+@use 'tokens/typography';
+@use 'tokens/spacing';
+@use 'tokens/layout';
+
+@use 'base/reset';
+@use 'base/base';
+
+:root {
+  /* 축소 대응 (WCAG 1.4.10 Reflow).
+     400% 확대해도 UA 는 PC 그대로라 MO 로 분기되지 않는다. 즉 PC CSS 자체가
+     1024px 미만에서 가로 스크롤을 만들지 않아야 한다. min() 으로 컨텐츠 폭을
+     뷰포트에 묶어두면 컨테이너가 생길 때 자동으로 따라온다.
+     (요소 단위 오버플로 방지는 base/_reset.scss 의 max-width:100% 가 맡는다) */
+  --layout-content: min(var(--layout-content-pc), 100%);
+  --layout-gutter: var(--layout-gutter-pc);
+}

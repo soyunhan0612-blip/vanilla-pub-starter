@@ -1,0 +1,178 @@
+// -----------------------------------------------------------------------------
+// base/_reset.scss — 리셋
+//
+// 일반적인 리셋에 더해 iOS Safari 대응 5종이 들어 있다. 이것들은 취향이 아니라
+// 실기기에서 즉시 문제로 드러나는 항목이라 뼈대 단계에서 박아둔다.
+//   ① 입력 자동 확대  ② 노치/홈 인디케이터  ③ 뷰포트 높이
+//   ④ 탭 하이라이트   ⑤ 모션 감소(WCAG 2.3.3)
+//
+// 색 리터럴을 쓰지 않는다. 색이 필요하면 base/_base.scss 에서 토큰으로 준다.
+// -----------------------------------------------------------------------------
+
+:root {
+  /* ② 노치 · 홈 인디케이터.
+     MO 하단 고정 네비가 홈 인디케이터에 가리는 것을 막는다.
+     env() 가 0 이 아니려면 HTML 의 viewport 메타에 `viewport-fit=cover` 가 있어야 한다. */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* ③ 뷰포트 높이. iOS 는 주소창 때문에 100vh 가 실제 화면보다 크다.
+     커스텀 속성은 값을 파싱하지 않아 `100dvh` 폴백 병기가 통하지 않는다.
+     그래서 @supports 로 갈라야 한다. */
+  --viewport-height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --viewport-height: 100dvh;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* 사용자 확대 설정을 존중해야 하므로 px 로 고정하지 않는다 */
+  font-size: 100%;
+  /* 기기 회전 시 iOS 가 임의로 글자를 키우는 것을 막는다 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* ④ 터치 시 뜨는 회색 박스 제거. 상태 표시는 :active / :focus-visible 로 한다 */
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: var(--viewport-height);
+  -webkit-overflow-scrolling: touch;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+address {
+  font-style: normal;
+}
+
+/* 폭 고정 요소가 뷰포트를 넘지 않게 한다. 축소 대응(WCAG 1.4.10)의 최소 보험이다. */
+img,
+picture,
+svg,
+video,
+canvas,
+table,
+pre {
+  max-width: 100%;
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+  height: auto;
+  vertical-align: middle;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+legend {
+  padding: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  font-family: inherit;
+  color: inherit;
+}
+
+/* ① 입력 자동 확대 방지.
+   CRITICAL: iOS Safari 는 16px 미만 입력에 포커스하면 화면을 확대한다.
+   토큰이 사라지더라도 16px 이 남도록 var() 폴백을 함께 적는다. */
+input,
+select,
+textarea {
+  font-size: var(--font-size-input, 16px);
+}
+
+textarea {
+  resize: vertical;
+}
+
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+  padding: 0;
+  background: none;
+  border: 0;
+  /* iOS 의 기본 버튼 외형(둥근 모서리·그라데이션) 제거 */
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+button:disabled,
+[type='button']:disabled,
+[type='submit']:disabled {
+  cursor: default;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* ⑤ 모션 감소 (WCAG 2.3.3).
+   전정기관 장애 사용자에게 애니메이션은 실제 신체 반응을 유발한다.
+   0 이 아니라 0.01ms 인 것은 transitionend / animationend 를 기다리는
+   JS 가 멈추지 않게 하기 위해서다. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

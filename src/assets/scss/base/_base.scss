@@ -1,0 +1,96 @@
+// -----------------------------------------------------------------------------
+// base/_base.scss — 기본 타이포그래피 · 링크 · 포커스 · 접근성 유틸
+//
+// 여기까지가 "요소 기본값"이다. 클래스로 부르는 UI 는 전부 컴포넌트 레이어 몫이다.
+// 값은 반드시 tokens/ 의 CSS 변수를 참조한다 — 리터럴을 쓰면 시안 교체 시
+// 따라오지 않는 지점이 생긴다(ADR-004).
+// -----------------------------------------------------------------------------
+
+@use '../abstracts/mixins' as *;
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-base);
+  color: var(--color-text-body);
+  background-color: var(--color-bg-page);
+  /* 한글 가독성. 자간을 임의로 벌리지 않는다 */
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-strong);
+}
+
+h1 {
+  font-size: var(--font-size-title);
+}
+
+h2 {
+  font-size: var(--font-size-section);
+}
+
+h3,
+h4,
+h5,
+h6 {
+  font-size: var(--font-size-body);
+}
+
+small {
+  font-size: var(--font-size-caption);
+}
+
+strong,
+b {
+  font-weight: var(--font-weight-bold);
+}
+
+/* 링크. 본문 안의 링크는 색만으로 구분하지 않는다 (WCAG 1.4.1) */
+a {
+  color: var(--color-info);
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* 키보드 포커스 (WCAG 2.4.7).
+   :focus-visible 이라 마우스 클릭에는 링이 뜨지 않는다. 어디에서도
+   `outline: none` 을 단독으로 쓰지 마라 — 키보드 사용자가 현재 위치를 잃는다. */
+:focus-visible {
+  @include focus-ring;
+}
+
+/* 스크린리더 전용 텍스트 */
+.sr-only {
+  @include sr-only;
+}
+
+/* 스킵 네비 — 키보드 사용자가 반복되는 헤더/GNB 를 건너뛴다 (WCAG 2.4.1).
+   평소에는 화면 밖에 있다가 포커스를 받으면 좌상단에 나타난다. */
+.skip-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--z-skip-nav);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-text-inverse);
+  background-color: var(--color-text-strong);
+  border-bottom-right-radius: var(--radius-sm);
+  /* display:none 이 아니라 화면 밖으로 밀어야 포커스를 받을 수 있다 */
+  transform: translateY(-100%);
+}
+
+.skip-nav:focus {
+  transform: translateY(0);
+}
