@@ -1,0 +1,23 @@
+node_modules/
+.venv/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+
+# pytest --basetemp 을 저장소 안으로 넘겼을 때 쌓이는 fixture 산출물.
+# 기본값은 시스템 temp 라 평소에는 생기지 않지만, 한 번 넘기면 수백 개가 남는다.
+pytest-temp/
+*.pytest-tmp/
+
+# 빌드 산출물 — 이관 시점에 build.js 로 생성한다
+dist/
+
+# 아래는 커밋 대상이므로 무시하지 않는다 (의도적)
+#   src/assets/css/       폐쇄망 안전망 3계층. sass 를 못 돌려도 뼈대가 열려야 한다
+#   src/guide.html        생성물이지만 이관 산출물이라 저장소에 있어야 한다
+#   .vscode/*.code-snippets  현업에서 npm 없이 바로 쓰기 위함
+#   tools/vendor/         dart-sass · axe 동봉 바이너리
+
+# phase execution outputs
+phases/**/phase*-output.json
+phases/**/step*-output.json

@@ -1,0 +1,41 @@
+{
+  "project": "이커머스 퍼블리싱 보일러플레이트",
+  "phase": "2-layout",
+  "steps": [
+    {
+      "step": 0,
+      "name": "shell-pc",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "shell-mo",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "layout-main",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "layout-catalog",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "layout-detail",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "layout-order",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "layout-mypage",
+      "status": "pending"
+    }
+  ]
+}

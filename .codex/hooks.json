@@ -1,0 +1,44 @@
+{
+  "description": "Codex equivalents of this repository's Claude safety, TDD, and validation hooks.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|shell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/codex-hook.js\" dangerous-command",
+            "commandWindows": "powershell -NoProfile -NonInteractive -Command \"& { $root = git rev-parse --show-toplevel; & node \\\"$root/scripts/hooks/codex-hook.js\\\" dangerous-command }\"",
+            "timeout": 15,
+            "statusMessage": "위험 명령 검사"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/codex-hook.js\" tdd-guard",
+            "commandWindows": "powershell -NoProfile -NonInteractive -Command \"& { $root = git rev-parse --show-toplevel; & node \\\"$root/scripts/hooks/codex-hook.js\\\" tdd-guard }\"",
+            "timeout": 15,
+            "statusMessage": "TDD 가드 검사"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/hooks/codex-hook.js\" stop-check",
+            "commandWindows": "powershell -NoProfile -NonInteractive -Command \"& { $root = git rev-parse --show-toplevel; & node \\\"$root/scripts/hooks/codex-hook.js\\\" stop-check }\"",
+            "timeout": 360,
+            "statusMessage": "tools/check.js 게이트"
+          }
+        ]
+      }
+    ]
+  }
+}
