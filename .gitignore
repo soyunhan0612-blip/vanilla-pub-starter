@@ -3,6 +3,11 @@ node_modules/
 # 빌드 산출물 — 이관 시점에 build.js 로 생성한다
 dist/
 
+# 파이썬 캐시 — scripts/ 하네스를 돌릴 때마다 재생성된다
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
 # 아래는 커밋 대상이므로 무시하지 않는다 (의도적)
 #   src/assets/css/       폐쇄망 안전망 3계층. sass 를 못 돌려도 뼈대가 열려야 한다
 #   src/guide.html        생성물이지만 이관 산출물이라 저장소에 있어야 한다
