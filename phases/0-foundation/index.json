@@ -24,7 +24,7 @@
       "status": "completed",
       "started_at": "2026-08-16T14:08:41+0900",
       "summary": "util/ 순수 로직 4종을 TDD로 작성(테스트 87개 전부 통과) — dom.js(buildClassName BEM 조립·parseDataAttr 앞자리0 보존 왕복규칙·buildDataSelector 이스케이프), focus-trap.js(nextFocusIndex 양방향 순환+비정상입력 보정·isFocusableSelector 는 disabled/hidden/tabindex=-1 제외), validate.js(required·email·phone(010 은 11자리)·password(8~64자·공백금지·2종조합)·formatPhone 진행형 마스킹, 실패 메시지는 고칠 지점을 지목), api.js(ApiError 로 network/http/parse/timeout/abort/unsupported 전부 정규화·AbortController 타임아웃·buildQuery 순수함수, 상단에 data-bind/-src/-href/-list 규약 문서화, 바인딩 구현은 하지 않음). 엔트리 pc.js·mo.js 는 스텁. Node 22+ 가 --test 위치인자를 glob 으로 해석해 디렉토리를 확장하지 않으므로 src/__tests__/index.js 진입점을 추가(파일을 하드코딩하지 않고 *.test.js 를 재귀 탐색) — 이것이 없으면 AC 와 check.js 의 runTests() 가 MODULE_NOT_FOUND 로 죽는다. AC 2커맨드 exit 0, 실패 테스트를 심어 check.js 가 차단하는지 확인",
-      "completed_at": "2026-08-16T14:18:44+0900"
+      "completed_at": "2026-08-16T14:19:34+0900"
     }
   ],
   "created_at": "2026-08-16T13:33:05+0900"
