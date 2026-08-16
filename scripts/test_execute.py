@@ -3,11 +3,13 @@ execute.py 리팩터링 안전망 테스트.
 리팩터링 전후 동작이 동일한지 검증한다.
 """
 
+import io
 import json
 import os
 import subprocess
 import sys
 import textwrap
+import time
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from unittest.mock import patch, MagicMock
@@ -485,6 +487,51 @@ class TestProgressIndicator:
         import time
         with ex.progress_indicator("test") as pi:
             time.sleep(0.2)
+        assert pi.elapsed > 0
+
+    def test_elapsed_readable_inside_block(self):
+        """with 블록 안에서 읽어도 경과 시간이 살아 있어야 한다."""
+        with ex.progress_indicator("test") as pi:
+            time.sleep(0.3)
+            inside = pi.elapsed
+        assert inside >= 0.25  # Windows 타이머 해상도(~15ms) 여유
+        assert pi.elapsed >= inside
+
+    def test_no_output_when_stderr_not_tty(self):
+        """리다이렉트된 stderr 에는 진행 표시를 쓰지 않는다 (로그 부풀림 방지)."""
+        buf = io.StringIO()  # isatty() -> False
+        with patch("sys.stderr", buf):
+            with ex.progress_indicator("test") as pi:
+                time.sleep(0.3)
+        assert buf.getvalue() == ""
+        assert pi.elapsed >= 0.25  # Windows 타이머 해상도(~15ms) 여유
+
+    def test_writes_when_stderr_is_tty(self):
+        buf = io.StringIO()
+        buf.isatty = lambda: True
+        with patch("sys.stderr", buf):
+            with ex.progress_indicator("test") as pi:
+                time.sleep(0.3)
+        assert "test" in buf.getvalue()
+        assert pi.elapsed >= 0.25  # Windows 타이머 해상도(~15ms) 여유
+
+    def test_stderr_without_isatty_is_silent(self):
+        """isatty 가 없는 객체로 stderr 이 대체돼도 죽지 않는다."""
+        class Dummy:
+            def __init__(self):
+                self.written = []
+
+            def write(self, s):
+                self.written.append(s)
+
+            def flush(self):
+                pass
+
+        dummy = Dummy()
+        with patch("sys.stderr", dummy):
+            with ex.progress_indicator("test") as pi:
+                time.sleep(0.2)
+        assert dummy.written == []
         assert pi.elapsed > 0
 
 

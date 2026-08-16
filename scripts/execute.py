@@ -17,7 +17,6 @@ import subprocess
 import sys
 import threading
 import time
-import types
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional
@@ -25,12 +24,37 @@ from typing import Optional
 ROOT = Path(__file__).resolve().parent.parent
 
 
+class _Progress:
+    """진행 시간 핸들. with 블록 안/밖 어디서 읽어도 경과 시간이 유효하다."""
+
+    def __init__(self, t0: float):
+        self._t0 = t0
+        self._final: Optional[float] = None
+
+    @property
+    def elapsed(self) -> float:
+        if self._final is not None:
+            return self._final
+        return time.monotonic() - self._t0
+
+    def _freeze(self) -> None:
+        self._final = time.monotonic() - self._t0
+
+
 @contextlib.contextmanager
 def progress_indicator(label: str):
-    """터미널 진행 표시기. with 문으로 사용하며 .elapsed 로 경과 시간을 읽는다."""
+    """터미널 진행 표시기. with 문으로 사용하며 .elapsed 로 경과 시간을 읽는다.
+
+    stderr 이 tty 가 아니면(백그라운드·CI·리다이렉트) 애니메이션을 그리지 않는다.
+    \\r 로 덮어쓸 수 없는 대상에는 매 틱이 새 줄로 쌓여 로그가 부풀기 때문이다.
+    """
     frames = "◐◓◑◒"
     stop = threading.Event()
     t0 = time.monotonic()
+    try:
+        animated = sys.stderr.isatty()
+    except Exception:  # stderr 가 isatty 없는 객체로 대체된 경우
+        animated = False
 
     def _animate():
         idx = 0
@@ -42,15 +66,18 @@ def progress_indicator(label: str):
         sys.stderr.write("\r" + " " * (len(label) + 20) + "\r")
         sys.stderr.flush()
 
-    th = threading.Thread(target=_animate, daemon=True)
-    th.start()
-    info = types.SimpleNamespace(elapsed=0.0)
+    th = None
+    if animated:
+        th = threading.Thread(target=_animate, daemon=True)
+        th.start()
+    info = _Progress(t0)
     try:
         yield info
     finally:
         stop.set()
-        th.join()
-        info.elapsed = time.monotonic() - t0
+        if th is not None:
+            th.join()
+        info._freeze()
 
 
 class StepExecutor:
