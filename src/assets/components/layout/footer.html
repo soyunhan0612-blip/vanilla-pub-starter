@@ -1,0 +1,61 @@
+<!-- @component 푸터
+     @category layout
+     @variant  common — PC·MO 공용 회사·고객센터·정책·SNS 정보
+     @a11y     이름이 있는 내비게이션과 SNS 링크별 대체 텍스트 제공
+     @snippet  footer
+-->
+<footer class="site-footer">
+  <div class="container">
+    <nav class="site-footer__policy" aria-label="약관 및 정책">
+      <ul class="site-footer__policy-list">
+        <li><a href="/terms">이용약관</a></li>
+        <li><a class="site-footer__privacy" href="/privacy"><strong>개인정보처리방침</strong></a></li>
+        <li><a href="/youth-policy">청소년보호정책</a></li>
+      </ul>
+    </nav>
+
+    <div class="site-footer__content">
+      <div class="site-footer__company">
+        <strong class="site-footer__title">쇼핑몰</strong>
+        <address class="site-footer__address">
+          <span>대표자: 홍길동</span>
+          <span>사업자등록번호: 000-00-00000</span>
+          <span>통신판매업 신고: 제0000-서울00-0000호</span>
+          <span>주소: 서울특별시 00구 00로 00</span>
+          <span>개인정보보호책임자: 홍길동</span>
+        </address>
+      </div>
+
+      <div class="site-footer__customer">
+        <strong class="site-footer__title">고객센터</strong>
+        <a class="site-footer__tel" href="tel:0000000000">0000-0000</a>
+        <p>평일 09:00~18:00 · 점심 12:00~13:00</p>
+        <p>주말 및 공휴일 휴무</p>
+      </div>
+
+      <nav class="site-footer__sns" aria-label="SNS">
+        <ul class="site-footer__sns-list">
+          <li>
+            <a href="https://www.instagram.com/" aria-label="인스타그램">
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+              </svg>
+            </a>
+          </li>
+          <li>
+            <a href="https://www.youtube.com/" aria-label="유튜브">
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                <path d="M21 12c0 3-.4 5-1.1 5.7-.8.8-2.7 1.1-7.9 1.1s-7.1-.3-7.9-1.1C3.4 17 3 15 3 12s.4-5 1.1-5.7C4.9 5.5 6.8 5.2 12 5.2s7.1.3 7.9 1.1C20.6 7 21 9 21 12Z" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <path d="m10 9 5 3-5 3Z" fill="currentColor" />
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+
+    <p class="site-footer__copyright">© SHOP. All rights reserved.</p>
+  </div>
+</footer>

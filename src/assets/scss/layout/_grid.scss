@@ -1,0 +1,32 @@
+@use '../abstracts/mixins' as *;
+
+.layout-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(var(--layout-grid-columns, 1), minmax(0, 1fr));
+  gap: var(--space-6);
+}
+
+.layout-grid--2 {
+  --layout-grid-columns: 2;
+}
+
+.layout-grid--3 {
+  --layout-grid-columns: 3;
+}
+
+.layout-grid--4 {
+  --layout-grid-columns: 4;
+}
+
+.layout-grid > * {
+  min-width: 0;
+}
+
+@include respond-mo {
+  .layout-grid--2,
+  .layout-grid--3,
+  .layout-grid--4 {
+    --layout-grid-columns: 1;
+  }
+}

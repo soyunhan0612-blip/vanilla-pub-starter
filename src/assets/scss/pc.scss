@@ -6,6 +6,11 @@
 @use 'tokens/layout';
 @use 'base/reset';
 @use 'base/base';
+@use 'layout/container';
+@use 'layout/header';
+@use 'layout/gnb';
+@use 'layout/footer';
+@use 'layout/grid';
 @use 'common/button';
 @use 'common/form';
 @use 'common/modal';

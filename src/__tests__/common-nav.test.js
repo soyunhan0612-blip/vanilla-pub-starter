@@ -100,6 +100,77 @@ function createAccordionFixture(mode, expandedStates) {
   return { root, panels, triggers };
 }
 
+function createGnbFixture() {
+  const root = new DelegatedRoot();
+  const panels = [];
+  const triggers = [];
+  const links = [];
+  const doc = {
+    getElementById(id) {
+      return panels.find((panel) => panel.id === id) || null;
+    },
+  };
+  const gnb = {
+    contains(target) {
+      return target === gnb || triggers.includes(target) || panels.includes(target) || links.includes(target);
+    },
+    querySelectorAll(selector) {
+      assert.equal(selector, '[data-gnb-trigger]');
+      return triggers;
+    },
+  };
+
+  for (let panelIndex = 0; panelIndex < 2; panelIndex += 1) {
+    const panelLinks = Array.from({ length: 2 }, () => {
+      const link = {
+        hidden: false,
+        focusCount: 0,
+        closest(selector) {
+          if (selector === '[data-gnb-panel]') return panels[panelIndex];
+          if (selector === '[data-gnb]') return gnb;
+          return null;
+        },
+        focus() {
+          link.focusCount += 1;
+        },
+      };
+      links.push(link);
+      return link;
+    });
+    const panel = {
+      id: `gnb-panel-${panelIndex}`,
+      hidden: true,
+      querySelectorAll() {
+        return panelLinks;
+      },
+      closest(selector) {
+        return selector === '[data-gnb]' ? gnb : null;
+      },
+    };
+    panels.push(panel);
+
+    const trigger = {
+      ...attributeNode({
+        'aria-controls': panel.id,
+        'aria-expanded': 'false',
+      }),
+      ownerDocument: doc,
+      focusCount: 0,
+      closest(selector) {
+        if (selector === '[data-gnb-trigger]') return trigger;
+        if (selector === '[data-gnb]') return gnb;
+        return null;
+      },
+      focus() {
+        trigger.focusCount += 1;
+      },
+    };
+    triggers.push(trigger);
+  }
+
+  return { root, gnb, panels, triggers, links };
+}
+
 function clickEvent(target) {
   return {
     target,
@@ -186,6 +257,85 @@ test('단일 열림 아코디언은 새 항목을 열 때 기존 항목을 닫�
   assert.deepEqual(Object.values(panels).map((panel) => panel.hidden), [true, false]);
 });
 
+test('GNB는 이벤트를 한 번만 위임하고 aria-expanded를 기준으로 패널을 전환한다', async () => {
+  const { initGnb } = await import('../assets/js/common/gnb.js');
+  const { root, panels, triggers } = createGnbFixture();
+
+  initGnb(root);
+  initGnb(root);
+  assert.equal(root.listeners.get('click').length, 1);
+  assert.equal(root.listeners.get('keydown').length, 1);
+  assert.equal(root.listeners.get('mouseover').length, 1);
+  assert.equal(root.listeners.get('mouseout').length, 1);
+
+  root.dispatch('click', clickEvent(triggers[0]));
+  assert.deepEqual(triggers.map((trigger) => trigger.getAttribute('aria-expanded')), ['true', 'false']);
+  assert.deepEqual(panels.map((panel) => panel.hidden), [false, true]);
+
+  root.dispatch('click', clickEvent(triggers[1]));
+  assert.deepEqual(triggers.map((trigger) => trigger.getAttribute('aria-expanded')), ['false', 'true']);
+  assert.deepEqual(panels.map((panel) => panel.hidden), [true, false]);
+});
+
+test('GNB는 방향키로 열린 패널 항목을 순환하고 Esc로 닫은 뒤 트리거에 복귀한다', async () => {
+  const { initGnb } = await import('../assets/js/common/gnb.js');
+  const { root, panels, triggers, links } = createGnbFixture();
+  initGnb(root);
+
+  const open = keyEvent(triggers[0], 'ArrowDown');
+  root.dispatch('keydown', open);
+  assert.equal(open.defaultPrevented, true);
+  assert.equal(triggers[0].getAttribute('aria-expanded'), 'true');
+  assert.equal(panels[0].hidden, false);
+  assert.equal(links[0].focusCount, 1);
+
+  const next = keyEvent(links[0], 'ArrowDown');
+  root.dispatch('keydown', next);
+  assert.equal(next.defaultPrevented, true);
+  assert.equal(links[1].focusCount, 1);
+
+  const wrap = keyEvent(links[1], 'ArrowDown');
+  root.dispatch('keydown', wrap);
+  assert.equal(links[0].focusCount, 2);
+
+  const close = keyEvent(links[0], 'Escape');
+  root.dispatch('keydown', close);
+  assert.equal(close.defaultPrevented, true);
+  assert.equal(triggers[0].getAttribute('aria-expanded'), 'false');
+  assert.equal(panels[0].hidden, true);
+  assert.equal(triggers[0].focusCount, 1);
+});
+
+test('GNB는 포인터가 메뉴를 벗어날 때 짧은 지연 후 닫는다', async () => {
+  const { initGnb } = await import('../assets/js/common/gnb.js');
+  const { root, gnb, panels, triggers } = createGnbFixture();
+  const originalSetTimeout = globalThis.setTimeout;
+  let scheduled;
+  globalThis.setTimeout = (callback, delay) => {
+    scheduled = { callback, delay };
+    return 1;
+  };
+
+  try {
+    initGnb(root);
+    root.dispatch('mouseover', { target: triggers[0], relatedTarget: null });
+    assert.equal(triggers[0].getAttribute('aria-expanded'), 'true');
+    root.dispatch('click', clickEvent(triggers[0]));
+    assert.equal(triggers[0].getAttribute('aria-expanded'), 'true');
+
+    root.dispatch('mouseout', { target: triggers[0], relatedTarget: null });
+    assert.ok(scheduled.delay >= 100);
+    assert.equal(panels[0].hidden, false);
+    scheduled.callback();
+    assert.equal(panels[0].hidden, true);
+
+    root.dispatch('mouseover', { target: triggers[1], relatedTarget: gnb });
+    assert.equal(triggers[1].getAttribute('aria-expanded'), 'true');
+  } finally {
+    globalThis.setTimeout = originalSetTimeout;
+  }
+});
+
 test('내비게이션 fragment는 필수 ARIA 계약과 변형을 문서화한다', async () => {
   const componentUrl = new URL('../assets/components/common/', import.meta.url);
   const [tab, accordion, pagination, breadcrumb] = await Promise.all(
@@ -219,4 +369,29 @@ test('내비게이션 fragment는 필수 ARIA 계약과 변형을 문서화한�
   assert.match(breadcrumb, /<nav[^>]*aria-label="현재 위치"/);
   assert.match(breadcrumb, /<ol[\s>]/);
   assert.match(breadcrumb, /aria-current="page"/);
+});
+
+test('PC 셸 fragment는 검색·메가메뉴·공용 푸터 접근성 계약을 제공한다', async () => {
+  const componentUrl = new URL('../assets/components/layout/', import.meta.url);
+  const [header, gnb, footer] = await Promise.all(
+    ['header-pc.html', 'gnb-pc.html', 'footer.html'].map((file) =>
+      readFile(new URL(file, componentUrl), 'utf8')
+    )
+  );
+
+  assert.match(header, /<nav[^>]*aria-label="유틸리티"/);
+  assert.match(header, /<form[^>]*role="search"/);
+  assert.match(header, /<label[^>]*for="site-search-pc"/);
+  assert.match(header, /<input[^>]*id="site-search-pc"[^>]*type="search"/s);
+  assert.match(header, /<span class="sr-only">장바구니 3개<\/span>/);
+  assert.match(header, /@include\s+layout\/gnb-pc\.html/);
+
+  assert.match(gnb, /<nav[^>]*aria-label="주요 메뉴"[^>]*data-gnb/);
+  assert.match(gnb, /<button[^>]*data-gnb-trigger[^>]*aria-expanded="false"[^>]*aria-controls=/s);
+  assert.match(gnb, /data-gnb-panel/);
+
+  assert.match(footer, /<footer\b/);
+  assert.match(footer, /사업자등록번호/);
+  assert.match(footer, /<strong>개인정보처리방침<\/strong>/);
+  assert.match(footer, /<a[^>]*aria-label="인스타그램"/);
 });

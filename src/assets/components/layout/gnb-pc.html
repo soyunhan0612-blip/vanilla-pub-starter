@@ -1,0 +1,82 @@
+<!-- @component PC GNB
+     @category layout
+     @variant  mega-menu — 클릭·키보드 중심의 카테고리 메가메뉴
+     @a11y     Tab으로 상위 메뉴 이동, Enter·Space로 열기, 하위 메뉴 방향키 이동, Esc로 닫기
+     @snippet  gnb-pc
+-->
+<nav class="gnb" aria-label="주요 메뉴" data-gnb>
+  <div class="container">
+    <ul class="gnb__list">
+      <li class="gnb__item">
+        <button
+          class="gnb__trigger"
+          type="button"
+          id="gnb-women-trigger"
+          data-gnb-trigger
+          aria-expanded="false"
+          aria-controls="gnb-women-panel"
+        >
+          여성
+          <svg class="gnb__trigger-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+            <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+        </button>
+        <div
+          class="gnb__panel"
+          id="gnb-women-panel"
+          data-gnb-panel
+          aria-labelledby="gnb-women-trigger"
+          hidden
+        >
+          <div class="container">
+            <ul class="gnb__submenu">
+              <li><a href="/category/women/outer">아우터</a></li>
+              <li><a href="/category/women/top">상의</a></li>
+              <li><a href="/category/women/bottom">하의</a></li>
+              <li><a href="/category/women/dress">원피스</a></li>
+              <li><a href="/category/women/bag">가방</a></li>
+              <li><a href="/category/women/shoes">신발</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+      <li class="gnb__item">
+        <button
+          class="gnb__trigger"
+          type="button"
+          id="gnb-men-trigger"
+          data-gnb-trigger
+          aria-expanded="false"
+          aria-controls="gnb-men-panel"
+        >
+          남성
+          <svg class="gnb__trigger-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+            <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+        </button>
+        <div
+          class="gnb__panel"
+          id="gnb-men-panel"
+          data-gnb-panel
+          aria-labelledby="gnb-men-trigger"
+          hidden
+        >
+          <div class="container">
+            <ul class="gnb__submenu">
+              <li><a href="/category/men/outer">아우터</a></li>
+              <li><a href="/category/men/top">상의</a></li>
+              <li><a href="/category/men/bottom">하의</a></li>
+              <li><a href="/category/men/suit">수트</a></li>
+              <li><a href="/category/men/bag">가방</a></li>
+              <li><a href="/category/men/shoes">신발</a></li>
+            </ul>
+          </div>
+        </div>
+      </li>
+      <li class="gnb__item"><a class="gnb__link" href="/new">신상품</a></li>
+      <li class="gnb__item"><a class="gnb__link" href="/best">베스트</a></li>
+      <li class="gnb__item"><a class="gnb__link" href="/sale">세일</a></li>
+      <li class="gnb__item"><a class="gnb__link" href="/events">기획전</a></li>
+    </ul>
+  </div>
+</nav>
