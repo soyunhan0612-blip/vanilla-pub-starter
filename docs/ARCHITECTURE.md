@@ -20,6 +20,7 @@
 src/
 ├── pc/                     # PC HTML 7장 (@include 마커 포함)
 ├── mo/                     # MO HTML 7장 (동일 파일명)
+├── index.html              # 자동 생성 — 직접 편집 금지 (PC/MO 루트 분기, 원본 tools/ua-redirect.js)
 ├── guide.html              # 자동 생성 — 직접 편집 금지
 ├── assets/
 │   ├── components/         # 마크업 단일 소스 + @component 주석 = 문서 소스

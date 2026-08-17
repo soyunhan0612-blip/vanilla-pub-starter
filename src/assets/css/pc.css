@@ -404,7 +404,7 @@ a {
   .site-header__user-nav {
     margin-left: auto;
   }
-  .site-header--mo {
+  .site-header--mo .site-header__utility {
     padding-top: var(--safe-top);
   }
   .site-header--mo .site-header__main-inner {

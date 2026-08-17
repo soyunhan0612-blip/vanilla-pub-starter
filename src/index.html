@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- 자동 생성 — 직접 편집 금지. 원본: tools/ua-redirect.js (node tools/build.js 가 덮어쓴다) -->
 <html lang="ko">
 <head>
   <meta charset="utf-8">
@@ -8,28 +9,36 @@
 <body>
   <main>
     <h1>쇼핑몰로 이동 중입니다</h1>
-    <p role="status">화면 크기와 저장된 선택에 맞는 페이지를 여는 중입니다.</p>
+    <p>화면 크기와 저장된 선택에 맞는 페이지를 여는 중입니다.</p>
     <noscript>
       <p>JavaScript를 사용할 수 없으면 <a href="pc/index.html">PC 버전</a> 또는 <a href="mo/index.html">모바일 버전</a>을 선택하세요.</p>
     </noscript>
   </main>
-  <script>(function runBrowserRedirect(browser) {
-  const breakpoint = 1024;
-  const storageKey = 'publishing-view';
-  const validViews = ['pc', 'mo'];
+  <script>(function () {
+function normalizeView(value, config) {
+  return config.validViews.includes(value) ? value : null;
+}
+
+function selectView({ explicitView, storedView, viewportWidth }, config) {
+  const explicit = normalizeView(explicitView, config);
+  if (explicit) return explicit;
+
+  const stored = normalizeView(storedView, config);
+  if (stored) return stored;
+
+  return Number(viewportWidth) >= config.breakpoint ? 'pc' : 'mo';
+}
+
+function runBrowserRedirect(browser, config) {
   const currentUrl = new URL(browser.location.href);
-  const explicit = validViews.includes(currentUrl.searchParams.get('view'))
-    ? currentUrl.searchParams.get('view')
-    : null;
+  const explicit = normalizeView(currentUrl.searchParams.get('view'), config);
 
   let storage = null;
   let stored = null;
   try {
     storage = browser.localStorage;
-    stored = validViews.includes(storage.getItem(storageKey))
-      ? storage.getItem(storageKey)
-      : null;
-    if (explicit) storage.setItem(storageKey, explicit);
+    stored = normalizeView(storage.getItem(config.storageKey), config);
+    if (explicit) storage.setItem(config.storageKey, explicit);
   } catch {
     storage = null;
   }
@@ -40,8 +49,13 @@
   const viewportWidth = Number(browser.innerWidth) > 0
     ? Number(browser.innerWidth)
     : Number(documentWidth);
-  const view = explicit || stored || (viewportWidth >= breakpoint ? 'pc' : 'mo');
-  const currentVariant = currentUrl.pathname.match(/\/(pc|mo)(?:\/|$)/);
+  const view = selectView(
+    { explicitView: explicit, storedView: stored, viewportWidth },
+    config
+  );
+
+  const variantPattern = new RegExp(`/(${config.validViews.join('|')})(?:/|$)`);
+  const currentVariant = currentUrl.pathname.match(variantPattern);
 
   // 이미 변형 페이지라면 폭 변화나 저장값으로 다시 보내지 않는다. PC/MO 양쪽에서
   // 서로를 재분기하면 모바일 브라우저의 주소창 변화만으로도 루프가 생길 수 있다.
@@ -56,6 +70,9 @@
 
   browser.location.replace(target.href);
   return { redirected: true, view, storageAvailable: Boolean(storage) };
-})(window);</script>
+}
+
+runBrowserRedirect(window, {"breakpoint":1024,"storageKey":"publishing-view","validViews":["pc","mo"]});
+})();</script>
 </body>
 </html>

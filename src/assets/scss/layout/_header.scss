@@ -153,7 +153,11 @@
     margin-left: auto;
   }
 
-  .site-header--mo {
+  // safe-area 는 헤더 루트가 아니라 **맨 위에 실제로 보이는 바**가 받아야 한다.
+  // 루트에 걸면 노치 영역이 .site-header 의 --color-bg-page 로 칠해져,
+  // 그 아래 --color-bg-muted 유틸리티 바와 사이에 흰 띠가 하나 더 생긴다.
+  // 좌우는 .container 가 --safe-left/right 로 이미 처리한다 (_container.scss).
+  .site-header--mo .site-header__utility {
     padding-top: var(--safe-top);
   }
 

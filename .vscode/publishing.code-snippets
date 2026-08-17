@@ -1462,7 +1462,7 @@
       "${2:<header class=\"site-header site-header--mo site-header--\\${1|default|\\}\">}",
       "  <div class=\"site-header__utility\">",
       "    <div class=\"container\">",
-      "      <nav aria-label=\"화면 버전\">",
+      "      <nav aria-label=\"유틸리티\">",
       "        <ul class=\"site-header__utility-list\">",
       "          <li><a href=\"../index.html?view=pc\">PC 버전으로</a></li>",
       "        </ul>",

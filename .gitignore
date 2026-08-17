@@ -15,6 +15,7 @@ dist/
 # 아래는 커밋 대상이므로 무시하지 않는다 (의도적)
 #   src/assets/css/       폐쇄망 안전망 3계층. sass 를 못 돌려도 뼈대가 열려야 한다
 #   src/guide.html        생성물이지만 이관 산출물이라 저장소에 있어야 한다
+#   src/index.html        생성물. 같은 이유 (PC/MO 루트 분기 — tools/ua-redirect.js 가 만든다)
 #   .vscode/*.code-snippets  현업에서 npm 없이 바로 쓰기 위함
 #   tools/vendor/         dart-sass · axe 동봉 바이너리
 
