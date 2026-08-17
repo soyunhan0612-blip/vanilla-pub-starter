@@ -21,7 +21,10 @@
     {
       "step": 2,
       "name": "layout-main",
-      "status": "pending"
+      "status": "completed",
+      "summary": "PC·MO 메인 7개 영역과 적응형 상품·카테고리·배너 그리드, JS 없는 scroll-snap 히어로 골격을 구현했다.",
+      "started_at": "2026-08-17T14:35:49+0900",
+      "completed_at": "2026-08-17T14:45:33+0900"
     },
     {
       "step": 3,

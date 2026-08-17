@@ -8,6 +8,7 @@
   <h2 id="product-card-showcase-title">상품 카드</h2>
 
   <div class="product-card-showcase__grid">
+    <!-- @variant grid -->
     <article class="product-card product-card--grid" data-bind-list="products">
       <div class="product-card__media">
         <a
@@ -51,7 +52,9 @@
         </div>
       </div>
     </article>
+    <!-- @endvariant -->
 
+    <!-- @variant list -->
     <article class="product-card product-card--list is-sold-out" data-bind-list="products">
       <div class="product-card__media">
         <a
@@ -100,5 +103,6 @@
         </div>
       </div>
     </article>
+    <!-- @endvariant -->
   </div>
 </section>

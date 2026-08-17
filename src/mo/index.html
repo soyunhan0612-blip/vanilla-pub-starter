@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>메인 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/mo.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-mo.html -->
+  <!-- @include layout/gnb-mo.html -->
+  <main class="site-main site-main--with-bottom-nav main-page" id="main">
+    <h1 class="sr-only">쇼핑몰 메인</h1>
+
+    <section class="main-section main-hero" aria-labelledby="mo-main-hero-title">
+      <h2 class="sr-only" id="mo-main-hero-title">히어로 배너</h2>
+      <ul class="main-carousel" aria-label="프로모션 배너 목록" tabindex="0">
+        <li class="main-carousel__slide">
+          <!-- @include common/image.html#eager -->
+        </li>
+        <li class="main-carousel__slide">
+          <!-- @include common/image.html#default -->
+        </li>
+        <li class="main-carousel__slide">
+          <!-- @include common/image.html#default -->
+        </li>
+      </ul>
+    </section>
+
+    <section class="main-section main-category" aria-labelledby="mo-main-category-title">
+      <div class="container">
+        <div class="main-section__header">
+          <h2 id="mo-main-category-title">카테고리 바로가기</h2>
+        </div>
+        <ul class="main-category__grid">
+          <li><a class="main-category__link" href="/category/women"><span class="main-category__icon" aria-hidden="true"></span><span>여성</span></a></li>
+          <li><a class="main-category__link" href="/category/men"><span class="main-category__icon" aria-hidden="true"></span><span>남성</span></a></li>
+          <li><a class="main-category__link" href="/category/kids"><span class="main-category__icon" aria-hidden="true"></span><span>키즈</span></a></li>
+          <li><a class="main-category__link" href="/category/outer"><span class="main-category__icon" aria-hidden="true"></span><span>아우터</span></a></li>
+          <li><a class="main-category__link" href="/category/top"><span class="main-category__icon" aria-hidden="true"></span><span>상의</span></a></li>
+          <li><a class="main-category__link" href="/category/bottom"><span class="main-category__icon" aria-hidden="true"></span><span>하의</span></a></li>
+          <li><a class="main-category__link" href="/category/bag"><span class="main-category__icon" aria-hidden="true"></span><span>가방</span></a></li>
+          <li><a class="main-category__link" href="/category/shoes"><span class="main-category__icon" aria-hidden="true"></span><span>신발</span></a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="main-section main-products" aria-labelledby="mo-main-recommend-title">
+      <div class="container">
+        <div class="main-section__header">
+          <h2 id="mo-main-recommend-title">추천 상품</h2>
+        </div>
+        <ul class="main-products__grid">
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="main-section main-event" aria-labelledby="mo-main-event-title">
+      <div class="container">
+        <div class="main-section__header">
+          <h2 id="mo-main-event-title">기획전과 이벤트</h2>
+        </div>
+        <div class="main-event__grid">
+          <article class="main-event__item">
+            <a class="main-event__link" href="/events/new-season">
+              <!-- @include common/image.html#default -->
+              <h3>새 시즌 기획전</h3>
+            </a>
+          </article>
+          <article class="main-event__item">
+            <a class="main-event__link" href="/events/weekly">
+              <!-- @include common/image.html#default -->
+              <h3>주간 이벤트</h3>
+            </a>
+          </article>
+          <article class="main-event__item">
+            <a class="main-event__link" href="/events/member">
+              <!-- @include common/image.html#default -->
+              <h3>회원 혜택</h3>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-section main-products" aria-labelledby="mo-main-new-title">
+      <div class="container">
+        <div class="main-section__header">
+          <h2 id="mo-main-new-title">신상품</h2>
+        </div>
+        <ul class="main-products__grid">
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="main-section main-products" aria-labelledby="mo-main-best-title">
+      <div class="container">
+        <div class="main-section__header">
+          <h2 id="mo-main-best-title">베스트셀러</h2>
+        </div>
+        <ol class="main-products__grid">
+          <li class="main-products__ranked"><strong class="main-products__rank" aria-label="1위">1</strong><!-- @include ecommerce/product-card.html#grid --></li>
+          <li class="main-products__ranked"><strong class="main-products__rank" aria-label="2위">2</strong><!-- @include ecommerce/product-card.html#grid --></li>
+          <li class="main-products__ranked"><strong class="main-products__rank" aria-label="3위">3</strong><!-- @include ecommerce/product-card.html#grid --></li>
+          <li class="main-products__ranked"><strong class="main-products__rank" aria-label="4위">4</strong><!-- @include ecommerce/product-card.html#grid --></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="main-section main-story" aria-labelledby="mo-main-story-title">
+      <div class="container main-story__layout">
+        <div class="main-story__media">
+          <!-- @include common/image.html#default -->
+        </div>
+        <div class="main-story__content">
+          <h2 id="mo-main-story-title">브랜드 스토리</h2>
+          <p data-bind="brand.story">브랜드가 추구하는 가치와 제작 이야기가 연결되는 콘텐츠 영역입니다.</p>
+          <a href="/brand-story">브랜드 이야기 보기</a>
+        </div>
+      </div>
+    </section>
+  </main>
+  <!-- @include layout/footer.html -->
+  <!-- @include layout/bottom-nav.html -->
+  <script type="module" src="/assets/js/mo.js"></script>
+</body>
+</html>
