@@ -152,4 +152,33 @@
   .site-header__user-nav {
     margin-left: auto;
   }
+
+  .site-header--mo {
+    padding-top: var(--safe-top);
+  }
+
+  .site-header--mo .site-header__main-inner {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    gap: var(--space-1);
+    padding-block: var(--space-2);
+  }
+
+  .site-header--mo .site-header__menu-button {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-strong);
+  }
+
+  .site-header--mo .site-header__logo {
+    justify-self: center;
+    font-size: var(--font-size-section-title);
+  }
+
+  .site-header--mo .site-header__user-nav {
+    margin-left: 0;
+  }
 }

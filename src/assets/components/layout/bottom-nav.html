@@ -1,0 +1,52 @@
+<!-- @component MO 하단 내비게이션
+     @category layout
+     @variant  fixed — 안전 영역을 포함한 모바일 하단 고정 주요 메뉴
+     @a11y     현재 위치와 아이콘별 텍스트 레이블, 44×44px 이상 터치 영역 제공
+     @snippet  bottom-nav
+-->
+<nav class="bottom-nav" aria-label="주요 메뉴">
+  <ul class="bottom-nav__list">
+    <li class="bottom-nav__item">
+      <a class="bottom-nav__link" href="/" aria-current="page">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="m3 11 9-8 9 8v10h-6v-6H9v6H3Z" fill="none" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        <span>홈</span>
+      </a>
+    </li>
+    <li class="bottom-nav__item">
+      <a class="bottom-nav__link" href="/category">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M4 5h16M4 12h16M4 19h16" fill="none" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        <span>카테고리</span>
+      </a>
+    </li>
+    <li class="bottom-nav__item">
+      <a class="bottom-nav__link" href="/search">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+          <path d="m16 16 5 5" fill="none" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        <span>검색</span>
+      </a>
+    </li>
+    <li class="bottom-nav__item">
+      <a class="bottom-nav__link" href="/wishlist">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z" fill="none" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        <span>찜</span>
+      </a>
+    </li>
+    <li class="bottom-nav__item">
+      <a class="bottom-nav__link" href="/mypage">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+          <circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.5" />
+          <path d="M4 21c.8-4 3.5-6 8-6s7.2 2 8 6" fill="none" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+        <span>마이</span>
+      </a>
+    </li>
+  </ul>
+</nav>

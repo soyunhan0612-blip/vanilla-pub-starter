@@ -14,6 +14,7 @@ class DelegatedRoot {
   }
 
   dispatch(type, event) {
+    event.currentTarget ||= this;
     for (const listener of this.listeners.get(type) || []) listener(event);
   }
 }
@@ -100,7 +101,7 @@ function createAccordionFixture(mode, expandedStates) {
   return { root, panels, triggers };
 }
 
-function createGnbFixture() {
+function createGnbFixture(mode) {
   const root = new DelegatedRoot();
   const panels = [];
   const triggers = [];
@@ -111,6 +112,9 @@ function createGnbFixture() {
     },
   };
   const gnb = {
+    getAttribute(name) {
+      return name === 'data-gnb-mode' ? mode || null : null;
+    },
     contains(target) {
       return target === gnb || triggers.includes(target) || panels.includes(target) || links.includes(target);
     },
@@ -336,6 +340,135 @@ test('GNB는 포인터가 메뉴를 벗어날 때 짧은 지연 후 닫는다', 
   }
 });
 
+test('MO GNB 아코디언은 포인터 진입으로 열리지 않고 클릭으로만 전환한다', async () => {
+  const { initGnb } = await import('../assets/js/common/gnb.js');
+  const { root, panels, triggers } = createGnbFixture('accordion');
+  initGnb(root);
+
+  root.dispatch('mouseover', { target: triggers[0], relatedTarget: null });
+  assert.equal(triggers[0].getAttribute('aria-expanded'), 'false');
+  assert.equal(panels[0].hidden, true);
+
+  root.dispatch('click', clickEvent(triggers[0]));
+  assert.equal(triggers[0].getAttribute('aria-expanded'), 'true');
+  assert.equal(panels[0].hidden, false);
+});
+
+test('모달 기반 드로어는 상태를 동기화하고 Esc 후 호출 버튼으로 포커스를 돌린다', async () => {
+  const { initModals } = await import('../assets/js/common/modal.js');
+  const doc = new DelegatedRoot();
+  const modalAttributes = new Map([
+    ['aria-hidden', 'true'],
+    ['data-modal', 'gnb-mo-drawer'],
+  ]);
+  const modalClasses = new Set(['gnb-drawer']);
+  const opener = {
+    ...attributeNode({
+      'aria-controls': 'gnb-mo-drawer',
+      'aria-expanded': 'false',
+      'data-modal-open': 'gnb-mo-drawer',
+    }),
+    hasAttribute(name) {
+      return this.getAttribute(name) !== null;
+    },
+    closest(selector) {
+      return selector === '[data-modal-open]' ? opener : null;
+    },
+    focusCount: 0,
+    focus() {
+      this.focusCount += 1;
+      doc.activeElement = this;
+    },
+  };
+  const closeButton = {
+    getAttribute() {
+      return null;
+    },
+    closest(selector) {
+      if (selector === '[data-modal-close]') return closeButton;
+      if (selector === '[data-modal]') return modal;
+      return null;
+    },
+    focus() {
+      doc.activeElement = this;
+    },
+  };
+  const modal = {
+    id: 'gnb-mo-drawer',
+    dataset: { modal: 'gnb-mo-drawer' },
+    hidden: true,
+    inert: true,
+    offsetWidth: 0,
+    classList: {
+      add(name) {
+        modalClasses.add(name);
+      },
+      remove(name) {
+        modalClasses.delete(name);
+      },
+      contains(name) {
+        return modalClasses.has(name);
+      },
+    },
+    matches(selector) {
+      return selector === '[data-modal]';
+    },
+    contains(target) {
+      return target === closeButton;
+    },
+    querySelectorAll() {
+      return [closeButton];
+    },
+    getAttribute(name) {
+      return modalAttributes.get(name) ?? null;
+    },
+    setAttribute(name, value) {
+      modalAttributes.set(name, String(value));
+    },
+    removeAttribute(name) {
+      modalAttributes.delete(name);
+    },
+  };
+
+  doc.nodeType = 9;
+  doc.activeElement = opener;
+  doc.body = { style: { position: '', top: '', width: '' } };
+  doc.documentElement = {
+    classList: {
+      add() {},
+      remove() {},
+    },
+  };
+  doc.defaultView = { scrollY: 120, scrollTo() {} };
+  doc.getElementById = (id) => (id === modal.id ? modal : null);
+  doc.querySelectorAll = () => [modal];
+
+  initModals(doc);
+  doc.dispatch('click', clickEvent(opener));
+
+  assert.equal(modal.hidden, false);
+  assert.equal(modal.inert, false);
+  assert.equal(modalClasses.has('is-open'), true);
+  assert.equal(opener.getAttribute('aria-expanded'), 'true');
+  assert.equal(doc.activeElement, closeButton);
+  assert.equal(doc.body.style.position, 'fixed');
+
+  const escape = keyEvent(closeButton, 'Escape');
+  escape.propagationStopped = false;
+  escape.stopPropagation = function stopPropagation() {
+    this.propagationStopped = true;
+  };
+  doc.dispatch('keydown', escape);
+
+  assert.equal(escape.defaultPrevented, true);
+  assert.equal(escape.propagationStopped, true);
+  assert.equal(modal.hidden, true);
+  assert.equal(modal.inert, true);
+  assert.equal(opener.getAttribute('aria-expanded'), 'false');
+  assert.equal(doc.activeElement, opener);
+  assert.equal(doc.body.style.position, '');
+});
+
 test('내비게이션 fragment는 필수 ARIA 계약과 변형을 문서화한다', async () => {
   const componentUrl = new URL('../assets/components/common/', import.meta.url);
   const [tab, accordion, pagination, breadcrumb] = await Promise.all(
@@ -394,4 +527,57 @@ test('PC 셸 fragment는 검색·메가메뉴·공용 푸터 접근성 계약을
   assert.match(footer, /사업자등록번호/);
   assert.match(footer, /<strong>개인정보처리방침<\/strong>/);
   assert.match(footer, /<a[^>]*aria-label="인스타그램"/);
+});
+
+test('MO 셸은 공용 GNB·모달 계약과 안전 영역을 포함한 고정 내비게이션을 제공한다', async () => {
+  const componentUrl = new URL('../assets/components/layout/', import.meta.url);
+  const [header, gnbMo, gnbPc, bottomNav, template, moEntry, bottomNavScss, moScss] =
+    await Promise.all([
+      'header-mo.html',
+      'gnb-mo.html',
+      'gnb-pc.html',
+      'bottom-nav.html',
+    ].map((file) => readFile(new URL(file, componentUrl), 'utf8')).concat([
+      readFile(new URL('../mo/_template.html', import.meta.url), 'utf8'),
+      readFile(new URL('../assets/js/mo.js', import.meta.url), 'utf8'),
+      readFile(new URL('../assets/scss/layout/_bottom-nav.scss', import.meta.url), 'utf8'),
+      readFile(new URL('../assets/scss/mo.scss', import.meta.url), 'utf8'),
+    ]));
+
+  assert.match(header, /aria-label="메뉴 열기"/);
+  assert.match(header, /aria-expanded="false"/);
+  assert.match(header, /aria-controls="gnb-mo-drawer"/);
+  assert.match(header, /data-modal-open="gnb-mo-drawer"/);
+  assert.match(header, /스크롤 시 축소·고정은 적용하지 않는다/);
+  assert.match(header, /<span class="sr-only">장바구니 3개<\/span>/);
+
+  assert.match(gnbMo, /role="dialog"/);
+  assert.match(gnbMo, /aria-modal="true"/);
+  assert.match(gnbMo, /data-modal="gnb-mo-drawer"/);
+  assert.match(gnbMo, /data-gnb[^>]*data-gnb-mode="accordion"/);
+  assert.match(gnbMo, /data-gnb-trigger/);
+  assert.match(gnbMo, /data-gnb-panel/);
+  const categoryLinks = (source) =>
+    [...source.matchAll(/href="(\/category\/[^"]+)"/g)].map((match) => match[1]);
+  assert.deepEqual(categoryLinks(gnbMo), categoryLinks(gnbPc));
+
+  assert.match(bottomNav, /<nav[^>]*aria-label="주요 메뉴"/);
+  assert.equal((bottomNav.match(/class="bottom-nav__link"/g) || []).length, 5);
+  assert.match(bottomNav, /aria-current="page"/);
+  for (const label of ['홈', '카테고리', '검색', '찜', '마이']) {
+    assert.match(bottomNav, new RegExp(`<span>${label}<\\/span>`));
+  }
+  assert.match(bottomNavScss, /min-width:\s*44px/);
+  assert.match(bottomNavScss, /min-height:\s*44px/);
+  assert.match(bottomNavScss, /var\(--safe-bottom\)/);
+
+  assert.match(template, /href="\/assets\/css\/mo\.css"/);
+  assert.match(template, /src="\/assets\/js\/mo\.js"/);
+  assert.match(template, /@include\s+layout\/header-mo\.html/);
+  assert.match(template, /@include\s+layout\/gnb-mo\.html/);
+  assert.match(template, /@include\s+layout\/footer\.html/);
+  assert.match(template, /@include\s+layout\/bottom-nav\.html/);
+  assert.match(template, /<main[^>]*site-main--with-bottom-nav/);
+  assert.match(moEntry, /initGnb\(document\)/);
+  assert.match(moScss, /max-width:\s*var\(--layout-content-mo-max\)/);
 });

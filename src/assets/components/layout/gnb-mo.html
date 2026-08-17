@@ -1,0 +1,100 @@
+<!-- @component MO GNB
+     @category layout
+     @variant  drawer — 왼쪽 드로어와 2뎁스 카테고리 아코디언
+     @a11y     모달 포커스 트랩·Esc·스크롤 잠금·호출 버튼 복귀와 aria-expanded 상태 제공
+     @snippet  gnb-mo
+-->
+<div
+  class="gnb-drawer"
+  id="gnb-mo-drawer"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="gnb-mo-title"
+  aria-hidden="true"
+  data-modal="gnb-mo-drawer"
+  tabindex="-1"
+  hidden
+  inert
+>
+  <div class="gnb-drawer__dialog">
+    <div class="gnb-drawer__header">
+      <h2 class="gnb-drawer__title" id="gnb-mo-title">카테고리</h2>
+      <button class="gnb-drawer__close" type="button" data-modal-close aria-label="메뉴 닫기">
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+      </button>
+    </div>
+
+    <nav class="gnb gnb--mo" aria-label="카테고리 메뉴" data-gnb data-gnb-mode="accordion">
+      <ul class="gnb__list">
+        <li class="gnb__item">
+          <button
+            class="gnb__trigger"
+            type="button"
+            id="gnb-mo-women-trigger"
+            data-gnb-trigger
+            aria-expanded="false"
+            aria-controls="gnb-mo-women-panel"
+          >
+            여성
+            <svg class="gnb__trigger-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+              <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </button>
+          <div
+            class="gnb__panel"
+            id="gnb-mo-women-panel"
+            data-gnb-panel
+            aria-labelledby="gnb-mo-women-trigger"
+            hidden
+          >
+            <ul class="gnb__submenu">
+              <li><a href="/category/women/outer">아우터</a></li>
+              <li><a href="/category/women/top">상의</a></li>
+              <li><a href="/category/women/bottom">하의</a></li>
+              <li><a href="/category/women/dress">원피스</a></li>
+              <li><a href="/category/women/bag">가방</a></li>
+              <li><a href="/category/women/shoes">신발</a></li>
+            </ul>
+          </div>
+        </li>
+        <li class="gnb__item">
+          <button
+            class="gnb__trigger"
+            type="button"
+            id="gnb-mo-men-trigger"
+            data-gnb-trigger
+            aria-expanded="false"
+            aria-controls="gnb-mo-men-panel"
+          >
+            남성
+            <svg class="gnb__trigger-icon" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+              <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </button>
+          <div
+            class="gnb__panel"
+            id="gnb-mo-men-panel"
+            data-gnb-panel
+            aria-labelledby="gnb-mo-men-trigger"
+            hidden
+          >
+            <ul class="gnb__submenu">
+              <li><a href="/category/men/outer">아우터</a></li>
+              <li><a href="/category/men/top">상의</a></li>
+              <li><a href="/category/men/bottom">하의</a></li>
+              <li><a href="/category/men/suit">수트</a></li>
+              <li><a href="/category/men/bag">가방</a></li>
+              <li><a href="/category/men/shoes">신발</a></li>
+            </ul>
+          </div>
+        </li>
+        <li class="gnb__item"><a class="gnb__link" href="/new">신상품</a></li>
+        <li class="gnb__item"><a class="gnb__link" href="/best">베스트</a></li>
+        <li class="gnb__item"><a class="gnb__link" href="/sale">세일</a></li>
+        <li class="gnb__item"><a class="gnb__link" href="/events">기획전</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>

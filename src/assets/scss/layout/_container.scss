@@ -1,3 +1,5 @@
+@use '../abstracts/mixins' as *;
+
 .container {
   width: 100%;
   max-width: 100%;
@@ -9,4 +11,12 @@
       calc((100% - var(--layout-content-pc)) / 2)
     );
   overflow-wrap: anywhere;
+}
+
+@include respond-mo {
+  .container {
+    padding-inline:
+      max(var(--layout-gutter-mo), var(--safe-left))
+      max(var(--layout-gutter-mo), var(--safe-right));
+  }
 }

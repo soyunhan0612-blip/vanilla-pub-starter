@@ -6,6 +6,12 @@
 @use 'tokens/layout';
 @use 'base/reset';
 @use 'base/base';
+@use 'layout/container';
+@use 'layout/header';
+@use 'layout/gnb';
+@use 'layout/footer';
+@use 'layout/grid';
+@use 'layout/bottom-nav';
 @use 'common/button';
 @use 'common/form';
 @use 'common/modal';
@@ -28,10 +34,12 @@
 
 body {
   width: var(--layout-content-mo);
+  padding-bottom: calc(var(--space-10) + var(--space-10) + var(--safe-bottom));
 }
 
 @media (min-width: ($mo-content-max + 1px)) and (max-width: $bp-mo-max) {
-  body {
+  body,
+  .container {
     max-width: var(--layout-content-mo-max);
     margin-inline: auto;
   }

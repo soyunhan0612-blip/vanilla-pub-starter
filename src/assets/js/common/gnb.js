@@ -128,7 +128,7 @@ function handleKeydown(event) {
 
 function handleMouseover(event) {
   const gnb = event.target?.closest?.('[data-gnb]');
-  if (!gnb) return;
+  if (!gnb || gnb.getAttribute?.('data-gnb-mode') === 'accordion') return;
   clearCloseTimer(gnb);
 
   const trigger = event.target.closest('[data-gnb-trigger]');
@@ -140,7 +140,11 @@ function handleMouseover(event) {
 
 function handleMouseout(event) {
   const gnb = event.target?.closest?.('[data-gnb]');
-  if (!gnb || gnb.contains(event.relatedTarget)) return;
+  if (
+    !gnb ||
+    gnb.getAttribute?.('data-gnb-mode') === 'accordion' ||
+    gnb.contains(event.relatedTarget)
+  ) return;
 
   clearCloseTimer(gnb);
   closeTimers.set(

@@ -1,0 +1,52 @@
+<!-- @component MO 헤더
+     @category layout
+     @variant  default — 메뉴·로고·검색·장바구니로 구성한 모바일 헤더
+     @a11y     메뉴 버튼 상태와 아이콘 링크의 대체 텍스트·장바구니 개수를 제공
+     @snippet  header-mo
+-->
+<!-- 스크롤 시 축소·고정은 적용하지 않는다. 콘텐츠를 가리지 않는 예측 가능한 문서 흐름을 유지한다. -->
+<header class="site-header site-header--mo">
+  <div class="site-header__main">
+    <div class="container site-header__main-inner">
+      <button
+        class="site-header__menu-button"
+        type="button"
+        aria-label="메뉴 열기"
+        aria-expanded="false"
+        aria-controls="gnb-mo-drawer"
+        data-modal-open="gnb-mo-drawer"
+      >
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+          <path d="M3 6h18M3 12h18M3 18h18" fill="none" stroke="currentColor" stroke-width="1.5" />
+        </svg>
+      </button>
+
+      <a class="site-header__logo" href="/" aria-label="쇼핑몰 홈">SHOP</a>
+
+      <nav class="site-header__user-nav" aria-label="사용자 메뉴">
+        <ul class="site-header__user-list">
+          <li>
+            <a class="site-header__icon-link" href="/search">
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <path d="m16 16 5 5" fill="none" stroke="currentColor" stroke-width="1.5" />
+              </svg>
+              <span class="sr-only">검색</span>
+            </a>
+          </li>
+          <li>
+            <a class="site-header__icon-link" href="/cart">
+              <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+                <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L20 8H7" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <circle cx="10" cy="20" r="1" fill="currentColor" />
+                <circle cx="18" cy="20" r="1" fill="currentColor" />
+              </svg>
+              <span class="site-header__badge" aria-hidden="true" data-bind="cart-count">3</span>
+              <span class="sr-only">장바구니 3개</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>

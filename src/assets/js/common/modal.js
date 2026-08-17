@@ -89,6 +89,9 @@ function hideFrame(frame) {
   frame.modal.setAttribute('aria-hidden', 'true');
   frame.modal.inert = true;
   frame.modal.hidden = true;
+  if (frame.trigger?.hasAttribute?.('aria-expanded')) {
+    frame.trigger.setAttribute('aria-expanded', 'false');
+  }
 }
 
 function handleDocumentClick(event) {
@@ -122,6 +125,7 @@ function handleDocumentKeydown(event) {
 
   if (event.key === 'Escape') {
     event.preventDefault();
+    event.stopPropagation();
     closeModal(frame.modal.id || frame.modal.dataset.modal);
     return;
   }
@@ -181,7 +185,11 @@ export function openModal(id) {
   modal.removeAttribute('aria-hidden');
   void modal.offsetWidth;
   modal.classList.add('is-open');
-  modalStack.push({ doc, modal, trigger });
+  const frame = { doc, modal, trigger };
+  modalStack.push(frame);
+  if (trigger?.hasAttribute?.('aria-expanded')) {
+    trigger.setAttribute('aria-expanded', 'true');
+  }
   focusFirst(modal);
   return modal;
 }
