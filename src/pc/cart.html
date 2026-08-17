@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>장바구니 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/pc.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-pc.html -->
+  <main class="cart-page" id="main">
+    <div class="container">
+      <header class="cart-page__header">
+        <h1>장바구니</h1>
+        <!-- @include ecommerce/step-indicator.html#cart -->
+      </header>
+
+      <div class="cart-page__layout">
+        <section class="cart-page__content" aria-labelledby="cart-list-title-pc">
+          <h2 id="cart-list-title-pc">장바구니 목록</h2>
+
+          <div class="cart-page__toolbar">
+            <label class="choice" for="cart-select-all-pc">
+              <input
+                class="choice__control"
+                id="cart-select-all-pc"
+                name="cart-select-all"
+                type="checkbox"
+                data-bind-event="select-all-cart-items"
+              >
+              <span>전체 선택</span>
+            </label>
+            <button
+              type="button"
+              class="btn btn--text btn--md"
+              data-modal-open="cart-delete-confirmation"
+              aria-controls="cart-delete-confirmation"
+              aria-expanded="false"
+            >
+              선택 삭제
+            </button>
+          </div>
+
+          <p
+            class="sr-only"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            data-bind="cart.updateMessage"
+          >
+            수량 변경 또는 삭제 후 장바구니 합계가 갱신되었습니다.
+          </p>
+
+          <ul class="cart-list" data-bind-list="cart.items">
+            <li class="cart-item">
+              <label class="cart-item__select" for="cart-item-shirt-pc">
+                <span class="sr-only">베이직 코튼 셔츠 선택</span>
+                <input
+                  class="choice__control"
+                  id="cart-item-shirt-pc"
+                  name="cart-items"
+                  type="checkbox"
+                  value="shirt"
+                  checked
+                >
+              </label>
+              <div class="cart-item__product">
+                <!-- @include ecommerce/product-card.html#list -->
+              </div>
+              <button
+                type="button"
+                class="btn btn--text btn--md cart-item__delete"
+                data-modal-open="cart-delete-confirmation"
+                aria-controls="cart-delete-confirmation"
+                aria-expanded="false"
+                aria-label="베이직 코튼 셔츠 삭제"
+              >
+                삭제
+              </button>
+            </li>
+            <li class="cart-item is-sold-out">
+              <label class="cart-item__select" for="cart-item-limited-pc">
+                <span class="sr-only">리미티드 에디션 상품 선택 — 품절</span>
+                <input
+                  class="choice__control"
+                  id="cart-item-limited-pc"
+                  name="cart-items"
+                  type="checkbox"
+                  value="limited"
+                  disabled
+                >
+              </label>
+              <div class="cart-item__product">
+                <!-- @include ecommerce/product-card.html#list-sold-out -->
+              </div>
+              <button
+                type="button"
+                class="btn btn--text btn--md cart-item__delete"
+                data-modal-open="cart-delete-confirmation"
+                aria-controls="cart-delete-confirmation"
+                aria-expanded="false"
+                aria-label="품절된 리미티드 에디션 상품 삭제"
+              >
+                삭제
+              </button>
+            </li>
+          </ul>
+
+          <aside class="cart-page__shipping" aria-labelledby="cart-shipping-title-pc">
+            <h2 id="cart-shipping-title-pc">배송비 안내</h2>
+            <p data-bind="cart.shippingNotice">50,000원 이상 주문하면 배송비가 무료입니다.</p>
+          </aside>
+        </section>
+
+        <!-- @include ecommerce/cart-summary.html#cart -->
+      </div>
+
+      <!-- 상태 변형: 빈 장바구니 시작 — 실제 연동 시 기본 목록·요약과 교체하고 hidden을 제거한다. -->
+      <section class="cart-page__empty" aria-labelledby="cart-empty-state-title-pc" hidden>
+        <h2 class="sr-only" id="cart-empty-state-title-pc">장바구니 빈 상태</h2>
+        <!-- @include common/empty.html#cart -->
+      </section>
+      <!-- 상태 변형: 빈 장바구니 끝 -->
+    </div>
+  </main>
+  <!-- @include common/modal.html#delete-confirmation -->
+  <!-- @include layout/footer.html -->
+  <script type="module" src="/assets/js/pc.js"></script>
+</body>
+</html>

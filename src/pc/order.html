@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>주문/결제 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/pc.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-pc.html -->
+  <main class="order-page" id="main">
+    <div class="container">
+      <header class="order-page__header">
+        <h1>주문/결제</h1>
+        <!-- @include ecommerce/step-indicator.html#order -->
+      </header>
+
+      <!-- 쿠폰 컴포넌트의 독립 form과 중첩하지 않도록 주문 입력은 form 속성으로 이 폼에 연결한다. -->
+      <form id="order-form" autocomplete="on" data-bind-event="submit-order"></form>
+
+      <div class="order-page__layout">
+        <div class="order-page__content">
+          <details class="order-products" open>
+            <summary>
+              <span>주문 상품 목록</span>
+              <span data-bind="order.itemCount">2개</span>
+            </summary>
+            <ul class="order-products__list" data-bind-list="order.items">
+              <li class="order-product">
+                <div class="order-product__media"><!-- @include common/image.html#fixed-ratio --></div>
+                <div class="order-product__info">
+                  <strong data-bind="product.name">베이직 코튼 셔츠</strong>
+                  <p data-bind="product.option">네이비 / M · 1개</p>
+                </div>
+                <!-- @include ecommerce/price.html#default -->
+              </li>
+              <li class="order-product">
+                <div class="order-product__media"><!-- @include common/image.html#fixed-ratio --></div>
+                <div class="order-product__info">
+                  <strong data-bind="product.name">데일리 와이드 팬츠</strong>
+                  <p data-bind="product.option">블랙 / S · 1개</p>
+                </div>
+                <!-- @include ecommerce/price.html#default -->
+              </li>
+            </ul>
+          </details>
+
+          <section class="order-section" aria-labelledby="shipping-address-title-pc">
+            <h2 id="shipping-address-title-pc">배송지 정보</h2>
+            <fieldset class="form-field order-fieldset" form="order-form">
+              <legend class="form-field__legend">배송지 선택 및 신규 입력</legend>
+
+              <div class="choice-list order-address-choice">
+                <label class="choice" for="saved-address-pc">
+                  <input
+                    class="choice__control"
+                    id="saved-address-pc"
+                    name="address-source"
+                    type="radio"
+                    value="saved"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                    checked
+                  >
+                  <span>기본 배송지</span>
+                </label>
+                <label class="choice" for="new-address-pc">
+                  <input
+                    class="choice__control"
+                    id="new-address-pc"
+                    name="address-source"
+                    type="radio"
+                    value="new"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                  >
+                  <span>신규 입력</span>
+                </label>
+              </div>
+
+              <div class="order-address-fields">
+                <div class="form-field">
+                  <label class="form-field__label" for="recipient-name-pc">받는 분 (필수)</label>
+                  <input
+                    class="form-control"
+                    id="recipient-name-pc"
+                    name="recipient-name"
+                    type="text"
+                    autocomplete="name"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                    value="홍길동"
+                  >
+                </div>
+
+                <div class="form-field">
+                  <label class="form-field__label" for="recipient-tel-pc">휴대폰 번호 (필수)</label>
+                  <input
+                    class="form-control"
+                    id="recipient-tel-pc"
+                    name="recipient-tel"
+                    type="tel"
+                    inputmode="tel"
+                    autocomplete="tel"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                    value="010-1234-5678"
+                  >
+                </div>
+
+                <div class="order-address-lookup">
+                  <div class="form-field is-error">
+                    <label class="form-field__label" for="postal-code-pc">우편번호 (필수)</label>
+                    <input
+                      class="form-control"
+                      id="postal-code-pc"
+                      name="postal-code"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="postal-code"
+                      form="order-form"
+                      required
+                      aria-required="true"
+                      aria-invalid="true"
+                      aria-describedby="postal-code-error-pc"
+                    >
+                    <p id="postal-code-error-pc" class="form-field__message form-field__message--error">
+                      우편번호 찾기로 배송지를 선택해 주세요.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn--outline btn--md"
+                    data-modal-open="address-search-modal"
+                    aria-controls="address-search-modal"
+                    aria-expanded="false"
+                  >
+                    우편번호 찾기
+                  </button>
+                </div>
+
+                <div class="form-field">
+                  <label class="form-field__label" for="address-level1-pc">시/도 (필수)</label>
+                  <input
+                    class="form-control"
+                    id="address-level1-pc"
+                    name="address-level1"
+                    type="text"
+                    autocomplete="address-level1"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                  >
+                </div>
+
+                <div class="form-field">
+                  <label class="form-field__label" for="address-level2-pc">시/군/구 (필수)</label>
+                  <input
+                    class="form-control"
+                    id="address-level2-pc"
+                    name="address-level2"
+                    type="text"
+                    autocomplete="address-level2"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                  >
+                </div>
+
+                <div class="form-field order-address-fields__wide">
+                  <label class="form-field__label" for="street-address-pc">도로명 주소 (필수)</label>
+                  <input
+                    class="form-control"
+                    id="street-address-pc"
+                    name="street-address"
+                    type="text"
+                    autocomplete="street-address"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                  >
+                </div>
+
+                <div class="form-field order-address-fields__wide">
+                  <label class="form-field__label" for="address-line2-pc">상세 주소 (선택)</label>
+                  <input
+                    class="form-control"
+                    id="address-line2-pc"
+                    name="address-line2"
+                    type="text"
+                    autocomplete="address-line2"
+                    form="order-form"
+                  >
+                </div>
+
+                <div class="form-field order-address-fields__wide">
+                  <label class="form-field__label" for="delivery-request-pc">배송 요청사항 (선택)</label>
+                  <textarea
+                    class="form-control"
+                    id="delivery-request-pc"
+                    name="delivery-request"
+                    autocomplete="off"
+                    form="order-form"
+                  ></textarea>
+                </div>
+              </div>
+            </fieldset>
+          </section>
+
+          <section class="order-section" aria-labelledby="shipping-method-title-pc">
+            <h2 id="shipping-method-title-pc">배송 방법</h2>
+            <fieldset class="form-field order-fieldset" form="order-form">
+              <legend class="form-field__legend">배송 방법 선택 (필수)</legend>
+              <div class="choice-list order-choice-grid">
+                <label class="choice" for="shipping-standard-pc">
+                  <input
+                    class="choice__control"
+                    id="shipping-standard-pc"
+                    name="shipping-method"
+                    type="radio"
+                    value="standard"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                    checked
+                  >
+                  <span>일반 배송</span>
+                </label>
+                <label class="choice" for="shipping-dawn-pc">
+                  <input
+                    class="choice__control"
+                    id="shipping-dawn-pc"
+                    name="shipping-method"
+                    type="radio"
+                    value="dawn"
+                    form="order-form"
+                    required
+                    aria-required="true"
+                  >
+                  <span>새벽 배송</span>
+                </label>
+              </div>
+            </fieldset>
+          </section>
+
+          <div class="order-section">
+            <!-- @include ecommerce/coupon.html#code -->
+            <section class="order-point" aria-labelledby="point-title-pc">
+              <h2 id="point-title-pc">포인트</h2>
+              <div class="form-field">
+                <label class="form-field__label" for="point-amount-pc">사용할 포인트</label>
+                <input
+                  class="form-control"
+                  id="point-amount-pc"
+                  name="point-amount"
+                  type="number"
+                  inputmode="numeric"
+                  min="0"
+                  step="1"
+                  autocomplete="off"
+                  form="order-form"
+                  aria-describedby="point-hint-pc"
+                >
+                <p id="point-hint-pc" class="form-field__hint">사용 가능한 포인트: 10,000P</p>
+              </div>
+            </section>
+          </div>
+
+          <section class="order-section" aria-labelledby="payment-method-title-pc">
+            <h2 id="payment-method-title-pc">결제 수단</h2>
+            <fieldset class="form-field order-fieldset is-error" form="order-form" aria-describedby="payment-method-error-pc">
+              <legend class="form-field__legend">결제 수단 선택 (필수)</legend>
+              <div class="choice-list order-choice-grid">
+                <label class="choice" for="payment-card-pc">
+                  <input class="choice__control" id="payment-card-pc" name="payment-method" type="radio" value="card" form="order-form" required aria-required="true" aria-invalid="true" aria-describedby="payment-method-error-pc">
+                  <span>카드</span>
+                </label>
+                <label class="choice" for="payment-bank-pc">
+                  <input class="choice__control" id="payment-bank-pc" name="payment-method" type="radio" value="bank" form="order-form" required aria-required="true" aria-invalid="true" aria-describedby="payment-method-error-pc">
+                  <span>계좌이체</span>
+                </label>
+                <label class="choice" for="payment-easy-pc">
+                  <input class="choice__control" id="payment-easy-pc" name="payment-method" type="radio" value="easy" form="order-form" required aria-required="true" aria-invalid="true" aria-describedby="payment-method-error-pc">
+                  <span>간편결제</span>
+                </label>
+                <label class="choice" for="payment-mobile-pc">
+                  <input class="choice__control" id="payment-mobile-pc" name="payment-method" type="radio" value="mobile" form="order-form" required aria-required="true" aria-invalid="true" aria-describedby="payment-method-error-pc">
+                  <span>휴대폰</span>
+                </label>
+              </div>
+              <p id="payment-method-error-pc" class="form-field__message form-field__message--error">결제 수단을 선택해 주세요.</p>
+            </fieldset>
+          </section>
+
+          <section class="order-section" aria-labelledby="agreement-title-pc">
+            <h2 id="agreement-title-pc">결제 정보 동의</h2>
+            <fieldset class="form-field order-fieldset" form="order-form">
+              <legend class="form-field__legend">약관 동의</legend>
+              <div class="choice-list order-agreements">
+                <label class="choice" for="agreement-all-pc">
+                  <input class="choice__control" id="agreement-all-pc" name="agreement-all" type="checkbox" form="order-form" data-bind-event="toggle-all-agreements">
+                  <span>전체 동의</span>
+                </label>
+                <label class="choice" for="agreement-purchase-pc">
+                  <input class="choice__control" id="agreement-purchase-pc" name="agreement-purchase" type="checkbox" form="order-form" required aria-required="true" aria-invalid="true" aria-describedby="agreement-error-pc">
+                  <span>[필수] 구매 조건 및 결제 진행 동의</span>
+                </label>
+                <label class="choice" for="agreement-privacy-pc">
+                  <input class="choice__control" id="agreement-privacy-pc" name="agreement-privacy" type="checkbox" form="order-form" required aria-required="true">
+                  <span>[필수] 개인정보 수집 및 이용 동의</span>
+                </label>
+                <label class="choice" for="agreement-marketing-pc">
+                  <input class="choice__control" id="agreement-marketing-pc" name="agreement-marketing" type="checkbox" form="order-form">
+                  <span>[선택] 마케팅 정보 수신 동의</span>
+                </label>
+              </div>
+              <p id="agreement-error-pc" class="form-field__message form-field__message--error">필수 약관에 동의해 주세요.</p>
+            </fieldset>
+          </section>
+        </div>
+
+        <!-- @include ecommerce/cart-summary.html#order -->
+      </div>
+    </div>
+  </main>
+  <!-- @include ecommerce/coupon.html#list -->
+  <!-- @include common/modal.html#address-search -->
+  <!-- @include layout/footer.html -->
+  <script type="module" src="/assets/js/pc.js"></script>
+</body>
+</html>

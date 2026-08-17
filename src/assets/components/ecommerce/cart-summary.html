@@ -1,15 +1,15 @@
 <!-- @component 주문 금액 요약
      @category ecommerce
-     @variant  default
+     @variant  cart | order
      @a11y     금액 항목은 dl의 이름·값 쌍으로 제공하고 최종 결제금액은 strong으로 의미를 강조
      @integration 금액 계산은 구현하지 않으며 각 data-bind 지점에 서버 또는 개발사 계산 결과를 주입
      @responsive PC에서는 sticky 사이드바, MO에서는 최종 금액과 결제 CTA를 safe-area가 반영된 하단 고정 바로 표시
      @snippet  cart-summary
 -->
-<!-- @variant default -->
+<!-- @variant cart -->
 <!-- MO 페이지에서는 <main>에 has-cart-summary-bar 클래스를 추가해 고정 결제 바 높이만큼 하단 여백을 확보한다. -->
-<aside class="cart-summary" aria-labelledby="cart-summary-title">
-  <h2 id="cart-summary-title" class="cart-summary__title">주문 금액</h2>
+<aside class="cart-summary" aria-labelledby="cart-summary-cart-title">
+  <h2 id="cart-summary-cart-title" class="cart-summary__title">주문 요약</h2>
 
   <div class="cart-summary__details">
     <dl class="cart-summary__breakdown">
@@ -47,7 +47,60 @@
         </dd>
       </div>
     </dl>
-    <button type="button" class="btn btn--primary btn--lg cart-summary__submit" data-bind-event="submit-order">
+    <button type="button" class="btn btn--primary btn--lg cart-summary__submit" data-bind-event="start-order">
+      주문하기
+    </button>
+  </div>
+</aside>
+<!-- @endvariant -->
+
+<!-- @variant order -->
+<!-- MO 페이지에서는 <main>에 has-cart-summary-bar 클래스를 추가해 고정 결제 바 높이만큼 하단 여백을 확보한다. -->
+<aside class="cart-summary" aria-labelledby="cart-summary-order-title">
+  <h2 id="cart-summary-order-title" class="cart-summary__title">최종 결제 금액</h2>
+
+  <div class="cart-summary__details">
+    <dl class="cart-summary__breakdown">
+      <div class="cart-summary__row">
+        <dt>상품금액</dt>
+        <dd data-bind="order.productAmount">
+          <!-- @include ecommerce/price.html#default -->
+        </dd>
+      </div>
+      <div class="cart-summary__row">
+        <dt>배송비</dt>
+        <dd data-bind="order.shippingFee">
+          <!-- @include ecommerce/price.html#default -->
+        </dd>
+      </div>
+      <div class="cart-summary__row">
+        <dt>할인금액</dt>
+        <dd data-bind="order.discountAmount">
+          <!-- @include ecommerce/price.html#default -->
+        </dd>
+      </div>
+    </dl>
+
+    <p class="cart-summary__shipping-message" data-bind="order.freeShippingMessage">
+      <strong>무료배송 안내:</strong> 10,000원 더 담으면 무료배송
+    </p>
+  </div>
+
+  <div class="cart-summary__checkout">
+    <dl class="cart-summary__total">
+      <div class="cart-summary__row cart-summary__row--total">
+        <dt><strong>최종 결제금액</strong></dt>
+        <dd data-bind="order.paymentAmount">
+          <!-- @include ecommerce/price.html#default -->
+        </dd>
+      </div>
+    </dl>
+    <button
+      type="submit"
+      class="btn btn--primary btn--lg cart-summary__submit"
+      form="order-form"
+      data-bind-event="submit-order"
+    >
       결제하기
     </button>
   </div>

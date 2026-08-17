@@ -34,6 +34,8 @@
 @use 'pages/main';
 @use 'pages/catalog';
 @use 'pages/detail';
+@use 'pages/cart';
+@use 'pages/order';
 
 body {
   width: var(--layout-content-mo);

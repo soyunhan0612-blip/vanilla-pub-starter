@@ -1,6 +1,6 @@
 <!-- @component 상품 카드
      @category ecommerce
-     @variant  grid | list
+     @variant  grid | list | list-sold-out
      @a11y     상품명 링크와 tabindex=-1 이미지 보조 링크를 분리하고 찜 상태·품절 상태를 텍스트와 속성으로 전달
      @snippet  product-card
 -->
@@ -55,6 +55,38 @@
     <!-- @endvariant -->
 
     <!-- @variant list -->
+    <article class="product-card product-card--list" data-bind-list="products">
+      <div class="product-card__media">
+        <a
+          class="product-card__image-link"
+          tabindex="-1"
+          href="/products/2"
+          data-bind-href="product.url"
+          data-bind="product.image"
+        >
+          <!-- @include common/image.html#fixed-ratio -->
+        </a>
+      </div>
+
+      <div class="product-card__info">
+        <span class="product-card__brand" data-bind="product.brand">브랜드명</span>
+        <h3 class="product-card__name">
+          <a class="product-card__name-link" href="/products/2" data-bind-href="product.url" data-bind="product.name">
+            베이직 코튼 셔츠
+          </a>
+        </h3>
+        <p data-bind="product.option">네이비 / M</p>
+        <div class="product-card__price">
+          <!-- @include ecommerce/price.html#default -->
+        </div>
+        <div class="product-card__quantity">
+          <!-- @include ecommerce/stepper.html -->
+        </div>
+      </div>
+    </article>
+    <!-- @endvariant -->
+
+    <!-- @variant list-sold-out -->
     <article class="product-card product-card--list is-sold-out" data-bind-list="products">
       <div class="product-card__media">
         <a
@@ -71,18 +103,6 @@
         </div>
         <span class="product-card__sold-out" aria-hidden="true">품절</span>
         <span class="sr-only" data-bind="product.stockStatus">품절된 상품입니다.</span>
-        <button
-          type="button"
-          class="product-card__wish"
-          aria-label="품절 상품 찜하기"
-          aria-pressed="false"
-          data-bind="product.wished"
-          disabled
-        >
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
-            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21.2l7.8-7.7 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"></path>
-          </svg>
-        </button>
       </div>
 
       <div class="product-card__info">
@@ -97,9 +117,6 @@
         </div>
         <div class="product-card__review">
           <!-- @include ecommerce/review.html#summary -->
-        </div>
-        <div class="product-card__quantity">
-          <!-- @include ecommerce/stepper.html -->
         </div>
       </div>
     </article>

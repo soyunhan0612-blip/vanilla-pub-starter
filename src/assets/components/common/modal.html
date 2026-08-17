@@ -5,6 +5,8 @@
      @variant  bottom-sheet — MO 하단 바텀시트
      @variant  image-viewer — 상품 이미지 확대 보기
      @variant  purchase-bottom-sheet — MO 상품 옵션 선택 바텀시트
+     @variant  delete-confirmation — 장바구니 상품 삭제 확인
+     @variant  address-search — 배송지 우편번호 검색
      @a11y     포커스 트랩, Esc·닫기 버튼·backdrop 닫기, 트리거 포커스 복귀
      @snippet  modal
 -->
@@ -207,6 +209,86 @@
       <footer class="modal__actions">
         <button type="button" class="btn btn--outline btn--md" data-modal-close>취소</button>
         <button type="submit" class="btn btn--primary btn--md" form="product-purchase-options">구매 확정</button>
+      </footer>
+    </div>
+  </div>
+  <!-- @endvariant -->
+
+  <!-- @variant delete-confirmation -->
+  <div
+    id="cart-delete-confirmation"
+    class="modal modal--default"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="cart-delete-confirmation-title"
+    aria-describedby="cart-delete-confirmation-description"
+    data-modal="cart-delete-confirmation"
+    tabindex="-1"
+    hidden
+  >
+    <div class="modal__dialog">
+      <header class="modal__header">
+        <h3 id="cart-delete-confirmation-title" class="modal__title">상품 삭제</h3>
+        <button type="button" class="modal__close" data-modal-close aria-label="상품 삭제 확인 닫기">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+        </button>
+      </header>
+      <div class="modal__body">
+        <p id="cart-delete-confirmation-description">선택한 상품을 장바구니에서 삭제하시겠습니까?</p>
+      </div>
+      <footer class="modal__actions">
+        <button type="button" class="btn btn--outline btn--md" data-modal-close>취소</button>
+        <button type="button" class="btn btn--primary btn--md" data-bind-event="delete-cart-item" data-modal-close>
+          삭제
+        </button>
+      </footer>
+    </div>
+  </div>
+  <!-- @endvariant -->
+
+  <!-- @variant address-search -->
+  <div
+    id="address-search-modal"
+    class="modal modal--default"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="address-search-title"
+    aria-describedby="address-search-description"
+    data-modal="address-search-modal"
+    tabindex="-1"
+    hidden
+  >
+    <div class="modal__dialog">
+      <header class="modal__header">
+        <h3 id="address-search-title" class="modal__title">우편번호 찾기</h3>
+        <button type="button" class="modal__close" data-modal-close aria-label="우편번호 찾기 닫기">
+          <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.5" />
+          </svg>
+        </button>
+      </header>
+      <div class="modal__body">
+        <p id="address-search-description">도로명 또는 지번 주소를 입력해 배송지를 검색합니다.</p>
+        <form id="address-search-form" data-bind-event="search-address">
+          <div class="form-field">
+            <label class="form-field__label" for="address-search-query">주소 검색어</label>
+            <input
+              class="form-control"
+              id="address-search-query"
+              name="address-search-query"
+              type="search"
+              autocomplete="street-address"
+              required
+              aria-required="true"
+            >
+          </div>
+        </form>
+      </div>
+      <footer class="modal__actions">
+        <button type="button" class="btn btn--outline btn--md" data-modal-close>취소</button>
+        <button type="submit" class="btn btn--primary btn--md" form="address-search-form">검색</button>
       </footer>
     </div>
   </div>
