@@ -549,33 +549,42 @@ class TestInvokeCodex:
         cmd = mock_run.call_args[0][0]
         assert cmd[0] == "codex"
         assert cmd[1] == "exec"
-        assert "--sandbox" in cmd
-        assert "workspace-write" in cmd
+        assert "--dangerously-bypass-approvals-and-sandbox" in cmd
         assert "--json" in cmd
         assert cmd[-1] == "-"
 
-    def test_windows_pins_unelevated_sandbox(self):
-        """elevated 기본값은 CreateProcessWithLogonW 로 죽어 쓰기·실행이 전부 막힌다."""
-        with patch.object(ex.sys, "platform", "win32"):
-            argv = ex.StepExecutor._codex_argv()
-        assert "-c" in argv
-        assert 'windows.sandbox="unelevated"' in argv
+    def test_sandbox_is_not_enabled(self):
+        """샌드박스를 켜면 모든 step 의 AC 가 통과 불가가 된다 (ADR-008).
 
-    def test_non_windows_omits_windows_config(self):
-        """windows.* 키는 다른 OS 에서 의미가 없다."""
-        with patch.object(ex.sys, "platform", "linux"):
-            argv = ex.StepExecutor._codex_argv()
+        Windows 의 codex 샌드박스는 프로세스 3단계째를 EPERM 으로 막는다.
+        `node tools/check.js` 는 powershell(1) → node(2) → spawnSync(3) 이므로
+        정확히 그 자리에서 죽는다 — 자식 프로세스로 테스트를 돌리는 것이 check.js 의
+        존재 이유라 우회로가 없다. 되돌리면 codex 는 자기 코드가 맞는지 모른 채
+        끝나고 3회 재시도 자가 교정도 함께 죽는다.
+        """
+        argv = ex.StepExecutor._codex_argv()
+        assert "--sandbox" not in argv
+        assert not any("workspace-write" in a for a in argv)
         assert not any("windows.sandbox" in a for a in argv)
+
+    def test_argv_does_not_branch_on_platform(self):
+        """플랫폼 분기가 없어야 한다.
+
+        `windows.sandbox` 고정은 샌드박스를 쓸 때만 의미가 있었다. 샌드박스를 끈
+        지금 남겨두면 동작하지 않는 설정이 근거처럼 보여 다음 사람을 오도한다.
+        """
+        with patch.object(ex.sys, "platform", "win32"):
+            win = ex.StepExecutor._codex_argv()
+        with patch.object(ex.sys, "platform", "linux"):
+            posix = ex.StepExecutor._codex_argv()
+        assert win == posix
 
     def test_argv_shape_is_stable(self):
         """프롬프트는 항상 마지막 `-` 로 stdin 에서 읽는다."""
-        for platform in ("win32", "linux"):
-            with patch.object(ex.sys, "platform", platform):
-                argv = ex.StepExecutor._codex_argv()
-            assert argv[:2] == ["codex", "exec"]
-            assert argv[-1] == "-"
-            assert "--dangerously-bypass-hook-trust" in argv
-            assert argv[argv.index("--sandbox") + 1] == "workspace-write"
+        argv = ex.StepExecutor._codex_argv()
+        assert argv[:2] == ["codex", "exec"]
+        assert argv[-1] == "-"
+        assert "--dangerously-bypass-hook-trust" in argv
 
     def test_hook_trust_bypass_is_passed(self, executor):
         """이 플래그가 빠지면 .codex/hooks.json 의 훅이 경고 없이 통째로 빠진다."""

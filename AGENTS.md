@@ -87,5 +87,11 @@ Tier 1 lint 를 안고 자라면 넘긴다. 넘기는 순간 훅은 실패로 �
 `scripts/execute.py` 는 이 신뢰가 없으면 훅 없이 조용히 실행되므로,
 자동화에서는 `--dangerously-bypass-hook-trust` 를 붙인다.
 
+**하네스는 codex 를 샌드박스 없이 돌린다** (ADR-008). Windows 의 codex 샌드박스가
+프로세스 3단계째를 EPERM 으로 막아 `node tools/check.js` 가 — 즉 모든 step 의 AC 가 —
+통과 불가이기 때문이다. 그래서 **위험 명령 훅이 사실상 유일한 자동 방어선이다.**
+`scripts/hooks/` 의 차단 패턴을 좁히거나 지우지 마라. 대신 하네스는 `--one` 으로
+step 하나씩 돌고 사람이 매 step 산출물을 확인한 뒤 다음으로 넘어간다.
+
 훅 판정 로직은 `.codex/` 나 `.claude/` 가 아니라 `scripts/hooks/` 에 산다. 둘 다 지워도
 `node tools/check.js` 로 같은 기준이 남는다.

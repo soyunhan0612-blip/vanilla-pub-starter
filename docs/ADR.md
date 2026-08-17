@@ -48,11 +48,22 @@
 **이유**: 훅이 깨지면 조용히 통과한다 — 이 저장소는 이미 그 사고를 겪었다(`jq` 부재로 TDD 가드가 무력화). Codex 이관 때도 같은 일이 재발했다: 셸 도구가 `command` 를 argv **배열**로 보내는데 문자열만 받고 있었고, `Edit`·`Write` 페이로드의 `file_path` 를 아무도 읽지 않아 가드가 한 번도 발동하지 않았다. 로직이 에이전트 설정 안에 인라인으로 있으면 이런 회귀를 테스트로 잡을 수 없다.
 **트레이드오프**: 훅 파일이 배선과 로직 두 곳으로 나뉜다. 대신 `.claude/` 와 `.codex/` 를 둘 다 지워도 `node tools/check.js` 로 동일한 기준이 남는다.
 
-### ADR-008: Codex 실행을 workspace-write 샌드박스로 고정
+### ADR-008: Codex 를 샌드박스 없이 돌리고, 안전은 훅·git·사람 확인으로 받는다
 
-**결정**: `scripts/execute.py` 는 `codex exec --sandbox workspace-write --dangerously-bypass-hook-trust` 로 step 을 돌린다. 승인 우회(`--dangerously-bypass-approvals-and-sandbox`)는 쓰지 않는다.
-**이유**: 하네스는 무인으로 20개 step 을 도는데, 샌드박스까지 해제하면 작업 트리 밖을 건드리는 사고를 막을 장치가 없다. 훅 신뢰만 우회하는 이유는 별개다 — Codex 는 신뢰 등록이 안 된 훅을 실행하지 않고 `exec` 는 비대화형이라 신뢰를 물을 수 없어서, 이 플래그가 없으면 **안전 훅이 통째로 빠진 채** step 이 돈다. 훅 소스는 저장소 안에 있고 테스트로 검증되므로 우회 대상으로 적절하다.
-**트레이드오프**: `workspace-write` 는 **네트워크가 기본 차단**이다. `npm install` 이 필요한 step 은 실패한다. Tier 0 원칙상 그런 step 이 있으면 안 되므로, 이 실패는 버그가 아니라 신호로 취급한다.
+**결정**: `scripts/execute.py` 는 `codex exec --dangerously-bypass-approvals-and-sandbox --dangerously-bypass-hook-trust` 로 step 을 돌린다.
+
+훅 신뢰 우회는 별개 사유다 — Codex 는 신뢰 등록이 안 된 훅을 실행하지 않고 `exec` 는 비대화형이라 신뢰를 물을 수 없어서, 이 플래그가 없으면 **안전 훅이 통째로 빠진 채** step 이 돈다. 훅 소스는 저장소 안에 있고 테스트로 검증되므로 우회 대상으로 적절하다.
+
+**원래 결정과 그것이 뒤집힌 이유**: 처음에는 `--sandbox workspace-write` 를 고정하고 "승인 우회는 쓰지 않는다" 고 못박았다. 근거는 *"하네스는 무인으로 20개 step 을 도는데, 샌드박스까지 해제하면 작업 트리 밖을 건드리는 사고를 막을 장치가 없다"* 였다. 실행해 보니 근거의 사실과 전제가 둘 다 틀렸다.
+
+- **사실** — Windows 의 codex 샌드박스로는 AC 를 실행할 수 없다. `elevated` 는 헬퍼 `codex-windows-sandbox-setup.exe` 가 설치본에 없어(`error=program not found`) 명령이 시작조차 못 한다. `unelevated` 는 동작하지만 **프로세스 3단계째가 EPERM** 이다: powershell(1) → `node check.js`(2) 까지는 되고, check.js 가 테스트를 돌리려 `spawnSync`(3) 하는 순간 막힌다. `node tools/check.js` 는 정의상 3단계이므로 — 자식 프로세스로 테스트를 돌리는 것이 그 존재 이유다 — **모든 step 의 AC 가 통과 불가**다. 실제로 0-foundation step 0 은 산출물을 전부 만들고도 검증하지 못해 `blocked` 로 끝났다.
+- **전제** — 하네스는 `--one` 으로 step 하나씩 돌고 사람이 매 step 을 확인한다. "무인 20 step" 이 아니다.
+
+AC 를 못 돌리는 대가가 샌드박스보다 크다. codex 가 자기 코드의 정오를 모른 채 끝나면 실패를 감지할 수 없고, 그러면 **3회 재시도 자가 교정이 통째로 죽는다.** 검증 없는 자동화는 자동화가 아니다.
+
+**남는 안전망**: `.codex/hooks.json` 의 위험 명령 훅은 샌드박스와 무관하게 그대로 작동한다 (해제 상태에서 `hook: PreToolUse Completed` 로 확인). 작업 트리는 git 이 관리하므로 되돌릴 수 있고, step 마다 사람이 산출물을 확인한 뒤 다음으로 넘어간다.
+
+**트레이드오프**: 저장소 밖을 건드리는 사고는 훅의 위험 명령 패턴에 걸리지 않는 한 막을 장치가 없다. 그 목록이 유일한 방어선이 되었으므로, 패턴을 좁게 유지하지 않는 것이 전보다 중요해졌다.
 
 ### ADR-009: 훅 명령을 셸 인용에 의존하지 않는 형태로 쓴다
 
@@ -64,13 +75,17 @@
 
 **트레이드오프**: cwd 가 저장소 루트라는 전제에 기댄다. 그 전제가 깨지면 훅이 다시 조용히 빠지므로, 훅 배선을 바꾼 뒤에는 반드시 프로브로 `Blocked` 를 눈으로 확인한다.
 
-### ADR-010: Windows 에서 codex 샌드박스를 unelevated 로 고정
+### ADR-010: (무효) Windows 에서 codex 샌드박스를 unelevated 로 고정
 
-**결정**: `sys.platform == "win32"` 일 때 `execute.py` 가 `-c windows.sandbox="unelevated"` 를 붙인다. 사용자의 `~/.codex/config.toml` 은 건드리지 않는다.
+**상태**: ADR-008 개정으로 무효. 샌드박스를 쓰지 않으므로 `execute.py` 는 `windows.sandbox` 를 더 이상 넘기지 않는다. 아래는 Windows codex 샌드박스의 관측 기록으로만 남긴다 — 되살리려는 사람이 같은 길을 다시 걷지 않도록.
 
-**이유**: 기본값 `elevated` 는 `CreateProcessWithLogonW` 로 다른 사용자 컨텍스트에서 프로세스를 띄우는데, 이게 실패하면(`failed: 2`) codex 의 **파일 쓰기와 셸 실행이 전부** 죽는다. step 은 아무것도 만들지 못한 채 3회 재시도만 돌다 `error` 로 끝난다. 증상이 "codex 가 일을 안 한다" 로만 보여 원인 추적이 비싸다. `unelevated` 도 샌드박스는 그대로 유지하므로 ADR-008 의 "승인 우회는 쓰지 않는다" 와 충돌하지 않는다.
+**원래 결정**: `sys.platform == "win32"` 일 때 `-c windows.sandbox="unelevated"` 를 붙인다.
 
-**트레이드오프**: 사용자 전역 설정을 덮어쓰므로, 의도적으로 `elevated` 를 쓰는 환경에서도 하네스 실행 중에는 무시된다. 저장소 밖 설정에 하네스가 좌우되지 않는 편이 낫다고 판단했다.
+**관측 1 — `elevated` 는 이 설치본에서 아예 뜨지 않는다.** 처음에는 `CreateProcessWithLogonW failed: 2` 로 보였고 "다른 사용자 컨텍스트 전환 실패" 로 해석했다. 실제 원인은 더 단순하다: 샌드박스 헬퍼 `codex-windows-sandbox-setup.exe` 가 설치본에 없다(`orchestrator_helper_launch_failed: … error=program not found`). `bin/` 에는 `codex.exe` 와 `codex-code-mode-host.exe` 뿐이다. 증상은 "codex 가 일을 안 한다" 로만 보여 원인 추적이 비싸다.
+
+**관측 2 — `unelevated` 는 프로세스 3단계째를 막는다.** 2단계까지는 정상이다 (`node tools/serve.js --smoke` 는 소켓까지 열고 SUCCESS). 3단계에서 `spawn EPERM` 이 난다. `node --test` 가 테스트 파일마다 자식을 띄우는 구조라 여기 걸린다. `--test-isolation=none` 은 그 자식을 없애 통과시키지만, `spawnSync` 자체가 검증 대상인 테스트(빌드 프로세스의 종료 코드, serve smoke)는 그것으로도 못 푼다.
+
+두 관측을 합치면 Windows 에서 codex 샌드박스로는 이 프로젝트의 AC 를 돌릴 수 없다. ADR-008 이 그 결론을 받아 샌드박스를 걷어냈다.
 
 ### ADR-011: 두 에이전트가 같은 훅 스크립트를 부르고, 배선 자체를 테스트한다
 
