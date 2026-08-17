@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>마이페이지 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/mo.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-mo.html -->
+  <!-- @include layout/gnb-mo.html -->
+  <main class="mypage-page mypage-page--mo" id="main">
+    <div class="container">
+      <header class="mypage-page__header">
+        <h1>마이페이지</h1>
+      </header>
+
+      <section class="mypage-member" aria-labelledby="mypage-member-title-mo">
+        <div class="mypage-member__identity">
+          <h2 id="mypage-member-title-mo">회원 요약</h2>
+          <p><strong data-bind="member.name">홍길동</strong> 님의 쇼핑 정보입니다.</p>
+        </div>
+        <dl class="mypage-member__benefits">
+          <div>
+            <dt>회원 등급</dt>
+            <dd data-bind="member.grade">일반회원</dd>
+          </div>
+          <div>
+            <dt>포인트</dt>
+            <dd data-bind="member.point">10,000P</dd>
+          </div>
+          <div>
+            <dt>쿠폰</dt>
+            <dd><a href="/mypage/benefits" data-bind="member.couponCount">2장</a></dd>
+          </div>
+        </dl>
+      </section>
+
+      <nav class="mypage-quick-menu" aria-labelledby="mypage-quick-menu-title-mo">
+        <h2 id="mypage-quick-menu-title-mo">빠른 메뉴</h2>
+        <ul class="mypage-quick-menu__list">
+          <li>
+            <a href="/mypage/orders" aria-current="page">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M4 6h16v13H4z"></path><path d="M8 3v6M16 3v6M4 10h16"></path>
+              </svg>
+              <span>주문/배송</span>
+            </a>
+          </li>
+          <li>
+            <a href="/mypage/returns">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M8 7H4v4"></path><path d="M4.5 10A8 8 0 1 1 6 17"></path>
+              </svg>
+              <span>취소/반품</span>
+            </a>
+          </li>
+          <li>
+            <a href="/mypage/wishlist">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21.2l8.8-8.8a5.5 5.5 0 0 0 0-7.8Z"></path>
+              </svg>
+              <span>찜한 상품</span>
+            </a>
+          </li>
+          <li>
+            <a href="/mypage/reviews">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M4 4h16v13H8l-4 3z"></path><path d="M8 8h8M8 12h6"></path>
+              </svg>
+              <span>리뷰 관리</span>
+            </a>
+          </li>
+          <li>
+            <a href="/mypage/benefits">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M3 7h18v10H3z"></path><path d="M8 7v10M16 7v10M12 7V4M9 4h6"></path>
+              </svg>
+              <span>쿠폰/포인트</span>
+            </a>
+          </li>
+          <li>
+            <a href="/mypage/addresses">
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <path d="M12 21s7-5.2 7-12a7 7 0 1 0-14 0c0 6.8 7 12 7 12Z"></path><circle cx="12" cy="9" r="2.5"></circle>
+              </svg>
+              <span>배송지 관리</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <section class="mypage-recent-orders" aria-labelledby="recent-orders-title-mo">
+        <div class="mypage-section-heading">
+          <h2 id="recent-orders-title-mo">최근 주문 내역</h2>
+          <a href="/mypage/orders">전체 보기</a>
+        </div>
+
+        <ul class="mypage-order-list" data-bind-list="orders.recent">
+          <li>
+            <article class="mypage-order" aria-labelledby="mypage-order-title-mo">
+              <header class="mypage-order__header">
+                <div>
+                  <h3 id="mypage-order-title-mo">
+                    <span class="sr-only">주문번호 </span>
+                    <a href="/mypage/orders/ORD-000000" data-bind="order.number">ORD-000000</a>
+                  </h3>
+                  <time datetime="2026-08-17" data-bind="order.date">2026.08.17</time>
+                </div>
+                <strong class="mypage-order__status" data-bind="order.status">
+                  <span class="sr-only">주문 상태: </span>배송중
+                </strong>
+              </header>
+
+              <div class="mypage-order__product">
+                <div class="mypage-order__media">
+                  <!-- @include common/image.html#fixed-ratio -->
+                </div>
+                <div class="mypage-order__product-info">
+                  <strong data-bind="product.name">베이직 코튼 셔츠</strong>
+                  <p data-bind="product.option">네이비 / M · 1개</p>
+                  <!-- @include ecommerce/price.html#default -->
+                </div>
+              </div>
+
+              <div class="mypage-order__actions">
+                <a class="btn btn--outline btn--md" href="/mypage/orders/ORD-000000">주문 상세</a>
+                <a class="btn btn--outline btn--md" href="/mypage/orders/ORD-000000/tracking">배송 조회</a>
+              </div>
+            </article>
+          </li>
+        </ul>
+      </section>
+
+      <section class="mypage-all-menu" aria-labelledby="mypage-all-menu-title-mo">
+        <h2 id="mypage-all-menu-title-mo">전체 메뉴</h2>
+        <nav aria-label="마이페이지 전체 메뉴">
+          <ul class="mypage-menu-list">
+            <li><a href="/mypage/orders" aria-current="page">주문/배송조회</a></li>
+            <li><a href="/mypage/returns">취소/반품/교환</a></li>
+            <li><a href="/mypage/wishlist">찜한 상품</a></li>
+            <li><a href="/mypage/reviews">리뷰 관리</a></li>
+            <li><a href="/mypage/benefits">쿠폰/포인트</a></li>
+            <li><a href="/mypage/profile">회원정보 수정</a></li>
+            <li><a href="/mypage/addresses">배송지 관리</a></li>
+          </ul>
+        </nav>
+      </section>
+
+      <!-- 상태 변형: 빈 주문 내역 시작 — 실제 연동 시 최근 주문 목록과 교체하고 hidden을 제거한다. -->
+      <section class="mypage-page__state" aria-labelledby="mypage-empty-state-title-mo" hidden>
+        <h2 class="sr-only" id="mypage-empty-state-title-mo">주문 내역 빈 상태</h2>
+        <!-- @include common/empty.html#order -->
+      </section>
+      <!-- 상태 변형: 빈 주문 내역 끝 -->
+
+      <!-- 상태 변형: 비로그인 시작 — 실제 연동 시 회원 전용 콘텐츠와 교체하고 hidden을 제거한다. -->
+      <section class="mypage-page__state" aria-labelledby="mypage-login-state-title-mo" hidden>
+        <h2 class="sr-only" id="mypage-login-state-title-mo">비로그인 상태</h2>
+        <div class="mypage-login-prompt">
+          <h3>로그인이 필요합니다</h3>
+          <p>주문 내역과 회원 혜택을 확인하려면 로그인해 주세요.</p>
+          <a class="btn btn--primary btn--md" href="/login">로그인</a>
+        </div>
+      </section>
+      <!-- 상태 변형: 비로그인 끝 -->
+    </div>
+  </main>
+  <!-- @include layout/footer.html -->
+  <!-- @include layout/bottom-nav.html -->
+  <script type="module" src="/assets/js/mo.js"></script>
+</body>
+</html>

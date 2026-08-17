@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>마이페이지 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/pc.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-pc.html -->
+  <main class="mypage-page mypage-page--pc" id="main">
+    <div class="container">
+      <!-- @include common/breadcrumb.html#default -->
+
+      <header class="mypage-page__header">
+        <h1>마이페이지</h1>
+      </header>
+
+      <div class="mypage-page__layout">
+        <nav class="mypage-side-menu" aria-label="마이페이지 메뉴">
+          <ul class="mypage-menu-list">
+            <li><a href="/mypage/orders" aria-current="page">주문/배송조회</a></li>
+            <li><a href="/mypage/returns">취소/반품/교환</a></li>
+            <li><a href="/mypage/wishlist">찜한 상품</a></li>
+            <li><a href="/mypage/reviews">리뷰 관리</a></li>
+            <li><a href="/mypage/benefits">쿠폰/포인트</a></li>
+            <li><a href="/mypage/profile">회원정보 수정</a></li>
+            <li><a href="/mypage/addresses">배송지 관리</a></li>
+          </ul>
+        </nav>
+
+        <div class="mypage-page__content">
+          <section class="mypage-member" aria-labelledby="mypage-member-title-pc">
+            <div class="mypage-member__identity">
+              <h2 id="mypage-member-title-pc">회원 요약</h2>
+              <p><strong data-bind="member.name">홍길동</strong> 님의 쇼핑 정보입니다.</p>
+            </div>
+            <dl class="mypage-member__benefits">
+              <div>
+                <dt>회원 등급</dt>
+                <dd data-bind="member.grade">일반회원</dd>
+              </div>
+              <div>
+                <dt>포인트</dt>
+                <dd data-bind="member.point">10,000P</dd>
+              </div>
+              <div>
+                <dt>쿠폰</dt>
+                <dd><a href="/mypage/benefits" data-bind="member.couponCount">2장</a></dd>
+              </div>
+            </dl>
+          </section>
+
+          <section class="mypage-recent-orders" aria-labelledby="recent-orders-title-pc">
+            <div class="mypage-section-heading">
+              <h2 id="recent-orders-title-pc">최근 주문 내역</h2>
+              <a href="/mypage/orders">전체 주문 보기</a>
+            </div>
+
+            <ul class="mypage-order-list" data-bind-list="orders.recent">
+              <li>
+                <article class="mypage-order" aria-labelledby="mypage-order-title-pc">
+                  <header class="mypage-order__header">
+                    <div>
+                      <h3 id="mypage-order-title-pc">
+                        <span class="sr-only">주문번호 </span>
+                        <a href="/mypage/orders/ORD-000000" data-bind="order.number">ORD-000000</a>
+                      </h3>
+                      <time datetime="2026-08-17" data-bind="order.date">2026.08.17</time>
+                    </div>
+                    <strong class="mypage-order__status" data-bind="order.status">
+                      <span class="sr-only">주문 상태: </span>배송중
+                    </strong>
+                  </header>
+
+                  <div class="mypage-order__product">
+                    <div class="mypage-order__media">
+                      <!-- @include common/image.html#fixed-ratio -->
+                    </div>
+                    <div class="mypage-order__product-info">
+                      <strong data-bind="product.name">베이직 코튼 셔츠</strong>
+                      <p data-bind="product.option">네이비 / M · 1개</p>
+                      <!-- @include ecommerce/price.html#default -->
+                    </div>
+                  </div>
+
+                  <div class="mypage-order__actions">
+                    <a class="btn btn--outline btn--md" href="/mypage/orders/ORD-000000">주문 상세</a>
+                    <a class="btn btn--outline btn--md" href="/mypage/orders/ORD-000000/tracking">배송 조회</a>
+                  </div>
+                </article>
+              </li>
+            </ul>
+          </section>
+
+          <nav class="mypage-shortcuts" aria-labelledby="mypage-shortcuts-title-pc">
+            <h2 id="mypage-shortcuts-title-pc">바로가기</h2>
+            <ul class="mypage-shortcuts__list">
+              <li>
+                <a href="/mypage/wishlist">
+                  <strong>찜한 상품</strong>
+                  <span>관심 상품을 확인합니다.</span>
+                </a>
+              </li>
+              <li>
+                <a href="/mypage/reviews">
+                  <strong>리뷰 관리</strong>
+                  <span>작성할 리뷰와 작성 내역을 확인합니다.</span>
+                </a>
+              </li>
+              <li>
+                <a href="/mypage/benefits">
+                  <strong>쿠폰/포인트</strong>
+                  <span>사용 가능한 혜택을 확인합니다.</span>
+                </a>
+              </li>
+              <li>
+                <a href="/mypage/addresses">
+                  <strong>배송지 관리</strong>
+                  <span>등록된 배송지를 관리합니다.</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- 상태 변형: 빈 주문 내역 시작 — 실제 연동 시 최근 주문 목록과 교체하고 hidden을 제거한다. -->
+      <section class="mypage-page__state" aria-labelledby="mypage-empty-state-title-pc" hidden>
+        <h2 class="sr-only" id="mypage-empty-state-title-pc">주문 내역 빈 상태</h2>
+        <!-- @include common/empty.html#order -->
+      </section>
+      <!-- 상태 변형: 빈 주문 내역 끝 -->
+
+      <!-- 상태 변형: 비로그인 시작 — 실제 연동 시 회원 전용 콘텐츠와 교체하고 hidden을 제거한다. -->
+      <section class="mypage-page__state" aria-labelledby="mypage-login-state-title-pc" hidden>
+        <h2 class="sr-only" id="mypage-login-state-title-pc">비로그인 상태</h2>
+        <div class="mypage-login-prompt">
+          <h3>로그인이 필요합니다</h3>
+          <p>주문 내역과 회원 혜택을 확인하려면 로그인해 주세요.</p>
+          <a class="btn btn--primary btn--md" href="/login">로그인</a>
+        </div>
+      </section>
+      <!-- 상태 변형: 비로그인 끝 -->
+    </div>
+  </main>
+  <!-- @include layout/footer.html -->
+  <script type="module" src="/assets/js/pc.js"></script>
+</body>
+</html>
