@@ -1,0 +1,38 @@
+.image-showcase,
+.image-showcase__section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.image-showcase {
+  gap: var(--space-8);
+}
+
+.responsive-image {
+  width: 100%;
+  overflow: hidden;
+  background: var(--color-bg-muted);
+}
+
+.responsive-image--default {
+  max-width: 600px;
+}
+
+.responsive-image--eager {
+  max-width: 1280px;
+}
+
+.responsive-image--fixed-ratio {
+  max-width: 300px;
+  aspect-ratio: 1 / 1;
+}
+
+.responsive-image img {
+  width: 100%;
+  height: auto;
+}
+
+.responsive-image--fixed-ratio img {
+  height: 100%;
+  object-fit: cover;
+}

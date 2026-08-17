@@ -29,7 +29,10 @@
     {
       "step": 3,
       "name": "common-media",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-08-17T11:36:45+0900",
+      "summary": "WebP 폴백·반응형·eager/lazy·고정비율 이미지와 CLS 방지 스켈레톤, CTA 포함 빈 상태 4종을 공통 fragment·SCSS로 구현",
+      "completed_at": "2026-08-17T11:45:10+0900"
     },
     {
       "step": 4,

@@ -1,0 +1,33 @@
+<!-- @component 빈 상태
+     @category common
+     @variant  search | cart | order | error
+     @a11y     에러 변형은 role="alert"로 즉시 알리고, 모든 변형은 다음 행동 CTA 제공
+     @snippet  empty
+-->
+<section class="empty-showcase" aria-labelledby="empty-showcase-title">
+  <h2 id="empty-showcase-title">빈 상태</h2>
+
+  <section class="empty-state empty-state--search" aria-labelledby="empty-search-title">
+    <h3 id="empty-search-title" class="empty-state__title">검색 결과가 없습니다</h3>
+    <p class="empty-state__description">검색어의 철자를 확인하거나 더 짧은 검색어로 찾아보세요.</p>
+    <a class="btn btn--outline btn--md empty-state__action" href="/search">다른 검색어로 찾아보기</a>
+  </section>
+
+  <section class="empty-state empty-state--cart" aria-labelledby="empty-cart-title">
+    <h3 id="empty-cart-title" class="empty-state__title">장바구니가 비어 있습니다</h3>
+    <p class="empty-state__description">관심 있는 상품을 둘러보고 장바구니에 담아보세요.</p>
+    <a class="btn btn--primary btn--md empty-state__action" href="/products">상품 둘러보기</a>
+  </section>
+
+  <section class="empty-state empty-state--order" aria-labelledby="empty-order-title">
+    <h3 id="empty-order-title" class="empty-state__title">주문 내역이 없습니다</h3>
+    <p class="empty-state__description">새로운 상품을 둘러보고 첫 주문을 시작해 보세요.</p>
+    <a class="btn btn--primary btn--md empty-state__action" href="/products">쇼핑 시작하기</a>
+  </section>
+
+  <section class="empty-state empty-state--error" role="alert" aria-labelledby="empty-error-title">
+    <h3 id="empty-error-title" class="empty-state__title">콘텐츠를 불러오지 못했습니다</h3>
+    <p class="empty-state__description">네트워크 연결을 확인한 뒤 다시 시도해 주세요.</p>
+    <a class="btn btn--outline btn--md empty-state__action" href="">다시 시도하기</a>
+  </section>
+</section>

@@ -1,0 +1,74 @@
+<!-- @component 반응형 이미지
+     @category common
+     @variant  default | eager | fixed-ratio
+     @a11y     의미 있는 이미지는 alt 필수. 장식용 이미지는 alt="" 를 명시하고 생략하지 말 것
+     @performance width/height로 종횡비를 예약하고, 첫 화면 이미지만 eager + high 우선순위 사용
+     @snippet  img
+-->
+<section class="image-showcase" aria-labelledby="image-showcase-title">
+  <h2 id="image-showcase-title">반응형 이미지</h2>
+
+  <div class="image-showcase__section">
+    <h3>기본 · 지연 로딩</h3>
+    <picture class="responsive-image responsive-image--default">
+      <source
+        type="image/webp"
+        srcset="/assets/img/media/content-600.webp 600w, /assets/img/media/content-1200.webp 1200w"
+        sizes="(min-width: 1024px) 600px, calc(100vw - 32px)"
+      >
+      <img
+        src="/assets/img/media/content-600.jpg"
+        srcset="/assets/img/media/content-600.jpg 600w, /assets/img/media/content-1200.jpg 1200w"
+        sizes="(min-width: 1024px) 600px, calc(100vw - 32px)"
+        alt="신상품 컬렉션 대표 이미지"
+        width="600"
+        height="400"
+        loading="lazy"
+        decoding="async"
+      >
+    </picture>
+  </div>
+
+  <div class="image-showcase__section">
+    <h3>첫 화면 · 우선 로딩</h3>
+    <picture class="responsive-image responsive-image--eager">
+      <source
+        type="image/webp"
+        srcset="/assets/img/media/hero-1280.webp 1280w, /assets/img/media/hero-2560.webp 2560w"
+        sizes="(min-width: 1024px) 1280px, 100vw"
+      >
+      <img
+        src="/assets/img/media/hero-1280.jpg"
+        srcset="/assets/img/media/hero-1280.jpg 1280w, /assets/img/media/hero-2560.jpg 2560w"
+        sizes="(min-width: 1024px) 1280px, 100vw"
+        alt="이번 주 기획전"
+        width="1280"
+        height="720"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      >
+    </picture>
+  </div>
+
+  <div class="image-showcase__section">
+    <h3>고정 비율 · 상품 이미지</h3>
+    <picture class="responsive-image responsive-image--fixed-ratio">
+      <source
+        type="image/webp"
+        srcset="/assets/img/media/product-600.webp 600w, /assets/img/media/product-1200.webp 1200w"
+        sizes="(min-width: 1024px) 300px, 50vw"
+      >
+      <img
+        src="/assets/img/media/product-600.jpg"
+        srcset="/assets/img/media/product-600.jpg 600w, /assets/img/media/product-1200.jpg 1200w"
+        sizes="(min-width: 1024px) 300px, 50vw"
+        alt="베이직 코튼 셔츠"
+        width="600"
+        height="600"
+        loading="lazy"
+        decoding="async"
+      >
+    </picture>
+  </div>
+</section>
