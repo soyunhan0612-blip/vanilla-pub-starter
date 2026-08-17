@@ -5,7 +5,9 @@
     {
       "step": 0,
       "name": "guide-generator",
-      "status": "pending"
+      "status": "completed",
+      "summary": "@component 메타데이터 기반 컴포넌트·레이아웃·토큰 가이드와 VS Code 스니펫 자동 생성을 build.js에 통합",
+      "started_at": "2026-08-17T17:06:40+0900"
     },
     {
       "step": 1,
@@ -17,5 +19,6 @@
       "name": "handover",
       "status": "pending"
     }
-  ]
+  ],
+  "created_at": "2026-08-17T17:06:40+0900"
 }
