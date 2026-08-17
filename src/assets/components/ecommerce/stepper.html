@@ -1,0 +1,39 @@
+<!-- @component 수량 선택기
+     @category ecommerce
+     @variant  default | min | max | disabled
+     @a11y     직접 입력 가능한 number input에 숨김 label을 연결하고 모든 버튼에 이름과 44×44px 터치 영역 제공
+     @snippet  stepper
+-->
+<div class="stepper" data-stepper>
+  <button
+    type="button"
+    class="stepper__button"
+    data-stepper-action="decrease"
+    aria-label="수량 줄이기"
+    disabled
+  >
+    <span aria-hidden="true">−</span>
+  </button>
+  <label class="stepper__field">
+    <span class="sr-only">상품 수량</span>
+    <input
+      class="stepper__input"
+      data-stepper-input
+      data-bind="cart.quantity"
+      type="number"
+      inputmode="numeric"
+      min="1"
+      max="99"
+      step="1"
+      value="1"
+    >
+  </label>
+  <button
+    type="button"
+    class="stepper__button"
+    data-stepper-action="increase"
+    aria-label="수량 늘리기"
+  >
+    <span aria-hidden="true">+</span>
+  </button>
+</div>

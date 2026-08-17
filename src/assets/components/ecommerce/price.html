@@ -1,0 +1,36 @@
+<!-- @component 가격
+     @category ecommerce
+     @variant  default | discount | range
+     @a11y     할인 가격은 del·ins 의미 요소와 스크린리더용 정가·할인가 문장으로 구분
+     @format   KRW 천 단위 구분은 숫자 세 자리마다 쉼표를 넣고 숫자와 원 사이를 띄우지 않는다 (예: 39,000원)
+     @snippet  price
+-->
+<div class="price-showcase" aria-label="가격 표시 변형">
+  <div class="price price--default">
+    <span class="sr-only">판매가 </span>
+    <strong class="price__current" data-bind="product.price">39,000원</strong>
+  </div>
+
+  <div class="price price--discount">
+    <p class="sr-only">
+      정가 <span data-bind="product.originalPrice">39,000원</span>,
+      할인가 <span data-bind="product.salePrice">29,000원</span>
+    </p>
+    <div class="price__visible" aria-hidden="true">
+      <del class="price__original" data-bind="product.originalPrice">39,000원</del>
+      <ins class="price__current" data-bind="product.salePrice">29,000원</ins>
+      <strong class="price__discount" data-bind="product.discountRate">25%</strong>
+    </div>
+  </div>
+
+  <div class="price price--range">
+    <span class="sr-only">가격 범위 </span>
+    <strong class="price__range">
+      <span data-bind="product.minPrice">29,000원</span>
+      <span aria-hidden="true">~</span>
+      <span class="sr-only">부터 </span>
+      <span data-bind="product.maxPrice">129,000원</span>
+      <span class="sr-only">까지</span>
+    </strong>
+  </div>
+</div>

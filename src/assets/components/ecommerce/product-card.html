@@ -1,0 +1,106 @@
+<!-- @component 상품 카드
+     @category ecommerce
+     @variant  grid | list
+     @a11y     상품명 링크와 tabindex=-1 이미지 보조 링크를 분리하고 찜 상태·품절 상태를 텍스트와 속성으로 전달
+     @snippet  product-card
+-->
+<section class="product-card-showcase" aria-labelledby="product-card-showcase-title">
+  <h2 id="product-card-showcase-title">상품 카드</h2>
+
+  <div class="product-card-showcase__grid">
+    <article class="product-card product-card--grid" data-bind-list="products">
+      <div class="product-card__media">
+        <a
+          class="product-card__image-link"
+          tabindex="-1"
+          href="/products/1"
+          data-bind-href="product.url"
+          data-bind="product.image"
+        >
+          <!-- @include common/image.html -->
+        </a>
+        <div class="product-card__badges" aria-label="상품 상태">
+          <span class="product-card__badge product-card__badge--new" data-bind="product.badges.new">신상품</span>
+          <span class="product-card__badge product-card__badge--sale" data-bind="product.badges.sale">세일</span>
+        </div>
+        <button
+          type="button"
+          class="product-card__wish"
+          aria-label="찜하기"
+          aria-pressed="false"
+          data-bind="product.wished"
+        >
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21.2l7.8-7.7 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="product-card__info">
+        <span class="product-card__brand" data-bind="product.brand">브랜드명</span>
+        <h3 class="product-card__name">
+          <a class="product-card__name-link" href="/products/1" data-bind-href="product.url" data-bind="product.name">
+            아주 긴 상품명에서도 두 줄을 넘기지 않는 오버핏 코튼 셔츠 테스트 상품명
+          </a>
+        </h3>
+        <div class="product-card__price" data-price-variant="discount">
+          <!-- @include ecommerce/price.html -->
+        </div>
+        <!-- 다음 step의 review 컴포넌트로 교체할 자리 -->
+        <p class="product-card__review" data-review-placeholder data-bind="product.reviewSummary">
+          <span class="sr-only">평점 5점 만점에 </span><span aria-hidden="true">★</span> 4.8 (125)
+        </p>
+      </div>
+    </article>
+
+    <article class="product-card product-card--list is-sold-out" data-bind-list="products">
+      <div class="product-card__media">
+        <a
+          class="product-card__image-link"
+          tabindex="-1"
+          href="/products/2"
+          data-bind-href="product.url"
+          data-bind="product.image"
+        >
+          <!-- @include common/image.html -->
+        </a>
+        <div class="product-card__badges" aria-label="상품 상태">
+          <span class="product-card__badge product-card__badge--sold-out" data-bind="product.badges.soldOut">품절</span>
+        </div>
+        <span class="product-card__sold-out" aria-hidden="true">품절</span>
+        <span class="sr-only" data-bind="product.stockStatus">품절된 상품입니다.</span>
+        <button
+          type="button"
+          class="product-card__wish"
+          aria-label="품절 상품 찜하기"
+          aria-pressed="false"
+          data-bind="product.wished"
+          disabled
+        >
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21.2l7.8-7.7 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="product-card__info">
+        <span class="product-card__brand" data-bind="product.brand">브랜드명</span>
+        <h3 class="product-card__name">
+          <a class="product-card__name-link" href="/products/2" data-bind-href="product.url" data-bind="product.name">
+            가격 자릿수가 커져도 레이아웃을 지키는 리미티드 에디션 상품
+          </a>
+        </h3>
+        <div class="product-card__price" data-price-variant="default">
+          <!-- @include ecommerce/price.html -->
+        </div>
+        <!-- 다음 step의 review 컴포넌트로 교체할 자리 -->
+        <p class="product-card__review" data-review-placeholder data-bind="product.reviewSummary">
+          <span class="sr-only">평점 5점 만점에 </span><span aria-hidden="true">★</span> 4.6 (999+)
+        </p>
+        <div class="product-card__quantity">
+          <!-- @include ecommerce/stepper.html -->
+        </div>
+      </div>
+    </article>
+  </div>
+</section>

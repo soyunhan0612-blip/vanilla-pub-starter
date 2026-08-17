@@ -1,0 +1,54 @@
+@use '../abstracts/mixins' as *;
+
+.stepper {
+  display: inline-grid;
+  grid-template-columns: 44px minmax(64px, auto) 44px;
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-page);
+}
+
+.stepper__field {
+  display: contents;
+}
+
+.stepper__button,
+.stepper__input {
+  height: 44px;
+  border: 0;
+  color: var(--color-text-strong);
+  background: var(--color-bg-page);
+  font-family: var(--font-family-base);
+}
+
+.stepper__button {
+  width: 44px;
+  min-width: 44px;
+  cursor: pointer;
+}
+
+.stepper__button:hover:not(:disabled) {
+  background: var(--color-bg-muted);
+}
+
+.stepper__button:focus-visible,
+.stepper__input:focus-visible {
+  position: relative;
+  z-index: 1;
+  @include focus-ring;
+}
+
+.stepper__button:disabled,
+.stepper__input:disabled {
+  color: var(--color-text-disabled);
+  background: var(--color-bg-muted);
+  cursor: not-allowed;
+}
+
+.stepper__input {
+  width: 64px;
+  min-width: 0;
+  border-inline: 1px solid var(--color-border);
+  text-align: center;
+}
