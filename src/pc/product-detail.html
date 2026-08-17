@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>베이직 코튼 셔츠 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/pc.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-pc.html -->
+  <main class="product-detail-page" id="main">
+    <div class="container">
+      <!-- @include common/breadcrumb.html#default -->
+
+      <section class="product-detail__overview" aria-labelledby="product-title-pc">
+        <div class="product-gallery product-gallery--pc" data-gallery>
+          <h2 class="sr-only">상품 이미지</h2>
+          <div class="product-gallery__main" data-gallery-main>
+            <!-- @include common/image.html#eager -->
+            <button
+              type="button"
+              class="btn btn--outline btn--md"
+              data-modal-open="product-image-viewer"
+              aria-controls="product-image-viewer"
+              aria-expanded="false"
+            >
+              이미지 확대 보기
+            </button>
+          </div>
+          <ul class="product-gallery__thumbnails" aria-label="상품 이미지 선택">
+            <li>
+              <button
+                type="button"
+                class="product-gallery__thumbnail"
+                aria-label="상품 정면 이미지 보기"
+                aria-pressed="true"
+                data-gallery-thumbnail
+                data-gallery-src="/assets/img/media/hero-1280.jpg"
+                data-gallery-srcset="/assets/img/media/hero-1280.jpg 1280w, /assets/img/media/hero-2560.jpg 2560w"
+                data-gallery-webp-srcset="/assets/img/media/hero-1280.webp 1280w, /assets/img/media/hero-2560.webp 2560w"
+                data-gallery-alt="베이직 코튼 셔츠 정면"
+              >
+                <!-- @include common/image.html#fixed-ratio -->
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                class="product-gallery__thumbnail"
+                aria-label="상품 뒷면 이미지 보기"
+                aria-pressed="false"
+                data-gallery-thumbnail
+                data-gallery-src="/assets/img/media/product-1200.jpg"
+                data-gallery-srcset="/assets/img/media/product-600.jpg 600w, /assets/img/media/product-1200.jpg 1200w"
+                data-gallery-webp-srcset="/assets/img/media/product-600.webp 600w, /assets/img/media/product-1200.webp 1200w"
+                data-gallery-alt="베이직 코튼 셔츠 뒷면"
+              >
+                <!-- @include common/image.html#fixed-ratio -->
+              </button>
+            </li>
+            <li>
+              <button
+                type="button"
+                class="product-gallery__thumbnail"
+                aria-label="상품 소재 상세 이미지 보기"
+                aria-pressed="false"
+                data-gallery-thumbnail
+                data-gallery-src="/assets/img/media/content-1200.jpg"
+                data-gallery-srcset="/assets/img/media/content-600.jpg 600w, /assets/img/media/content-1200.jpg 1200w"
+                data-gallery-webp-srcset="/assets/img/media/content-600.webp 600w, /assets/img/media/content-1200.webp 1200w"
+                data-gallery-alt="베이직 코튼 셔츠 소재 상세"
+              >
+                <!-- @include common/image.html#fixed-ratio -->
+              </button>
+            </li>
+          </ul>
+          <!-- @include common/modal.html#image-viewer -->
+        </div>
+
+        <section class="product-detail__purchase" aria-label="상품 구매 정보">
+          <p class="product-detail__brand" data-bind="product.brand">브랜드명</p>
+          <h1 id="product-title-pc" data-bind="product.name">베이직 코튼 셔츠</h1>
+          <!-- @include ecommerce/review.html#summary -->
+          <!-- @include ecommerce/price.html#discount -->
+
+          <form class="product-detail__form">
+            <div class="form-field">
+              <label class="form-field__label" for="product-option-pc">색상·사이즈</label>
+              <select class="form-control" id="product-option-pc" name="product-option" required>
+                <option value="">옵션을 선택하세요</option>
+                <option value="navy-medium">네이비 / M</option>
+                <option value="navy-large">네이비 / L</option>
+                <option value="ivory-medium" disabled>아이보리 / M — 품절</option>
+              </select>
+            </div>
+
+            <div class="product-detail__selected-options" aria-live="polite" data-bind-list="selectedOptions">
+              <div class="product-detail__selected-option">
+                <span data-bind="option.name">네이비 / M</span>
+                <button type="button" class="btn btn--text btn--sm" aria-label="네이비 / M 제거">제거</button>
+              </div>
+            </div>
+
+            <div class="product-detail__quantity">
+              <span>수량</span>
+              <!-- @include ecommerce/stepper.html -->
+            </div>
+
+            <div class="product-detail__total">
+              <span>총 상품 금액</span>
+              <!-- @include ecommerce/price.html#default -->
+            </div>
+
+            <div class="product-detail__actions">
+              <button type="button" class="btn btn--outline btn--lg">장바구니</button>
+              <button type="submit" class="btn btn--primary btn--lg">바로구매</button>
+            </div>
+          </form>
+
+          <dl class="product-detail__notices">
+            <div>
+              <dt>배송</dt>
+              <dd data-bind="product.delivery">결제 완료 후 2~3일 이내 출고</dd>
+            </div>
+            <div>
+              <dt>반품</dt>
+              <dd data-bind="product.returns">수령 후 7일 이내 신청</dd>
+            </div>
+          </dl>
+        </section>
+      </section>
+
+      <!-- 직접 링크와 뒤로가기를 지원하도록 탭은 URL 해시를 바꾸는 섹션 앵커로 사용한다. -->
+      <!-- @include common/tab.html#anchors -->
+
+      <section class="product-detail__content-section" id="product-info" aria-labelledby="product-info-title">
+        <h2 id="product-info-title">상세정보</h2>
+        <ul class="product-detail__images" aria-label="상품 상세 이미지">
+          <li><!-- @include common/image.html#default --></li>
+          <li><!-- @include common/image.html#default --></li>
+          <li><!-- @include common/image.html#default --></li>
+        </ul>
+      </section>
+
+      <section class="product-detail__content-section" id="product-reviews" aria-labelledby="product-reviews-title">
+        <h2 id="product-reviews-title">리뷰</h2>
+        <div class="product-detail__review-list">
+          <!-- @include ecommerce/review.html#item -->
+        </div>
+        <!-- @include common/pagination.html#default -->
+      </section>
+
+      <section class="product-detail__content-section" id="product-inquiries" aria-labelledby="product-inquiries-title">
+        <h2 id="product-inquiries-title">Q&amp;A</h2>
+        <!-- @include common/accordion.html#multiple -->
+      </section>
+
+      <section class="product-detail__content-section" id="product-delivery" aria-labelledby="product-delivery-title">
+        <h2 id="product-delivery-title">배송·반품 안내</h2>
+        <p>배송 일정, 배송비, 교환 및 반품 기준이 연결되는 영역입니다.</p>
+      </section>
+
+      <section class="product-detail__content-section" aria-labelledby="related-products-title-pc">
+        <h2 id="related-products-title-pc">함께 본 상품</h2>
+        <ul class="catalog-products__grid product-detail__related-grid" data-bind-list="relatedProducts">
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+        </ul>
+      </section>
+    </div>
+  </main>
+  <!-- @include layout/footer.html -->
+  <script type="module" src="/assets/js/pc.js"></script>
+</body>
+</html>

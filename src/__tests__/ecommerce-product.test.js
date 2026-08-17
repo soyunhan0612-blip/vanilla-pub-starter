@@ -3,9 +3,10 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 class DelegatedRoot {
-  constructor(steppers = []) {
+  constructor(steppers = [], galleries = []) {
     this.listeners = new Map();
     this.steppers = steppers;
+    this.galleries = galleries;
   }
 
   addEventListener(type, listener) {
@@ -15,8 +16,9 @@ class DelegatedRoot {
   }
 
   querySelectorAll(selector) {
-    assert.equal(selector, '[data-stepper]');
-    return this.steppers;
+    if (selector === '[data-stepper]') return this.steppers;
+    if (selector === '[data-gallery]') return this.galleries;
+    assert.fail(`예상하지 않은 선택자: ${selector}`);
   }
 
   dispatch(type, event) {
@@ -88,6 +90,93 @@ function clickEvent(target) {
   };
 }
 
+function createGalleryFixture() {
+  const root = new DelegatedRoot();
+  const attributes = (initial) => {
+    const values = new Map(Object.entries(initial));
+    return {
+      getAttribute(name) {
+        return values.get(name) ?? null;
+      },
+      setAttribute(name, value) {
+        values.set(name, String(value));
+      },
+    };
+  };
+  const image = attributes({
+    src: '/assets/img/media/hero-1280.jpg',
+    srcset: '/assets/img/media/hero-1280.jpg 1280w',
+    alt: '상품 정면',
+  });
+  const source = attributes({
+    srcset: '/assets/img/media/hero-1280.webp 1280w',
+  });
+  const viewerImage = attributes({
+    src: '/assets/img/media/content-600.jpg',
+    srcset: '/assets/img/media/content-600.jpg 600w',
+    alt: '확대 이미지',
+  });
+  const viewerSource = attributes({
+    srcset: '/assets/img/media/content-600.webp 600w',
+  });
+  const main = {
+    querySelector(selector) {
+      if (selector === 'img') return image;
+      if (selector === 'source[type="image/webp"]') return source;
+      return null;
+    },
+  };
+  const viewer = {
+    querySelector(selector) {
+      if (selector === 'img') return viewerImage;
+      if (selector === 'source[type="image/webp"]') return viewerSource;
+      return null;
+    },
+  };
+  const gallery = {
+    querySelector(selector) {
+      if (selector === '[data-gallery-main]') return main;
+      if (selector === '[data-gallery-viewer]') return viewer;
+      return null;
+    },
+    querySelectorAll(selector) {
+      assert.equal(selector, '[data-gallery-thumbnail]');
+      return buttons;
+    },
+  };
+  const buttons = [
+    {
+      ...attributes({
+        'aria-pressed': 'true',
+        'data-gallery-src': '/assets/img/media/hero-1280.jpg',
+        'data-gallery-srcset': '/assets/img/media/hero-1280.jpg 1280w',
+        'data-gallery-webp-srcset': '/assets/img/media/hero-1280.webp 1280w',
+        'data-gallery-alt': '상품 정면',
+      }),
+    },
+    {
+      ...attributes({
+        'aria-pressed': 'false',
+        'data-gallery-src': '/assets/img/media/product-1200.jpg',
+        'data-gallery-srcset': '/assets/img/media/product-600.jpg 600w, /assets/img/media/product-1200.jpg 1200w',
+        'data-gallery-webp-srcset': '/assets/img/media/product-600.webp 600w, /assets/img/media/product-1200.webp 1200w',
+        'data-gallery-alt': '상품 뒷면',
+      }),
+    },
+  ];
+
+  for (const button of buttons) {
+    button.closest = (selector) => {
+      if (selector === '[data-gallery-thumbnail]') return button;
+      if (selector === '[data-gallery]') return gallery;
+      return null;
+    };
+  }
+  root.galleries = [gallery];
+
+  return { root, image, source, viewerImage, viewerSource, buttons };
+}
+
 test('stepper는 한 번만 위임하고 증감 시 경계·disabled·change 이벤트를 동기화한다', async () => {
   const { initSteppers } = await import('../assets/js/common/stepper.js');
   const { root, input, buttons, emittedEvents } = createStepperFixture();
@@ -130,6 +219,30 @@ test('stepper는 직접 입력한 비숫자와 범위 밖 값을 안전한 값�
   root.dispatch('change', { target: input });
   assert.equal(input.value, '1');
   assert.equal(buttons[0].disabled, true);
+});
+
+test('상품 갤러리는 썸네일 클릭을 한 번만 위임해 메인 이미지와 선택 상태를 바꾼다', async () => {
+  const { initGalleries } = await import('../assets/js/common/gallery.js');
+  const { root, image, source, viewerImage, viewerSource, buttons } = createGalleryFixture();
+
+  initGalleries(root);
+  initGalleries(root);
+  assert.equal(root.listeners.get('click').length, 1);
+  assert.equal(viewerImage.getAttribute('src'), '/assets/img/media/hero-1280.jpg');
+  assert.equal(viewerImage.getAttribute('alt'), '상품 정면');
+
+  const event = clickEvent(buttons[1]);
+  root.dispatch('click', event);
+
+  assert.equal(event.defaultPrevented, true);
+  assert.equal(image.getAttribute('src'), '/assets/img/media/product-1200.jpg');
+  assert.equal(image.getAttribute('alt'), '상품 뒷면');
+  assert.match(image.getAttribute('srcset'), /product-600\.jpg/);
+  assert.match(source.getAttribute('srcset'), /product-600\.webp/);
+  assert.equal(viewerImage.getAttribute('src'), '/assets/img/media/product-1200.jpg');
+  assert.equal(viewerImage.getAttribute('alt'), '상품 뒷면');
+  assert.match(viewerSource.getAttribute('srcset'), /product-600\.webp/);
+  assert.deepEqual(buttons.map((button) => button.getAttribute('aria-pressed')), ['false', 'true']);
 });
 
 test('상품 컴포넌트 fragment가 include·가격 의미·접근성 계약을 문서화한다', async () => {

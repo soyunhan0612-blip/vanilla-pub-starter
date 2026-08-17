@@ -1,9 +1,11 @@
 <!-- @component 탭
      @category common
      @variant  default — 자동 활성화형 가로 탭
+     @variant  anchors — URL 해시를 사용하는 섹션 이동 탭
      @a11y     선택 탭만 tabindex 0. 좌우 방향키·Home·End로 선택과 포커스 이동
      @snippet  tab
 -->
+<!-- @variant default -->
 <section class="tab-showcase" aria-labelledby="tab-showcase-title">
   <h2 id="tab-showcase-title">탭</h2>
   <p>상품 정보 영역을 한 번의 Tab 정지점과 방향키로 탐색합니다.</p>
@@ -123,3 +125,15 @@
     </div>
   </div>
 </section>
+<!-- @endvariant -->
+
+<!-- @variant anchors -->
+<nav class="tabs detail-tabs" aria-label="상품 상세 영역">
+  <div class="tabs__list detail-tabs__list">
+    <a class="tabs__tab" href="#product-info">상세정보</a>
+    <a class="tabs__tab" href="#product-reviews">리뷰</a>
+    <a class="tabs__tab" href="#product-inquiries">Q&amp;A</a>
+    <a class="tabs__tab" href="#product-delivery">배송·반품</a>
+  </div>
+</nav>
+<!-- @endvariant -->

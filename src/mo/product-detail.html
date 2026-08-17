@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>베이직 코튼 셔츠 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/mo.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-mo.html -->
+  <!-- @include layout/gnb-mo.html -->
+  <main class="product-detail-page product-detail-page--mo" id="main">
+    <section class="product-gallery product-gallery--mo" aria-labelledby="product-gallery-title-mo">
+      <h2 class="sr-only" id="product-gallery-title-mo">상품 이미지</h2>
+      <ul class="product-gallery__track" tabindex="0" aria-label="상품 이미지 슬라이드">
+        <li class="product-gallery__slide"><!-- @include common/image.html#eager --></li>
+        <li class="product-gallery__slide"><!-- @include common/image.html#default --></li>
+        <li class="product-gallery__slide"><!-- @include common/image.html#default --></li>
+      </ul>
+      <p class="product-gallery__indicator" aria-live="polite">
+        <span data-bind="gallery.current">1</span> / <span data-bind="gallery.total">3</span>
+      </p>
+    </section>
+
+    <div class="container product-detail__body">
+      <section class="product-detail__summary" aria-labelledby="product-title-mo">
+        <p class="product-detail__brand" data-bind="product.brand">브랜드명</p>
+        <h1 id="product-title-mo" data-bind="product.name">베이직 코튼 셔츠</h1>
+        <!-- @include ecommerce/review.html#summary -->
+        <!-- @include ecommerce/price.html#discount -->
+        <p data-bind="product.delivery">결제 완료 후 2~3일 이내 출고</p>
+      </section>
+
+      <!-- 직접 링크와 뒤로가기를 지원하도록 탭은 URL 해시를 바꾸는 섹션 앵커로 사용한다. -->
+      <!-- @include common/tab.html#anchors -->
+
+      <section class="product-detail__content-section" id="product-info" aria-labelledby="product-info-title">
+        <h2 id="product-info-title">상세정보</h2>
+        <ul class="product-detail__images" aria-label="상품 상세 이미지">
+          <li><!-- @include common/image.html#default --></li>
+          <li><!-- @include common/image.html#default --></li>
+        </ul>
+      </section>
+
+      <section class="product-detail__content-section" id="product-reviews" aria-labelledby="product-reviews-title">
+        <h2 id="product-reviews-title">리뷰</h2>
+        <div class="product-detail__review-list">
+          <!-- @include ecommerce/review.html#item -->
+        </div>
+        <!-- @include common/pagination.html#more -->
+      </section>
+
+      <section class="product-detail__content-section" id="product-inquiries" aria-labelledby="product-inquiries-title">
+        <h2 id="product-inquiries-title">Q&amp;A</h2>
+        <!-- @include common/accordion.html#multiple -->
+      </section>
+
+      <section class="product-detail__content-section" id="product-delivery" aria-labelledby="product-delivery-title">
+        <h2 id="product-delivery-title">배송·반품 안내</h2>
+        <p>배송 일정, 배송비, 교환 및 반품 기준이 연결되는 영역입니다.</p>
+      </section>
+
+      <section class="product-detail__content-section" aria-labelledby="related-products-title-mo">
+        <h2 id="related-products-title-mo">함께 본 상품</h2>
+        <ul class="catalog-products__grid product-detail__related-grid" data-bind-list="relatedProducts">
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <div class="product-purchase-bar" role="group" aria-label="상품 구매">
+    <button type="button" class="btn btn--outline btn--lg" aria-label="찜하기" aria-pressed="false">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21.2l7.8-7.7 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="btn btn--outline btn--lg"
+      data-modal-open="product-purchase-bottom-sheet"
+      aria-controls="product-purchase-bottom-sheet"
+      aria-expanded="false"
+    >
+      장바구니
+    </button>
+    <button
+      type="button"
+      class="btn btn--primary btn--lg"
+      data-modal-open="product-purchase-bottom-sheet"
+      aria-controls="product-purchase-bottom-sheet"
+      aria-expanded="false"
+    >
+      바로구매
+    </button>
+  </div>
+
+  <!-- @include common/modal.html#purchase-bottom-sheet -->
+  <!-- @include layout/footer.html -->
+  <script type="module" src="/assets/js/mo.js"></script>
+</body>
+</html>

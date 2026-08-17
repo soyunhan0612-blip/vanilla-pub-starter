@@ -33,6 +33,7 @@
 @use 'ecommerce/coupon';
 @use 'pages/main';
 @use 'pages/catalog';
+@use 'pages/detail';
 
 body {
   width: var(--layout-content-mo);
