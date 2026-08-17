@@ -74,7 +74,7 @@ test('컴파일러가 없으면 null을 반환한다', () => {
   }
 });
 
-test('SCSS 엔트리가 없어도 실제 빌드 프로세스가 빈 dist와 종료 코드 0을 만든다', () => {
+test('SCSS 엔트리가 없어도 실제 빌드 프로세스가 루트 분기 HTML과 종료 코드 0을 만든다', () => {
   const root = createRoot();
   try {
     fs.mkdirSync(path.join(root, 'src'), { recursive: true });
@@ -85,7 +85,11 @@ test('SCSS 엔트리가 없어도 실제 빌드 프로세스가 빈 dist와 종�
     const output = `${result.stdout || ''}${result.stderr || ''}`;
     assert.equal(result.status, 0, output);
     assert.match(output, /SCSS 엔트리.*건너뜁니다/);
-    assert.deepEqual(fs.readdirSync(path.join(root, 'dist')), []);
+    assert.deepEqual(fs.readdirSync(path.join(root, 'dist')), ['index.html']);
+    assert.match(
+      fs.readFileSync(path.join(root, 'dist', 'index.html'), 'utf8'),
+      /pc\/index\.html/
+    );
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -126,6 +130,20 @@ test('dist HTML의 include를 평면 마크업으로 해소하고 css/js/img를 
       '<main><button>구매</button></main>'
     );
     assert.equal(output.assetFiles.length, 3);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('src 루트 진입 HTML을 dist 루트에 복사한다', () => {
+  const root = createRoot();
+  try {
+    write(root, 'src/index.html', '<!doctype html><title>분기</title>');
+    createDist(root);
+    assert.equal(
+      fs.readFileSync(path.join(root, 'dist', 'index.html'), 'utf8'),
+      '<!doctype html><title>분기</title>'
+    );
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

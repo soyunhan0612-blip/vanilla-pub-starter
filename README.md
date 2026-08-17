@@ -39,6 +39,22 @@ node tools/serve.js --timeout=120
 
 새 컴포넌트는 `src/assets/components/`의 fragment와 `@component` 주석을 원본으로 만든다. 페이지에는 `<!-- @include ... -->`로 연결하고 SCSS를 PC/MO 엔트리에 연결한 뒤 빌드한다. 전체 절차는 [CONVENTIONS.md의 컴포넌트 추가 절차](CONVENTIONS.md#컴포넌트-추가-절차)를 따른다.
 
+## 개발사 이관 절차
+
+이관 직전에 `node tools/build.js`와 `node tools/check.js`를 실행한 뒤 다음 세 항목을 전달한다.
+
+- `dist/` — include가 모두 해소된 PC/MO 평면 HTML과 읽을 수 있는 비압축 CSS·JavaScript·이미지. 파일명에는 해시가 없다.
+- `src/guide.html` — 전달본에서는 `guide.html` 이름 그대로 두는 컴포넌트·레이아웃·토큰 카탈로그. 서버 없이 `file://`로 열 수 있다.
+- `CONVENTIONS.md` — 마크업, 토큰, 접근성, 컴포넌트 추가와 데이터 연동 계약.
+
+개발사는 `data-bind`, `data-bind-src`, `data-bind-href`, `data-bind-list`, `data-bind-event`를 서버 템플릿 연동 지점으로 사용한다. 각 마커의 치환 방식과 보안·ARIA 동기화 규칙은 [개발사 데이터 연동 규약](CONVENTIONS.md#개발사-데이터-연동-규약)에 있다.
+
+색·간격·타이포그래피 토큰은 `dist/assets/css/pc.css`와 `mo.css`의 CSS Custom Properties로 출력되어 있으므로 Sass 없이도 값을 바꿀 수 있다. 원본 저장소에서 계속 개발한다면 `src/assets/scss/tokens/`를 수정하고 다시 빌드해 두 CSS를 함께 갱신한다.
+
+PC/MO 선택은 운영 서버에서 처리하는 것이 원칙이다. `dist/index.html`의 클라이언트 분기는 뷰포트 폭을 우선하는 폴백 참조 구현일 뿐이며, 그대로 프로덕션 분기 방식으로 채택하면 SEO와 초기 렌더에 손해가 난다. 명시적인 버전 전환과 무한 루프 방지 규약은 [PC/MO 진입과 버전 전환](CONVENTIONS.md#pcmo-진입과-버전-전환)을 따른다.
+
+초기 커밋 일부에는 `Co-Authored-By: Claude` 트레일러가 있다. 저장소 히스토리까지 사내로 반입할 계획이면 회사의 저작자·감사 정책에 맞게 이관 시점에 트레일러 정리가 필요한지 먼저 확인한다. 공개되었거나 공유된 히스토리를 임의로 다시 쓰기 전에 담당자 승인을 받는다.
+
 ## Tier 1 — npm을 사용할 수 있을 때
 
 ```bash

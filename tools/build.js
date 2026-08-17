@@ -11,6 +11,7 @@ const {
   stripComponentComments,
   stripVariantMarkers,
 } = require('./include');
+const { generateRedirectEntry } = require('./ua-redirect');
 
 const DEFAULT_ROOT = path.join(__dirname, '..');
 const VARIANTS = ['pc', 'mo'];
@@ -736,6 +737,12 @@ function createDist(root = DEFAULT_ROOT) {
   fs.mkdirSync(dist, { recursive: true });
 
   const htmlFiles = [];
+  const rootEntry = path.join(src, 'index.html');
+  if (fs.existsSync(rootEntry)) {
+    const target = path.join(dist, 'index.html');
+    fs.copyFileSync(rootEntry, target);
+    htmlFiles.push(target);
+  }
   for (const variant of VARIANTS) {
     const sourceDir = path.join(src, variant);
     for (const file of walkFiles(sourceDir).filter((candidate) => path.extname(candidate) === '.html')) {
@@ -760,6 +767,7 @@ function createDist(root = DEFAULT_ROOT) {
 function build(root = DEFAULT_ROOT, platform = process.platform) {
   const absoluteRoot = path.resolve(root);
   const scss = compileScss(absoluteRoot, platform);
+  const redirectEntry = generateRedirectEntry(absoluteRoot);
   const output = createDist(absoluteRoot);
   const components = parseComponents(absoluteRoot);
   const tokens = parseTokens(absoluteRoot);
@@ -768,7 +776,7 @@ function build(root = DEFAULT_ROOT, platform = process.platform) {
   console.log(`[build] dist 생성 완료 (HTML ${output.htmlFiles.length}개, 자산 ${output.assetFiles.length}개)`);
   console.log(`[build] guide: ${path.relative(absoluteRoot, guideFile)}`);
   console.log(`[build] snippets: ${path.relative(absoluteRoot, snippetsFile)}`);
-  return { ...output, scss, components, tokens, guideFile, snippetsFile };
+  return { ...output, scss, components, tokens, guideFile, redirectEntry, snippetsFile };
 }
 
 function parseRootArg(argv) {
