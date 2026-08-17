@@ -5,7 +5,11 @@
     {
       "step": 0,
       "name": "skeleton",
-      "status": "pending"
+      "status": "completed",
+      "summary": "tools/include.js(중첩 해소·순환 감지 throw·@component 제거)·serve.js(MIME 9종·index.html 폴백·.html 실시간 include·--smoke 는 404 도 성공)·build.js(sass 탐색 node_modules/.bin→tools/vendor→경고 후 건너뜀·dist 생성) 와 각 *.test.js 3벌 작성. 셋 다 CommonJS 이고 node: 내장만 쓰며 판정 로직을 module.exports 로 노출해 --root= 픽스처로 테스트한다. src/ 스켈레톤(.gitkeep 17개)과 src/package.json={\"type\":\"module\"} 로 src/ 만 ESM, tools/ 는 CommonJS 로 분리. README·.githooks/pre-commit(node tools/check.js)·root package.json(Tier 1 선택, type 필드 없음) 추가. AC 3개(build·check·serve --smoke) 와 tools 테스트 54개 통과 — 단 검증은 샌드박스 밖에서 수행했다(아래 참고).",
+      "started_at": "2026-08-17T09:13:01+0900",
+      "completed_at": "2026-08-17T09:24:44+0900",
+      "note": "codex 세션은 workspace-write 샌드박스가 Node 자식 프로세스를 EPERM 으로 막아 AC 를 스스로 돌리지 못하고 blocked 로 보고했다. 산출물 결함이 아니라 환경 제약이며, AC 3개와 테스트 54개는 샌드박스 밖에서 전부 통과함을 확인한 뒤 completed 로 정정했다."
     },
     {
       "step": 1,
@@ -17,5 +21,6 @@
       "name": "js-core",
       "status": "pending"
     }
-  ]
+  ],
+  "created_at": "2026-08-17T09:13:01+0900"
 }
