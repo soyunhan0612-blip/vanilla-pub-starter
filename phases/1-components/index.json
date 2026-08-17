@@ -13,7 +13,10 @@
     {
       "step": 1,
       "name": "common-overlay",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-08-17T10:58:00+0900",
+      "summary": "기본·풀스크린·바텀시트 모달과 3종 토스트, 위임형 포커스 트랩·중첩 스택·5초 알림 동작을 구현하고 PC·MO 공통 자산에 연결",
+      "completed_at": "2026-08-17T11:13:21+0900"
     },
     {
       "step": 2,

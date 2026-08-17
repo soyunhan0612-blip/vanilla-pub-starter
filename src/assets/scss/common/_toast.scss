@@ -1,0 +1,73 @@
+@use '../abstracts/mixins' as *;
+
+.toast-showcase,
+.toast-showcase__list,
+.toast-region {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.toast-region {
+  position: fixed;
+  z-index: 1100;
+  right: max(var(--space-4), var(--safe-right));
+  bottom: max(var(--space-4), var(--safe-bottom));
+  width: min(360px, calc(100% - (var(--space-4) * 2)));
+  pointer-events: none;
+}
+
+.toast {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-inline-start-width: 4px;
+  border-inline-start-color: var(--color-info);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-body);
+  background: var(--color-bg-page);
+  opacity: 0;
+  transform: translateY(var(--space-2));
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+  pointer-events: none;
+}
+
+.toast--success {
+  border-inline-start-color: var(--color-success);
+}
+
+.toast--error {
+  border-inline-start-color: var(--color-danger);
+}
+
+.toast.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.is-leaving {
+  opacity: 0;
+  transform: translateY(var(--space-2));
+}
+
+.toast__message {
+  line-height: var(--line-height-body);
+}
+
+.toast__close {
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--color-text-weak);
+  text-decoration: underline;
+  pointer-events: auto;
+}
+
+.toast__close:hover {
+  color: var(--color-text-strong);
+}
+
+.toast__close:focus-visible {
+  @include focus-ring;
+}
