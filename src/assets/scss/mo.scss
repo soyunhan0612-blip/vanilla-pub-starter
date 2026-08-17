@@ -32,6 +32,7 @@
 @use 'ecommerce/cart-summary';
 @use 'ecommerce/coupon';
 @use 'pages/main';
+@use 'pages/catalog';
 
 body {
   width: var(--layout-content-mo);

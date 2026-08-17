@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>여성 카테고리 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/pc.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-pc.html -->
+  <main class="catalog-page category-page" id="main">
+    <div class="container">
+      <!-- @include common/breadcrumb.html#default -->
+
+      <header class="catalog-page__header">
+        <h1 class="catalog-page__title" data-bind="category.name">여성</h1>
+        <p class="catalog-page__description" data-bind="category.description">
+          계절과 일상에 맞는 여성 상품을 하위 카테고리와 대표 상품으로 탐색합니다.
+        </p>
+      </header>
+
+      <section class="catalog-section category-children" aria-labelledby="pc-category-children-title">
+        <div class="catalog-section__header">
+          <h2 id="pc-category-children-title">하위 카테고리</h2>
+        </div>
+        <ul class="category-children__grid" data-bind-list="category.children">
+          <li><a class="category-children__link" href="/category/women/outer"><span class="category-children__media" aria-hidden="true"></span><span>아우터</span></a></li>
+          <li><a class="category-children__link" href="/category/women/top"><span class="category-children__media" aria-hidden="true"></span><span>상의</span></a></li>
+          <li><a class="category-children__link" href="/category/women/bottom"><span class="category-children__media" aria-hidden="true"></span><span>하의</span></a></li>
+          <li><a class="category-children__link" href="/category/women/dress"><span class="category-children__media" aria-hidden="true"></span><span>원피스</span></a></li>
+          <li><a class="category-children__link" href="/category/women/bag"><span class="category-children__media" aria-hidden="true"></span><span>가방</span></a></li>
+          <li><a class="category-children__link" href="/category/women/shoes"><span class="category-children__media" aria-hidden="true"></span><span>신발</span></a></li>
+        </ul>
+      </section>
+
+      <section class="catalog-section category-banner" aria-labelledby="pc-category-banner-title">
+        <h2 class="sr-only" id="pc-category-banner-title">카테고리 기획 배너</h2>
+        <a href="/events/women-season" aria-label="여성 시즌 기획전 보기">
+          <!-- @include common/image.html#default -->
+        </a>
+      </section>
+
+      <section class="catalog-section category-featured" aria-labelledby="pc-category-featured-title">
+        <div class="catalog-section__header">
+          <h2 id="pc-category-featured-title">대표 상품</h2>
+          <a href="/product-list">전체 보기</a>
+        </div>
+        <ul class="catalog-products__grid">
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+          <li><!-- @include ecommerce/product-card.html#grid --></li>
+        </ul>
+      </section>
+    </div>
+  </main>
+  <!-- @include layout/footer.html -->
+  <script type="module" src="/assets/js/pc.js"></script>
+</body>
+</html>

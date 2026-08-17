@@ -2,6 +2,7 @@
 .skeleton-showcase__section,
 .skeleton-text,
 .skeleton-product-card,
+.skeleton-product-card__name,
 .skeleton-product-card__content {
   display: grid;
   gap: var(--space-4);
@@ -20,8 +21,12 @@
 }
 
 .skeleton-text,
-.skeleton-product-card__content {
+.skeleton-product-card__name {
   gap: var(--space-2);
+}
+
+.skeleton-product-card__content {
+  gap: var(--space-4);
 }
 
 .skeleton--text {

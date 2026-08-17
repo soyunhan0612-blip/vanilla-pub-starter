@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>여성 아우터 상품 목록 | 쇼핑몰</title>
+  <link rel="stylesheet" href="/assets/css/pc.css">
+</head>
+<body>
+  <a class="skip-nav" href="#main">본문 바로가기</a>
+  <!-- @include layout/header-pc.html -->
+  <main class="catalog-page product-list-page" id="main">
+    <div class="container">
+      <!-- @include common/breadcrumb.html#default -->
+
+      <header class="catalog-page__header">
+        <h1 class="catalog-page__title" data-bind="category.name">여성 아우터</h1>
+      </header>
+
+      <section aria-labelledby="pc-product-list-content-title">
+        <h2 class="sr-only" id="pc-product-list-content-title">상품 필터와 목록</h2>
+        <div class="product-list__layout">
+          <!-- @include ecommerce/filter-bar.html#pc -->
+
+          <div class="product-list__results">
+            <ul class="catalog-products__grid" aria-label="상품 목록" data-bind-list="products">
+              <li><!-- @include ecommerce/product-card.html#grid --></li>
+              <li><!-- @include ecommerce/product-card.html#grid --></li>
+              <li><!-- @include ecommerce/product-card.html#grid --></li>
+              <li><!-- @include ecommerce/product-card.html#grid --></li>
+              <li><!-- @include ecommerce/product-card.html#grid --></li>
+              <li><!-- @include ecommerce/product-card.html#grid --></li>
+              <li><!-- @include ecommerce/product-card.html#grid --></li>
+              <li><!-- @include ecommerce/product-card.html#grid --></li>
+            </ul>
+            <!-- @include common/pagination.html#default -->
+          </div>
+        </div>
+      </section>
+
+      <!-- 상태 변형: 로딩 시작 — 실제 연동 시 기본 상품 목록과 교체하고 hidden을 제거한다. -->
+      <section class="catalog-state catalog-state--loading" aria-labelledby="pc-product-loading-title" hidden>
+        <h2 class="sr-only" id="pc-product-loading-title">상품 불러오는 중</h2>
+        <p class="sr-only" role="status">상품 목록을 불러오고 있습니다.</p>
+        <ul class="catalog-products__grid catalog-products__grid--skeleton" aria-hidden="true">
+          <li><!-- @include common/skeleton.html#product-card --></li>
+          <li><!-- @include common/skeleton.html#product-card --></li>
+          <li><!-- @include common/skeleton.html#product-card --></li>
+          <li><!-- @include common/skeleton.html#product-card --></li>
+          <li><!-- @include common/skeleton.html#product-card --></li>
+          <li><!-- @include common/skeleton.html#product-card --></li>
+          <li><!-- @include common/skeleton.html#product-card --></li>
+          <li><!-- @include common/skeleton.html#product-card --></li>
+        </ul>
+      </section>
+      <!-- 상태 변형: 로딩 끝 -->
+
+      <!-- 상태 변형: 검색 결과 없음 시작 — 실제 연동 시 기본 상품 목록과 교체하고 hidden을 제거한다. -->
+      <section class="catalog-state catalog-state--empty" aria-labelledby="pc-product-empty-title" hidden>
+        <h2 class="sr-only" id="pc-product-empty-title">상품 목록 빈 상태</h2>
+        <!-- @include common/empty.html#search -->
+      </section>
+      <!-- 상태 변형: 검색 결과 없음 끝 -->
+    </div>
+  </main>
+  <!-- @include layout/footer.html -->
+  <script type="module" src="/assets/js/pc.js"></script>
+</body>
+</html>

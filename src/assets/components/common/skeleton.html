@@ -9,26 +9,36 @@
 
   <div class="skeleton-showcase__section">
     <h3>텍스트 줄</h3>
+    <!-- @variant text -->
     <div class="skeleton-text" aria-hidden="true">
       <span class="skeleton skeleton--text"></span>
       <span class="skeleton skeleton--text skeleton--text-short"></span>
     </div>
+    <!-- @endvariant -->
   </div>
 
   <div class="skeleton-showcase__section">
     <h3>이미지 블록</h3>
+    <!-- @variant image -->
     <div class="skeleton skeleton--image" aria-hidden="true"></div>
+    <!-- @endvariant -->
   </div>
 
   <div class="skeleton-showcase__section">
     <h3>상품카드</h3>
+    <!-- @variant product-card -->
     <article class="skeleton-product-card" aria-hidden="true">
       <div class="skeleton skeleton--image"></div>
       <div class="skeleton-product-card__content">
-        <span class="skeleton skeleton--text"></span>
         <span class="skeleton skeleton--text skeleton--text-short"></span>
+        <span class="skeleton-product-card__name">
+          <span class="skeleton skeleton--text"></span>
+          <span class="skeleton skeleton--text skeleton--text-short"></span>
+        </span>
         <span class="skeleton skeleton--price"></span>
+        <span class="skeleton skeleton--text skeleton--text-short"></span>
       </div>
     </article>
+    <!-- @endvariant -->
   </div>
 </section>
