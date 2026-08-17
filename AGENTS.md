@@ -30,6 +30,10 @@
   - 이 범위가 `tools/check.js` 의 `SIZE_PROPERTIES` 와 정확히 같다. **한쪽만 고치지 마라** — 문서가 게이트보다 넓으면 사람이 어느 쪽을 믿을지 갈린다.
 - **컴포넌트 fragment 는 레이블까지 자기 안에 갖는다.** `<input>`·`<select>`·`<textarea>` 는 같은 fragment 안의 `<label for>`·감싸는 `<label>`·`aria-label` 중 하나로 연결되어야 한다. `check.js` 가 파일 단위로 검사하므로 페이지가 레이블을 대신 주는 구조는 오류로 잡힌다 — 단일 소스 컴포넌트가 자기완결적이어야 하기 때문이다.
 - **컴포넌트 마크업은 `assets/components/` 가 단일 소스.** 페이지는 `<!-- @include ... -->` 로 참조한다. 헤더 하나 고치려고 14개 파일을 여는 상황을 만들지 마라.
+  - fragment 는 변형을 한 파일에 모아 두므로, 통째로 include 하면 변형 전부가 딸려 온다. **한 조각만 필요하면 변형을 지정한다** — `<!-- @include common/image.html#fixed-ratio -->`.
+  - 가져올 쪽 fragment 는 그 조각을 `<!-- @variant fixed-ratio -->` ~ `<!-- @endvariant -->` 로 감싼다. 마커는 주석이라 쇼케이스 렌더에는 영향이 없고, 이름은 `@component` 주석의 `@variant` 목록과 맞춘다.
+  - **필요 없는 변형을 CSS `display: none` 으로 가리지 마라.** DOM 과 이미지 요청이 그대로 남고, `:last-of-type` 같은 순서 의존 선택자는 원본 fragment 의 변형 순서만 바뀌어도 조용히 깨진다. 무엇보다 `ecommerce/` SCSS 가 `common/` fragment 의 내부 구조를 알게 되어 계층 경계가 뒤집힌다.
+  - 변형 이름 오타는 `tools/check.js` 가 잡는다. 판정은 `tools/include.js` 의 `selectVariant` 한 곳에 있다 — **한쪽만 고치지 마라.**
 - **공통 자산은 PC/MO가 공유한다.** HTML만 2벌이고 SCSS·JS는 단일 소스다. `common/` 에 PC 전용 분기를 넣지 마라.
 - 모든 컴포넌트 fragment는 `@component` 주석을 갖는다. 이 주석이 `guide.html` 과 에디터 스니펫의 생성 소스다.
 
