@@ -13,7 +13,10 @@
     {
       "step": 1,
       "name": "docs",
-      "status": "pending"
+      "status": "completed",
+      "summary": "실제 BEM·data-bind·토큰 규칙에 맞춘 컨벤션과 시안 검토·수동 QA·크로스브라우징 인수 문서를 루트에 정리하고 README에 연결",
+      "started_at": "2026-08-17T17:29:20+0900",
+      "completed_at": "2026-08-17T17:39:21+0900"
     },
     {
       "step": 2,
