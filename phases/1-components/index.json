@@ -53,7 +53,10 @@
     {
       "step": 6,
       "name": "ecommerce-order",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-08-17T13:09:02+0900",
+      "summary": "주문 3단계 표시와 가격 컴포넌트 재사용 금액 요약, safe-area MO 결제 바, 접근성 쿠폰 코드·목록·피드백을 ecommerce fragment·SCSS로 구현",
+      "completed_at": "2026-08-17T13:22:49+0900"
     }
   ],
   "created_at": "2026-08-17T10:36:30+0900"

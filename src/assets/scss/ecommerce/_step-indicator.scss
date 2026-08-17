@@ -1,0 +1,78 @@
+@use '../abstracts/mixins' as *;
+
+.step-indicator {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.step-indicator__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  gap: var(--space-3);
+  list-style: none;
+}
+
+.step-indicator__item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-weak);
+}
+
+.step-indicator__number {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-page);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+}
+
+.step-indicator__content,
+.step-indicator__label {
+  min-width: 0;
+}
+
+.step-indicator__label {
+  overflow-wrap: anywhere;
+}
+
+.step-indicator__item.is-complete,
+.step-indicator__item.is-current {
+  color: var(--color-text-strong);
+}
+
+.step-indicator__item.is-complete .step-indicator__number {
+  border-color: var(--color-text-strong);
+  color: var(--color-bg-page);
+  background: var(--color-text-strong);
+}
+
+.step-indicator__item.is-current {
+  font-weight: var(--font-weight-semibold);
+}
+
+.step-indicator__item.is-current .step-indicator__number {
+  border-color: var(--color-text-strong);
+  border-width: 2px;
+}
+
+@include respond-mo {
+  .step-indicator__list {
+    grid-template-columns: repeat(3, auto);
+    justify-content: space-between;
+  }
+
+  .step-indicator__item:not([aria-current='step']) .step-indicator__content {
+    @include sr-only;
+  }
+}

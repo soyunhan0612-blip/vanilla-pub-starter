@@ -22,6 +22,9 @@
 @use 'ecommerce/stepper';
 @use 'ecommerce/filter-bar';
 @use 'ecommerce/review';
+@use 'ecommerce/step-indicator';
+@use 'ecommerce/cart-summary';
+@use 'ecommerce/coupon';
 
 html,
 body,

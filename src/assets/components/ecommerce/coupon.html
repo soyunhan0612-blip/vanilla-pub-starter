@@ -1,0 +1,141 @@
+<!-- @component 쿠폰
+     @category ecommerce
+     @variant  code | list
+     @state    success | error | applied
+     @a11y     입력에 label을 연결하고 성공은 status, 실패는 alert와 명시적 상태 텍스트로 전달
+     @integration 쿠폰 검증·적용·해제는 data-bind-event 지점에서 서버 또는 개발사 로직을 연결
+     @snippet  coupon
+-->
+<!-- @variant code -->
+<section class="coupon coupon--code" aria-labelledby="coupon-code-title">
+  <h2 id="coupon-code-title" class="coupon__title">쿠폰</h2>
+
+  <form class="coupon__code-form" data-bind-event="apply-coupon-code">
+    <div class="form-field coupon__code-field">
+      <label class="form-field__label" for="coupon-code">쿠폰 코드</label>
+      <input
+        class="form-control"
+        id="coupon-code"
+        name="coupon-code"
+        type="text"
+        autocomplete="off"
+        aria-describedby="coupon-code-hint"
+        data-bind="coupon.code"
+      >
+      <p id="coupon-code-hint" class="form-field__hint">공백 없이 쿠폰 코드를 입력해 주세요.</p>
+    </div>
+    <button type="submit" class="btn btn--primary btn--md coupon__apply-button">적용</button>
+  </form>
+
+  <button
+    type="button"
+    class="btn btn--outline btn--md coupon__list-open"
+    data-modal-open="coupon-list-modal"
+    aria-controls="coupon-list-modal"
+  >
+    보유 쿠폰 보기
+  </button>
+
+  <div class="coupon__feedbacks" aria-label="쿠폰 적용 결과 예시">
+    <p
+      class="coupon__feedback coupon__feedback--success"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+      data-bind="coupon.successMessage"
+    >
+      <strong>적용 성공:</strong> 5,000원 할인 쿠폰이 적용되었습니다.
+    </p>
+    <p
+      class="coupon__feedback coupon__feedback--error"
+      role="alert"
+      aria-atomic="true"
+      data-bind="coupon.errorMessage"
+    >
+      <strong>적용 실패:</strong> 사용할 수 없거나 만료된 쿠폰입니다.
+    </p>
+  </div>
+
+  <div class="coupon__applied" data-bind="coupon.applied">
+    <div>
+      <strong data-bind="coupon.name">신규회원 5,000원 할인</strong>
+      <p data-bind="coupon.discountMessage">5,000원 할인 적용됨</p>
+    </div>
+    <button type="button" class="btn btn--text btn--md" data-bind-event="remove-coupon">
+      적용 해제
+    </button>
+  </div>
+</section>
+<!-- @endvariant -->
+
+<!-- @variant list -->
+<!-- common/modal.html의 bottom-sheet 마크업·동작 계약을 그대로 재사용한다. -->
+<div
+  id="coupon-list-modal"
+  class="modal modal--bottom-sheet coupon coupon--list"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="coupon-list-title"
+  aria-describedby="coupon-list-description"
+  data-modal="coupon-list-modal"
+  tabindex="-1"
+  hidden
+>
+  <div class="modal__dialog">
+    <header class="modal__header">
+      <h2 id="coupon-list-title" class="modal__title">보유 쿠폰</h2>
+      <button type="button" class="modal__close" data-modal-close aria-label="보유 쿠폰 목록 닫기">
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+    <div class="modal__body">
+      <p id="coupon-list-description" class="sr-only">주문에 적용할 쿠폰 한 장을 선택합니다.</p>
+      <form id="coupon-list-form" data-bind-event="select-coupon">
+        <fieldset class="form-field coupon__list-field">
+          <legend class="form-field__legend">적용할 쿠폰 선택</legend>
+          <div class="choice-list" data-bind-list="coupon.available">
+            <label class="choice" for="coupon-list-new-member">
+              <input
+                class="choice__control"
+                id="coupon-list-new-member"
+                name="coupon-selection"
+                type="radio"
+                value="new-member"
+                checked
+              >
+              <span>
+                <strong>신규회원 5,000원 할인</strong>
+                <small>30,000원 이상 구매 시</small>
+              </span>
+            </label>
+            <label class="choice" for="coupon-list-delivery">
+              <input
+                class="choice__control"
+                id="coupon-list-delivery"
+                name="coupon-selection"
+                type="radio"
+                value="free-delivery"
+              >
+              <span>
+                <strong>무료배송 쿠폰</strong>
+                <small>배송비 3,000원 할인</small>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <footer class="modal__actions">
+      <button type="button" class="btn btn--outline btn--md" data-modal-close="coupon-list-modal">취소</button>
+      <button
+        type="submit"
+        class="btn btn--primary btn--md"
+        form="coupon-list-form"
+        data-modal-close="coupon-list-modal"
+      >
+        선택 쿠폰 적용
+      </button>
+    </footer>
+  </div>
+</div>
+<!-- @endvariant -->

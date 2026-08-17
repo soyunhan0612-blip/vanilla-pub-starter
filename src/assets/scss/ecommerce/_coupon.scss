@@ -1,0 +1,93 @@
+@use '../abstracts/mixins' as *;
+
+.coupon--code,
+.coupon__feedbacks,
+.coupon__applied,
+.coupon__list-field {
+  display: grid;
+}
+
+.coupon--code {
+  gap: var(--space-5);
+}
+
+.coupon__title {
+  font-size: var(--font-size-section-title);
+}
+
+.coupon__code-form {
+  display: flex;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.coupon__code-field {
+  flex: 1;
+}
+
+.coupon__apply-button {
+  flex: none;
+}
+
+.coupon__list-open {
+  justify-self: start;
+}
+
+.coupon__feedbacks,
+.coupon__list-field {
+  gap: var(--space-3);
+}
+
+.coupon__feedback {
+  padding: var(--space-3);
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-page);
+  font-size: var(--font-size-caption);
+}
+
+.coupon__feedback--success {
+  color: var(--color-success);
+}
+
+.coupon__feedback--error {
+  color: var(--color-danger);
+}
+
+.coupon__applied {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-text-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text-strong);
+  background: var(--color-bg-surface);
+}
+
+.coupon__applied p,
+.coupon--list small {
+  color: var(--color-text-weak);
+  font-size: var(--font-size-caption);
+}
+
+.coupon--list .choice {
+  align-items: flex-start;
+}
+
+.coupon--list .choice > span {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+@include respond-mo {
+  .coupon__code-form {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .coupon__apply-button {
+    width: 100%;
+  }
+}

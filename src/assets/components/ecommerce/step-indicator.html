@@ -1,0 +1,90 @@
+<!-- @component 주문 단계 표시
+     @category ecommerce
+     @variant  cart | order | complete
+     @a11y     nav·ol로 순서를 전달하고 완료·현재·남은 상태를 숨김 텍스트와 aria-current로 함께 제공
+     @responsive MO에서는 모든 단계 번호와 현재 단계명만 보이고 나머지 단계명은 스크린리더에 유지
+     @snippet  step-indicator
+-->
+<!-- @variant cart -->
+<nav class="step-indicator" aria-label="주문 진행 단계">
+  <ol class="step-indicator__list">
+    <li class="step-indicator__item is-current" aria-current="step">
+      <span class="step-indicator__number" aria-hidden="true">1</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">현재 단계: </span>
+        <span class="step-indicator__label">장바구니</span>
+      </span>
+    </li>
+    <li class="step-indicator__item is-upcoming">
+      <span class="step-indicator__number" aria-hidden="true">2</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">남은 단계: </span>
+        <span class="step-indicator__label">주문/결제</span>
+      </span>
+    </li>
+    <li class="step-indicator__item is-upcoming">
+      <span class="step-indicator__number" aria-hidden="true">3</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">남은 단계: </span>
+        <span class="step-indicator__label">완료</span>
+      </span>
+    </li>
+  </ol>
+</nav>
+<!-- @endvariant -->
+
+<!-- @variant order -->
+<nav class="step-indicator" aria-label="주문 진행 단계">
+  <ol class="step-indicator__list">
+    <li class="step-indicator__item is-complete">
+      <span class="step-indicator__number" aria-hidden="true">1</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">완료: </span>
+        <span class="step-indicator__label">장바구니</span>
+      </span>
+    </li>
+    <li class="step-indicator__item is-current" aria-current="step">
+      <span class="step-indicator__number" aria-hidden="true">2</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">현재 단계: </span>
+        <span class="step-indicator__label">주문/결제</span>
+      </span>
+    </li>
+    <li class="step-indicator__item is-upcoming">
+      <span class="step-indicator__number" aria-hidden="true">3</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">남은 단계: </span>
+        <span class="step-indicator__label">완료</span>
+      </span>
+    </li>
+  </ol>
+</nav>
+<!-- @endvariant -->
+
+<!-- @variant complete -->
+<nav class="step-indicator" aria-label="주문 진행 단계">
+  <ol class="step-indicator__list">
+    <li class="step-indicator__item is-complete">
+      <span class="step-indicator__number" aria-hidden="true">1</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">완료: </span>
+        <span class="step-indicator__label">장바구니</span>
+      </span>
+    </li>
+    <li class="step-indicator__item is-complete">
+      <span class="step-indicator__number" aria-hidden="true">2</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">완료: </span>
+        <span class="step-indicator__label">주문/결제</span>
+      </span>
+    </li>
+    <li class="step-indicator__item is-current" aria-current="step">
+      <span class="step-indicator__number" aria-hidden="true">3</span>
+      <span class="step-indicator__content">
+        <span class="sr-only">현재 단계: </span>
+        <span class="step-indicator__label">완료</span>
+      </span>
+    </li>
+  </ol>
+</nav>
+<!-- @endvariant -->
