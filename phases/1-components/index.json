@@ -5,7 +5,9 @@
     {
       "step": 0,
       "name": "common-form",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-08-17T10:36:30+0900",
+      "summary": "버튼 4종·3크기 상태와 링크형, 접근성 폼 전 유형의 상태 fragment·SCSS를 구현하고 PC·MO 엔트리에 연결"
     },
     {
       "step": 1,
@@ -37,5 +39,6 @@
       "name": "ecommerce-order",
       "status": "pending"
     }
-  ]
+  ],
+  "created_at": "2026-08-17T10:36:30+0900"
 }

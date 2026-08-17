@@ -1,0 +1,134 @@
+@use '../abstracts/mixins' as *;
+
+.button-showcase {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.button-showcase__section,
+.button-showcase__grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.button-showcase__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.button-showcase__label {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+}
+
+.btn {
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  gap: var(--space-2);
+  border: 1px solid transparent;
+  color: var(--color-text-strong);
+  background: transparent;
+  font-family: var(--font-family-base);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-body);
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.btn:focus-visible,
+.btn.is-focus {
+  @include focus-ring;
+}
+
+.btn--sm {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-caption);
+}
+
+.btn--md {
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-body);
+}
+
+.btn--lg {
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-price);
+}
+
+.btn--primary {
+  border-color: var(--color-text-strong);
+  color: var(--color-bg-page);
+  background: var(--color-text-strong);
+}
+
+.btn--primary:hover:not(:disabled),
+.btn--primary.is-hover {
+  border-color: var(--color-text-body);
+  background: var(--color-text-body);
+}
+
+.btn--secondary {
+  border-color: var(--color-bg-muted);
+  color: var(--color-text-strong);
+  background: var(--color-bg-muted);
+}
+
+.btn--secondary:hover:not(:disabled),
+.btn--secondary.is-hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-bg-surface);
+}
+
+.btn--outline {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-strong);
+  background: var(--color-bg-page);
+}
+
+.btn--outline:hover:not(:disabled),
+.btn--outline.is-hover {
+  background: var(--color-bg-muted);
+}
+
+.btn--text {
+  color: var(--color-text-weak);
+}
+
+.btn--text:hover:not(:disabled),
+.btn--text.is-hover {
+  color: var(--color-text-strong);
+  text-decoration: underline;
+}
+
+.btn:disabled {
+  border-color: var(--color-border);
+  color: var(--color-text-disabled);
+  background: var(--color-bg-muted);
+  cursor: not-allowed;
+}
+
+.btn[aria-busy='true'] {
+  cursor: progress;
+}
+
+.btn__spinner {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--radius-lg);
+  transform: rotate(45deg);
+}

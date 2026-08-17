@@ -1,0 +1,328 @@
+<!-- @component 폼
+     @category common
+     @variant  input | textarea | select | checkbox | radio | switch
+     @state    default | focus | disabled | readonly | error | success
+     @a11y     모든 입력은 label for로 연결. 오류는 aria-invalid와 aria-describedby를 함께 사용
+     @snippet  form
+-->
+<section class="form-showcase" aria-labelledby="form-showcase-title">
+  <h2 id="form-showcase-title">폼</h2>
+
+  <div class="form-showcase__section">
+    <h3>Input 유형과 상태</h3>
+    <div class="form-showcase__grid">
+      <div class="form-field">
+        <label class="form-field__label" for="form-input-text">텍스트 · 기본</label>
+        <input class="form-control" id="form-input-text" name="form-input-text" type="text">
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-input-email-focus">이메일 · 포커스</label>
+        <input class="form-control is-focus" id="form-input-email-focus" name="form-input-email-focus" type="email" value="buyer@example.com">
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-input-tel-disabled">휴대폰 번호 · Disabled</label>
+        <input class="form-control" id="form-input-tel-disabled" name="form-input-tel-disabled" type="tel" value="010-1234-5678" disabled>
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-input-password-readonly">비밀번호 · Readonly</label>
+        <input class="form-control" id="form-input-password-readonly" name="form-input-password-readonly" type="password" value="shop1234" readonly>
+      </div>
+
+      <div class="form-field is-error">
+        <label class="form-field__label" for="form-input-number-error">수량 · 에러</label>
+        <input class="form-control" id="form-input-number-error" name="form-input-number-error" type="number" min="1" aria-invalid="true" aria-describedby="form-input-number-error-message">
+        <p id="form-input-number-error-message" class="form-field__message form-field__message--error">필수 입력 항목입니다.</p>
+      </div>
+
+      <div class="form-field is-success">
+        <label class="form-field__label" for="form-input-text-success">주문자명 · 성공</label>
+        <input class="form-control" id="form-input-text-success" name="form-input-text-success" type="text" value="홍길동" aria-describedby="form-input-text-success-message">
+        <p id="form-input-text-success-message" class="form-field__message form-field__message--success"><span class="sr-only">입력 성공: </span>입력 내용이 확인되었습니다.</p>
+      </div>
+    </div>
+
+    <div class="form-showcase__grid">
+      <div class="form-field is-error">
+        <label class="form-field__label" for="form-input-email-error">이메일 · 에러 문구</label>
+        <input class="form-control" id="form-input-email-error" name="form-input-email-error" type="email" value="buyer@localhost" aria-invalid="true" aria-describedby="form-input-email-error-message">
+        <p id="form-input-email-error-message" class="form-field__message form-field__message--error">이메일 주소를 name@example.com 형식으로 입력해 주세요.</p>
+      </div>
+
+      <div class="form-field is-error">
+        <label class="form-field__label" for="form-input-tel-error">휴대폰 번호 · 에러 문구</label>
+        <input class="form-control" id="form-input-tel-error" name="form-input-tel-error" type="tel" value="02-1234-5678" aria-invalid="true" aria-describedby="form-input-tel-error-message">
+        <p id="form-input-tel-error-message" class="form-field__message form-field__message--error">휴대폰 번호를 010-1234-5678 형식으로 입력해 주세요.</p>
+      </div>
+
+      <div class="form-field is-error">
+        <label class="form-field__label" for="form-input-password-error">비밀번호 · 에러 문구</label>
+        <input class="form-control" id="form-input-password-error" name="form-input-password-error" type="password" value="shop12" aria-invalid="true" aria-describedby="form-input-password-error-message">
+        <p id="form-input-password-error-message" class="form-field__message form-field__message--error">비밀번호를 영문과 숫자를 포함한 8~20자로 입력해 주세요.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-showcase__section">
+    <h3>Textarea 상태</h3>
+    <div class="form-showcase__grid">
+      <div class="form-field">
+        <label class="form-field__label" for="form-textarea-default">배송 요청사항 · 기본</label>
+        <textarea class="form-control" id="form-textarea-default" name="form-textarea-default"></textarea>
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-textarea-focus">배송 요청사항 · 포커스</label>
+        <textarea class="form-control is-focus" id="form-textarea-focus" name="form-textarea-focus">문 앞에 놓아 주세요.</textarea>
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-textarea-disabled">배송 요청사항 · Disabled</label>
+        <textarea class="form-control" id="form-textarea-disabled" name="form-textarea-disabled" disabled>선택할 수 없습니다.</textarea>
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-textarea-readonly">배송 요청사항 · Readonly</label>
+        <textarea class="form-control" id="form-textarea-readonly" name="form-textarea-readonly" readonly>문 앞에 놓아 주세요.</textarea>
+      </div>
+
+      <div class="form-field is-error">
+        <label class="form-field__label" for="form-textarea-error">배송 요청사항 · 에러</label>
+        <textarea class="form-control" id="form-textarea-error" name="form-textarea-error" aria-invalid="true" aria-describedby="form-textarea-error-message"></textarea>
+        <p id="form-textarea-error-message" class="form-field__message form-field__message--error">필수 입력 항목입니다.</p>
+      </div>
+
+      <div class="form-field is-success">
+        <label class="form-field__label" for="form-textarea-success">배송 요청사항 · 성공</label>
+        <textarea class="form-control" id="form-textarea-success" name="form-textarea-success" aria-describedby="form-textarea-success-message">문 앞에 놓아 주세요.</textarea>
+        <p id="form-textarea-success-message" class="form-field__message form-field__message--success"><span class="sr-only">입력 성공: </span>요청사항이 확인되었습니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-showcase__section">
+    <h3>Select 상태</h3>
+    <div class="form-showcase__grid">
+      <div class="form-field">
+        <label class="form-field__label" for="form-select-default">배송지 · 기본</label>
+        <select class="form-control" id="form-select-default" name="form-select-default">
+          <option value="">배송지를 선택해 주세요</option>
+          <option value="home">집</option>
+          <option value="office">회사</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-select-focus">배송지 · 포커스</label>
+        <select class="form-control is-focus" id="form-select-focus" name="form-select-focus">
+          <option value="home">집</option>
+          <option value="office">회사</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-select-disabled">배송지 · Disabled</label>
+        <select class="form-control" id="form-select-disabled" name="form-select-disabled" disabled>
+          <option value="home">집</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="form-select-readonly-alternative">배송지 · Readonly 대안</label>
+        <select class="form-control is-readonly" id="form-select-readonly-alternative" name="form-select-readonly-alternative" disabled>
+          <option value="home">집</option>
+        </select>
+        <p class="form-field__hint">select는 readonly를 지원하지 않습니다. 값 고정 시 disabled 또는 별도 텍스트로 표시합니다.</p>
+      </div>
+
+      <div class="form-field is-error">
+        <label class="form-field__label" for="form-select-error">배송지 · 에러</label>
+        <select class="form-control" id="form-select-error" name="form-select-error" aria-invalid="true" aria-describedby="form-select-error-message">
+          <option value="">배송지를 선택해 주세요</option>
+          <option value="home">집</option>
+        </select>
+        <p id="form-select-error-message" class="form-field__message form-field__message--error">필수 입력 항목입니다.</p>
+      </div>
+
+      <div class="form-field is-success">
+        <label class="form-field__label" for="form-select-success">배송지 · 성공</label>
+        <select class="form-control" id="form-select-success" name="form-select-success" aria-describedby="form-select-success-message">
+          <option value="home">집</option>
+          <option value="office">회사</option>
+        </select>
+        <p id="form-select-success-message" class="form-field__message form-field__message--success"><span class="sr-only">선택 성공: </span>배송지가 선택되었습니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-showcase__section">
+    <h3>Checkbox 상태</h3>
+    <div class="form-showcase__grid">
+      <div class="form-field">
+        <label class="choice" for="form-checkbox-default">
+          <input class="choice__control" id="form-checkbox-default" name="form-checkbox-default" type="checkbox">
+          <span>기본 체크박스</span>
+        </label>
+      </div>
+
+      <div class="form-field">
+        <label class="choice" for="form-checkbox-focus">
+          <input class="choice__control is-focus" id="form-checkbox-focus" name="form-checkbox-focus" type="checkbox" checked>
+          <span>포커스 체크박스</span>
+        </label>
+      </div>
+
+      <div class="form-field">
+        <label class="choice" for="form-checkbox-disabled">
+          <input class="choice__control" id="form-checkbox-disabled" name="form-checkbox-disabled" type="checkbox" disabled>
+          <span>Disabled 체크박스</span>
+        </label>
+      </div>
+
+      <div class="form-field is-error">
+        <label class="choice" for="form-checkbox-error">
+          <input class="choice__control" id="form-checkbox-error" name="form-checkbox-error" type="checkbox" aria-invalid="true" aria-describedby="form-checkbox-error-message">
+          <span>필수 약관 동의 · 에러</span>
+        </label>
+        <p id="form-checkbox-error-message" class="form-field__message form-field__message--error">필수 입력 항목입니다.</p>
+      </div>
+
+      <div class="form-field is-success">
+        <label class="choice" for="form-checkbox-success">
+          <input class="choice__control" id="form-checkbox-success" name="form-checkbox-success" type="checkbox" checked aria-describedby="form-checkbox-success-message">
+          <span>필수 약관 동의 · 성공</span>
+        </label>
+        <p id="form-checkbox-success-message" class="form-field__message form-field__message--success"><span class="sr-only">선택 성공: </span>필수 약관에 동의했습니다.</p>
+      </div>
+    </div>
+    <p class="form-field__hint">checkbox는 readonly를 지원하지 않습니다. 변경할 수 없는 값은 disabled 또는 별도 텍스트로 표시합니다.</p>
+  </div>
+
+  <div class="form-showcase__section">
+    <h3>Radio 상태</h3>
+    <div class="form-showcase__grid">
+      <fieldset class="form-field">
+        <legend class="form-field__legend">결제 수단 · 기본</legend>
+        <div class="choice-list">
+          <label class="choice" for="form-radio-default-card">
+            <input class="choice__control" id="form-radio-default-card" name="form-radio-default" type="radio" value="card" checked>
+            <span>신용카드</span>
+          </label>
+          <label class="choice" for="form-radio-default-bank">
+            <input class="choice__control" id="form-radio-default-bank" name="form-radio-default" type="radio" value="bank">
+            <span>무통장 입금</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-field">
+        <legend class="form-field__legend">결제 수단 · 포커스</legend>
+        <div class="choice-list">
+          <label class="choice" for="form-radio-focus-card">
+            <input class="choice__control is-focus" id="form-radio-focus-card" name="form-radio-focus" type="radio" value="card" checked>
+            <span>신용카드</span>
+          </label>
+          <label class="choice" for="form-radio-focus-bank">
+            <input class="choice__control" id="form-radio-focus-bank" name="form-radio-focus" type="radio" value="bank">
+            <span>무통장 입금</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-field">
+        <legend class="form-field__legend">결제 수단 · Disabled</legend>
+        <div class="choice-list">
+          <label class="choice" for="form-radio-disabled-card">
+            <input class="choice__control" id="form-radio-disabled-card" name="form-radio-disabled" type="radio" value="card" checked disabled>
+            <span>신용카드</span>
+          </label>
+          <label class="choice" for="form-radio-disabled-bank">
+            <input class="choice__control" id="form-radio-disabled-bank" name="form-radio-disabled" type="radio" value="bank" disabled>
+            <span>무통장 입금</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset class="form-field is-error" aria-describedby="form-radio-error-message">
+        <legend class="form-field__legend">결제 수단 · 에러</legend>
+        <div class="choice-list">
+          <label class="choice" for="form-radio-error-card">
+            <input class="choice__control" id="form-radio-error-card" name="form-radio-error" type="radio" value="card" aria-invalid="true" aria-describedby="form-radio-error-message">
+            <span>신용카드</span>
+          </label>
+          <label class="choice" for="form-radio-error-bank">
+            <input class="choice__control" id="form-radio-error-bank" name="form-radio-error" type="radio" value="bank" aria-invalid="true" aria-describedby="form-radio-error-message">
+            <span>무통장 입금</span>
+          </label>
+        </div>
+        <p id="form-radio-error-message" class="form-field__message form-field__message--error">필수 입력 항목입니다.</p>
+      </fieldset>
+
+      <fieldset class="form-field is-success" aria-describedby="form-radio-success-message">
+        <legend class="form-field__legend">결제 수단 · 성공</legend>
+        <div class="choice-list">
+          <label class="choice" for="form-radio-success-card">
+            <input class="choice__control" id="form-radio-success-card" name="form-radio-success" type="radio" value="card" checked aria-describedby="form-radio-success-message">
+            <span>신용카드</span>
+          </label>
+          <label class="choice" for="form-radio-success-bank">
+            <input class="choice__control" id="form-radio-success-bank" name="form-radio-success" type="radio" value="bank" aria-describedby="form-radio-success-message">
+            <span>무통장 입금</span>
+          </label>
+        </div>
+        <p id="form-radio-success-message" class="form-field__message form-field__message--success"><span class="sr-only">선택 성공: </span>결제 수단이 선택되었습니다.</p>
+      </fieldset>
+    </div>
+    <p class="form-field__hint">radio는 readonly를 지원하지 않습니다. 변경할 수 없는 값은 disabled 또는 별도 텍스트로 표시합니다.</p>
+  </div>
+
+  <div class="form-showcase__section">
+    <h3>Switch 상태</h3>
+    <div class="form-showcase__grid">
+      <div class="form-field">
+        <label class="choice" for="form-switch-default">
+          <input class="choice__control choice__control--switch" id="form-switch-default" name="form-switch-default" type="checkbox" role="switch">
+          <span class="switch__track" aria-hidden="true"></span>
+          <span>기본 스위치</span>
+        </label>
+      </div>
+
+      <div class="form-field">
+        <label class="choice" for="form-switch-focus">
+          <input class="choice__control choice__control--switch is-focus" id="form-switch-focus" name="form-switch-focus" type="checkbox" role="switch" checked>
+          <span class="switch__track" aria-hidden="true"></span>
+          <span>포커스 스위치</span>
+        </label>
+      </div>
+
+      <div class="form-field">
+        <label class="choice" for="form-switch-disabled">
+          <input class="choice__control choice__control--switch" id="form-switch-disabled" name="form-switch-disabled" type="checkbox" role="switch" disabled>
+          <span class="switch__track" aria-hidden="true"></span>
+          <span>Disabled 스위치</span>
+        </label>
+      </div>
+
+      <div class="form-field is-error">
+        <label class="choice" for="form-switch-error">
+          <input class="choice__control choice__control--switch" id="form-switch-error" name="form-switch-error" type="checkbox" role="switch" aria-invalid="true" aria-describedby="form-switch-error-message">
+          <span class="switch__track" aria-hidden="true"></span>
+          <span>마케팅 수신 · 에러</span>
+        </label>
+        <p id="form-switch-error-message" class="form-field__message form-field__message--error">필수 입력 항목입니다.</p>
+      </div>
+
+      <div class="form-field is-success">
+        <label class="choice" for="form-switch-success">
+          <input class="choice__control choice__control--switch" id="form-switch-success" name="form-switch-success" type="checkbox" role="switch" checked aria-describedby="form-switch-success-message">
+          <span class="switch__track" aria-hidden="true"></span>
+          <span>마케팅 수신 · 성공</span>
+        </label>
+        <p id="form-switch-success-message" class="form-field__message form-field__message--success"><span class="sr-only">선택 성공: </span>수신 설정이 저장되었습니다.</p>
+      </div>
+    </div>
+    <p class="form-field__hint">switch는 readonly를 지원하지 않습니다. 변경할 수 없는 값은 disabled 또는 별도 텍스트로 표시합니다.</p>
+  </div>
+</section>

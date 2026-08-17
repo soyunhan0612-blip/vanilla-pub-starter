@@ -1,0 +1,151 @@
+<!-- @component 버튼
+     @category common
+     @variant  primary | secondary | outline | text
+     @size     sm | md | lg
+     @a11y     최소 터치 영역 44×44px. disabled는 aria-disabled가 아니라 disabled 속성 사용
+     @snippet  btn
+-->
+<section class="button-showcase" aria-labelledby="button-showcase-title">
+  <h2 id="button-showcase-title">버튼</h2>
+
+  <div class="button-showcase__section">
+    <h3>button 변형·크기·상태</h3>
+    <div class="button-showcase__grid">
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Primary / sm</span>
+        <button type="button" class="btn btn--primary btn--sm">기본</button>
+        <button type="button" class="btn btn--primary btn--sm is-hover">Hover</button>
+        <button type="button" class="btn btn--primary btn--sm" disabled>Disabled</button>
+        <button type="button" class="btn btn--primary btn--sm" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Primary / md</span>
+        <button type="button" class="btn btn--primary btn--md">기본</button>
+        <button type="button" class="btn btn--primary btn--md is-hover">Hover</button>
+        <button type="button" class="btn btn--primary btn--md" disabled>Disabled</button>
+        <button type="button" class="btn btn--primary btn--md" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Primary / lg</span>
+        <button type="button" class="btn btn--primary btn--lg">기본</button>
+        <button type="button" class="btn btn--primary btn--lg is-hover">Hover</button>
+        <button type="button" class="btn btn--primary btn--lg" disabled>Disabled</button>
+        <button type="button" class="btn btn--primary btn--lg" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Secondary / sm</span>
+        <button type="button" class="btn btn--secondary btn--sm">기본</button>
+        <button type="button" class="btn btn--secondary btn--sm is-hover">Hover</button>
+        <button type="button" class="btn btn--secondary btn--sm" disabled>Disabled</button>
+        <button type="button" class="btn btn--secondary btn--sm" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Secondary / md</span>
+        <button type="button" class="btn btn--secondary btn--md">기본</button>
+        <button type="button" class="btn btn--secondary btn--md is-hover">Hover</button>
+        <button type="button" class="btn btn--secondary btn--md" disabled>Disabled</button>
+        <button type="button" class="btn btn--secondary btn--md" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Secondary / lg</span>
+        <button type="button" class="btn btn--secondary btn--lg">기본</button>
+        <button type="button" class="btn btn--secondary btn--lg is-hover">Hover</button>
+        <button type="button" class="btn btn--secondary btn--lg" disabled>Disabled</button>
+        <button type="button" class="btn btn--secondary btn--lg" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Outline / sm</span>
+        <button type="button" class="btn btn--outline btn--sm">기본</button>
+        <button type="button" class="btn btn--outline btn--sm is-hover">Hover</button>
+        <button type="button" class="btn btn--outline btn--sm" disabled>Disabled</button>
+        <button type="button" class="btn btn--outline btn--sm" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Outline / md</span>
+        <button type="button" class="btn btn--outline btn--md">기본</button>
+        <button type="button" class="btn btn--outline btn--md is-hover">Hover</button>
+        <button type="button" class="btn btn--outline btn--md" disabled>Disabled</button>
+        <button type="button" class="btn btn--outline btn--md" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Outline / lg</span>
+        <button type="button" class="btn btn--outline btn--lg">기본</button>
+        <button type="button" class="btn btn--outline btn--lg is-hover">Hover</button>
+        <button type="button" class="btn btn--outline btn--lg" disabled>Disabled</button>
+        <button type="button" class="btn btn--outline btn--lg" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Text / sm</span>
+        <button type="button" class="btn btn--text btn--sm">기본</button>
+        <button type="button" class="btn btn--text btn--sm is-hover">Hover</button>
+        <button type="button" class="btn btn--text btn--sm" disabled>Disabled</button>
+        <button type="button" class="btn btn--text btn--sm" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Text / md</span>
+        <button type="button" class="btn btn--text btn--md">기본</button>
+        <button type="button" class="btn btn--text btn--md is-hover">Hover</button>
+        <button type="button" class="btn btn--text btn--md" disabled>Disabled</button>
+        <button type="button" class="btn btn--text btn--md" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+      <div class="button-showcase__row">
+        <span class="button-showcase__label">Text / lg</span>
+        <button type="button" class="btn btn--text btn--lg">기본</button>
+        <button type="button" class="btn btn--text btn--lg is-hover">Hover</button>
+        <button type="button" class="btn btn--text btn--lg" disabled>Disabled</button>
+        <button type="button" class="btn btn--text btn--lg" aria-busy="true" disabled>
+          <span class="btn__spinner" aria-hidden="true"></span>처리 중
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="button-link-examples" class="button-showcase__section">
+    <h3>링크 버튼</h3>
+    <div class="button-showcase__row">
+      <a class="btn btn--primary btn--sm" href="#button-link-examples">Primary sm</a>
+      <a class="btn btn--primary btn--md" href="#button-link-examples">Primary md</a>
+      <a class="btn btn--primary btn--lg" href="#button-link-examples">Primary lg</a>
+    </div>
+    <div class="button-showcase__row">
+      <a class="btn btn--secondary btn--sm" href="#button-link-examples">Secondary sm</a>
+      <a class="btn btn--secondary btn--md" href="#button-link-examples">Secondary md</a>
+      <a class="btn btn--secondary btn--lg" href="#button-link-examples">Secondary lg</a>
+    </div>
+    <div class="button-showcase__row">
+      <a class="btn btn--outline btn--sm" href="#button-link-examples">Outline sm</a>
+      <a class="btn btn--outline btn--md" href="#button-link-examples">Outline md</a>
+      <a class="btn btn--outline btn--lg" href="#button-link-examples">Outline lg</a>
+    </div>
+    <div class="button-showcase__row">
+      <a class="btn btn--text btn--sm" href="#button-link-examples">Text sm</a>
+      <a class="btn btn--text btn--md" href="#button-link-examples">Text md</a>
+      <a class="btn btn--text btn--lg" href="#button-link-examples">Text lg</a>
+    </div>
+  </div>
+</section>
