@@ -1081,14 +1081,6 @@ textarea.form-control {
   object-fit: cover;
 }
 
-@keyframes skeleton-pulse {
-  from {
-    opacity: 0.45;
-  }
-  to {
-    opacity: 0.75;
-  }
-}
 .skeleton-showcase,
 .skeleton-showcase__section,
 .skeleton-text,
@@ -1105,7 +1097,6 @@ textarea.form-control {
 .skeleton {
   display: block;
   background: var(--color-bg-muted);
-  animation: skeleton-pulse 200ms ease-out infinite alternate;
 }
 
 .skeleton-text,
@@ -1140,12 +1131,6 @@ textarea.form-control {
   border-radius: var(--radius-sm);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .skeleton {
-    animation: none;
-    opacity: 0.6;
-  }
-}
 .empty-showcase,
 .empty-state {
   display: grid;
@@ -1937,10 +1922,6 @@ textarea.form-control {
 .cart-summary__row dd {
   text-align: right;
   overflow-wrap: anywhere;
-}
-
-.cart-summary__row .price-showcase {
-  display: block;
 }
 
 .cart-summary__row .price {

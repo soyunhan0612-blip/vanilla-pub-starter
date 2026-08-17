@@ -1,13 +1,3 @@
-@keyframes skeleton-pulse {
-  from {
-    opacity: 0.45;
-  }
-
-  to {
-    opacity: 0.75;
-  }
-}
-
 .skeleton-showcase,
 .skeleton-showcase__section,
 .skeleton-text,
@@ -21,10 +11,12 @@
   gap: var(--space-8);
 }
 
+// 정적 블록이다. UI_GUIDE.md 의 애니메이션 규칙이 펄스를 명시적으로 금지한다 —
+// 로딩 자리표시자는 화면에 여러 개가 동시에 떠 있으므로 명멸이 특히 산만하다.
+// 자리를 잡아 CLS 를 막는 것이 이 컴포넌트의 목적이고, 그건 움직임 없이도 된다.
 .skeleton {
   display: block;
   background: var(--color-bg-muted);
-  animation: skeleton-pulse 200ms ease-out infinite alternate;
 }
 
 .skeleton-text,
@@ -57,11 +49,4 @@
   width: 40%;
   height: calc(var(--font-size-price) * var(--line-height-body));
   border-radius: var(--radius-sm);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeleton {
-    animation: none;
-    opacity: 0.6;
-  }
 }
