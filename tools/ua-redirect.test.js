@@ -102,6 +102,17 @@ test('생성 HTML은 file 경로에서도 동작하는 상대 목적지와 수�
   assert.doesNotMatch(html, /userAgent|navigator/);
 });
 
+test('file 루트에서도 드라이브 루트가 아닌 이관 폴더 안의 PC 페이지로 이동한다', () => {
+  const { browser, replacements } = createBrowser({
+    href: 'file:///C:/handover/index.html?view=pc',
+    width: 360,
+  });
+
+  runBrowserRedirect(browser);
+
+  assert.deepEqual(replacements, ['file:///C:/handover/pc/index.html']);
+});
+
 test('루트 진입 HTML을 src/index.html에 생성한다', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ua-redirect-'));
   try {

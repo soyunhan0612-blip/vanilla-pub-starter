@@ -44,7 +44,7 @@ node tools/serve.js --timeout=120
 이관 직전에 `node tools/build.js`와 `node tools/check.js`를 실행한 뒤 다음 세 항목을 전달한다.
 
 - `dist/` — include가 모두 해소된 PC/MO 평면 HTML과 읽을 수 있는 비압축 CSS·JavaScript·이미지. 파일명에는 해시가 없다.
-- `src/guide.html` — 전달본에서는 `guide.html` 이름 그대로 두는 컴포넌트·레이아웃·토큰 카탈로그. 서버 없이 `file://`로 열 수 있다.
+- `guide.html`(원본 경로 `src/guide.html`) — 컴포넌트·레이아웃·토큰 카탈로그. 서버 없이 `file://`로 열 수 있다.
 - `CONVENTIONS.md` — 마크업, 토큰, 접근성, 컴포넌트 추가와 데이터 연동 계약.
 
 개발사는 `data-bind`, `data-bind-src`, `data-bind-href`, `data-bind-list`, `data-bind-event`를 서버 템플릿 연동 지점으로 사용한다. 각 마커의 치환 방식과 보안·ARIA 동기화 규칙은 [개발사 데이터 연동 규약](CONVENTIONS.md#개발사-데이터-연동-규약)에 있다.
@@ -54,6 +54,22 @@ node tools/serve.js --timeout=120
 PC/MO 선택은 운영 서버에서 처리하는 것이 원칙이다. `dist/index.html`의 클라이언트 분기는 뷰포트 폭을 우선하는 폴백 참조 구현일 뿐이며, 그대로 프로덕션 분기 방식으로 채택하면 SEO와 초기 렌더에 손해가 난다. 명시적인 버전 전환과 무한 루프 방지 규약은 [PC/MO 진입과 버전 전환](CONVENTIONS.md#pcmo-진입과-버전-전환)을 따른다.
 
 초기 커밋 일부에는 `Co-Authored-By: Claude` 트레일러가 있다. 저장소 히스토리까지 사내로 반입할 계획이면 회사의 저작자·감사 정책에 맞게 이관 시점에 트레일러 정리가 필요한지 먼저 확인한다. 공개되었거나 공유된 히스토리를 임의로 다시 쓰기 전에 담당자 승인을 받는다.
+
+### 걷어내기 리허설 기록 — 2026-08-17
+
+`rehearsal-strip` 임시 브랜치에서 `.claude/`, `.codex/`, `phases/`, `scripts/`, `docs/`, `CLAUDE.md`, `AGENTS.md`, `node_modules/`를 모두 작업 트리 밖으로 걷어낸 뒤 아래 결과를 확인하고 원복했다. 추적 파일 제거 뒤 남아 있던 무시 파일(`settings.local.json`, phase output, `__pycache__`)도 발견 즉시 함께 격리했으며, 모든 대상의 부재를 다시 확인한 시점부터 검증을 실행했다.
+
+| 검증 | 실제 결과 |
+|---|---|
+| `node tools/build.js` | 통과. `vendor` Sass로 PC/MO CSS 컴파일, `dist` 생성 |
+| `node tools/check.js` | 통과, 경고 0건 |
+| `node tools/serve.js --smoke` | 통과, HTTP 200 |
+| `node --test "src/__tests__/**/*.test.js"` | 34개 통과 |
+| `git hook run pre-commit` | `.githooks/pre-commit`이 `check.js`를 실행해 통과 |
+| `node tools/serve.js --timeout=120` + Edge | `/pc/index.html`, `/mo/index.html`, `/guide.html`, 명시 PC/MO 루트 분기 렌더 통과 |
+| 외부 임시 폴더의 `dist/` 복제본 | 복제본을 문서 루트로 PC/MO/루트 렌더 통과; 원본 자산 참조 없음 |
+| `file:///.../src/guide.html` | 카탈로그 렌더 및 동봉 axe 요약 DOM 생성 통과 |
+| 이관 형식 | `@include` 0건, 해시 파일명 0건, 비압축 CSS PC 3,691줄/MO 3,729줄 |
 
 ## Tier 1 — npm을 사용할 수 있을 때
 
