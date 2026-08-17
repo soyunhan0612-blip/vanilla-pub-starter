@@ -1,0 +1,19 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins';
+@use 'tokens/color';
+@use 'tokens/typography';
+@use 'tokens/spacing';
+@use 'tokens/layout';
+@use 'base/reset';
+@use 'base/base';
+
+body {
+  width: var(--layout-content-mo);
+}
+
+@media (min-width: ($mo-content-max + 1px)) and (max-width: $bp-mo-max) {
+  body {
+    max-width: var(--layout-content-mo-max);
+    margin-inline: auto;
+  }
+}

@@ -1,0 +1,28 @@
+@use 'abstracts/variables' as *;
+@use 'abstracts/mixins' as *;
+@use 'tokens/color';
+@use 'tokens/typography';
+@use 'tokens/spacing';
+@use 'tokens/layout';
+@use 'base/reset';
+@use 'base/base';
+
+html,
+body,
+main {
+  max-width: 100%;
+}
+
+@include respond-mo {
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  main {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}

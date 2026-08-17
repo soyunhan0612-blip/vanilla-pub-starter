@@ -1,0 +1,18 @@
+:root {
+  /* 시안 확정 후 웹폰트를 도입할 때 이 한 줄만 교체한다.
+     @font-face 선언은 base/_fonts.scss 에 따로 모은다. */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+                      "Malgun Gothic", "맑은 고딕", sans-serif;
+  --font-size-page-title: 28px;
+  --font-size-page-title-mo: 22px;
+  --font-size-section-title: 20px;
+  --font-size-section-title-mo: 18px;
+  --font-size-product-name: 15px;
+  --font-size-price: 17px;
+  --font-size-body: 15px;
+  --font-size-caption: 13px;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-body: 1.6;
+}

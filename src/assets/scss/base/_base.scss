@@ -1,0 +1,76 @@
+@use '../abstracts/mixins' as *;
+
+html {
+  background: var(--color-bg-page);
+}
+
+body {
+  color: var(--color-text-body);
+  background: var(--color-bg-page);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-body);
+}
+
+h1 {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-page-title);
+  font-weight: var(--font-weight-semibold);
+}
+
+h2 {
+  color: var(--color-text-strong);
+  font-size: var(--font-size-section-title);
+  font-weight: var(--font-weight-semibold);
+}
+
+strong,
+b {
+  font-weight: var(--font-weight-bold);
+}
+
+small,
+figcaption,
+caption {
+  font-size: var(--font-size-caption);
+}
+
+a {
+  color: var(--color-info);
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  @include focus-ring;
+}
+
+.sr-only {
+  @include sr-only;
+}
+
+.skip-nav {
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  left: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  color: var(--color-bg-page);
+  background: var(--color-text-strong);
+  transform: translateY(-200%);
+}
+
+.skip-nav:focus-visible {
+  transform: translateY(0);
+}
+
+@include respond-mo {
+  h1 {
+    font-size: var(--font-size-page-title-mo);
+  }
+
+  h2 {
+    font-size: var(--font-size-section-title-mo);
+  }
+}
