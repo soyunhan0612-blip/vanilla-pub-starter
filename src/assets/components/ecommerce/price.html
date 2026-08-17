@@ -6,11 +6,14 @@
      @snippet  price
 -->
 <div class="price-showcase" aria-label="가격 표시 변형">
+  <!-- @variant default -->
   <div class="price price--default">
     <span class="sr-only">판매가 </span>
     <strong class="price__current" data-bind="product.price">39,000원</strong>
   </div>
+  <!-- @endvariant -->
 
+  <!-- @variant discount -->
   <div class="price price--discount">
     <p class="sr-only">
       정가 <span data-bind="product.originalPrice">39,000원</span>,
@@ -22,7 +25,9 @@
       <strong class="price__discount" data-bind="product.discountRate">25%</strong>
     </div>
   </div>
+  <!-- @endvariant -->
 
+  <!-- @variant range -->
   <div class="price price--range">
     <span class="sr-only">가격 범위 </span>
     <strong class="price__range">
@@ -33,4 +38,5 @@
       <span class="sr-only">까지</span>
     </strong>
   </div>
+  <!-- @endvariant -->
 </div>

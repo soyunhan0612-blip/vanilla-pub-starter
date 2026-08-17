@@ -17,7 +17,7 @@
           data-bind-href="product.url"
           data-bind="product.image"
         >
-          <!-- @include common/image.html -->
+          <!-- @include common/image.html#fixed-ratio -->
         </a>
         <div class="product-card__badges" aria-label="상품 상태">
           <span class="product-card__badge product-card__badge--new" data-bind="product.badges.new">신상품</span>
@@ -43,8 +43,8 @@
             아주 긴 상품명에서도 두 줄을 넘기지 않는 오버핏 코튼 셔츠 테스트 상품명
           </a>
         </h3>
-        <div class="product-card__price" data-price-variant="discount">
-          <!-- @include ecommerce/price.html -->
+        <div class="product-card__price">
+          <!-- @include ecommerce/price.html#discount -->
         </div>
         <!-- 다음 step의 review 컴포넌트로 교체할 자리 -->
         <p class="product-card__review" data-review-placeholder data-bind="product.reviewSummary">
@@ -62,7 +62,7 @@
           data-bind-href="product.url"
           data-bind="product.image"
         >
-          <!-- @include common/image.html -->
+          <!-- @include common/image.html#fixed-ratio -->
         </a>
         <div class="product-card__badges" aria-label="상품 상태">
           <span class="product-card__badge product-card__badge--sold-out" data-bind="product.badges.soldOut">품절</span>
@@ -90,8 +90,8 @@
             가격 자릿수가 커져도 레이아웃을 지키는 리미티드 에디션 상품
           </a>
         </h3>
-        <div class="product-card__price" data-price-variant="default">
-          <!-- @include ecommerce/price.html -->
+        <div class="product-card__price">
+          <!-- @include ecommerce/price.html#default -->
         </div>
         <!-- 다음 step의 review 컴포넌트로 교체할 자리 -->
         <p class="product-card__review" data-review-placeholder data-bind="product.reviewSummary">

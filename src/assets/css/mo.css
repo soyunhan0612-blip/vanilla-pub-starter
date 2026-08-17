@@ -1228,20 +1228,6 @@ textarea.form-control {
   text-decoration: none;
 }
 
-.product-card__image-link .image-showcase {
-  display: contents;
-}
-
-.product-card__image-link .image-showcase > h2,
-.product-card__image-link .image-showcase__section,
-.product-card__image-link .image-showcase__section:last-of-type > h3 {
-  display: none;
-}
-
-.product-card__image-link .image-showcase__section:last-of-type {
-  display: block;
-}
-
 .product-card__image-link .responsive-image--fixed-ratio {
   display: block;
   max-width: none;
@@ -1344,19 +1330,6 @@ textarea.form-control {
 
 .product-card__name-link:hover {
   text-decoration: underline;
-}
-
-.product-card__price .price-showcase {
-  display: contents;
-}
-
-.product-card__price .price {
-  display: none;
-}
-
-.product-card__price[data-price-variant=default] .price--default,
-.product-card__price[data-price-variant=discount] .price--discount {
-  display: flex;
 }
 
 .product-card__quantity {

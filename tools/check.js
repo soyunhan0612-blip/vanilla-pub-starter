@@ -16,6 +16,7 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync } = require('child_process');
+const { selectVariant, splitRequest } = require('./include');
 
 // --root= 는 tools/check.test.js 가 픽스처 저장소를 겨누기 위한 것뿐이다.
 // 검사 규칙이 늘어날수록 회귀 위험도 같이 커지는데, ROOT 가 고정이면 이 파일만
@@ -237,9 +238,27 @@ function checkIncludes(files) {
   const componentsDir = path.join(SRC, 'assets', 'components');
   for (const file of files) {
     for (const m of read(file).matchAll(INCLUDE_RE)) {
-      const target = path.join(componentsDir, m[1].replace(/^components\//, ''));
+      const { requestedPath, variant } = splitRequest(m[1]);
+      const target = path.join(componentsDir, requestedPath.replace(/^components\//, ''));
       if (!fs.existsSync(target)) {
-        err(file, `@include 대상이 없다: ${m[1]}`);
+        err(file, `@include 대상이 없다: ${requestedPath}`);
+        continue;
+      }
+      if (variant === null) continue;
+      if (variant === '') {
+        err(file, `@include 변형 이름이 비어 있다: ${m[1]}`);
+        continue;
+      }
+      // 변형 이름의 오타는 여기서 잡아야 한다. 페이지가 fragment 를 참조하기
+      // 전까지 build 는 include 를 해소하지 않으므로, 이 관문이 없으면 오타가
+      // 다음 phase 까지 조용히 남는다.
+      //
+      // 판정은 include.js 에 맡기고 메시지를 그대로 옮긴다 — 같은 문구를 두 곳에
+      // 두면 한쪽만 고쳐져 사람이 어느 쪽을 믿을지 갈린다.
+      try {
+        selectVariant(read(target), variant, requestedPath);
+      } catch (error) {
+        err(file, error.message);
       }
     }
   }

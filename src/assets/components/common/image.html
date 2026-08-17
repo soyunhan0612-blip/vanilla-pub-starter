@@ -5,11 +5,12 @@
      @performance width/height로 종횡비를 예약하고, 첫 화면 이미지만 eager + high 우선순위 사용
      @snippet  img
 -->
-<section class="image-showcase">
-  <h2>반응형 이미지</h2>
+<section class="image-showcase" aria-labelledby="image-showcase-title">
+  <h2 id="image-showcase-title">반응형 이미지</h2>
 
   <div class="image-showcase__section">
     <h3>기본 · 지연 로딩</h3>
+    <!-- @variant default -->
     <picture class="responsive-image responsive-image--default">
       <source
         type="image/webp"
@@ -27,10 +28,12 @@
         decoding="async"
       >
     </picture>
+    <!-- @endvariant -->
   </div>
 
   <div class="image-showcase__section">
     <h3>첫 화면 · 우선 로딩</h3>
+    <!-- @variant eager -->
     <picture class="responsive-image responsive-image--eager">
       <source
         type="image/webp"
@@ -49,10 +52,12 @@
         decoding="async"
       >
     </picture>
+    <!-- @endvariant -->
   </div>
 
   <div class="image-showcase__section">
     <h3>고정 비율 · 상품 이미지</h3>
+    <!-- @variant fixed-ratio -->
     <picture class="responsive-image responsive-image--fixed-ratio">
       <source
         type="image/webp"
@@ -70,5 +75,6 @@
         decoding="async"
       >
     </picture>
+    <!-- @endvariant -->
   </div>
 </section>

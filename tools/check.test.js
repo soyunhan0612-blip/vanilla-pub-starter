@@ -251,6 +251,60 @@ test('도구: vendor/ 의 서드파티는 면제한다', () => {
 });
 
 // ---------------------------------------------------------------------------
+// @include 마커
+// ---------------------------------------------------------------------------
+
+const COMPONENT = 'src/assets/components/common/image.html';
+const CARD = 'src/assets/components/ecommerce/card.html';
+
+/** fragment 는 @component 주석이 있어야 한다 — 그 검사에 걸려 오답이 나지 않게 붙인다. */
+const fragment = (body) => `<!-- @component f\n     @category common\n-->\n${body}\n`;
+
+const IMAGE_FRAGMENT = fragment(
+  [
+    '<!-- @variant fixed-ratio -->',
+    '<picture><img src="/a.jpg" alt="상품" width="1" height="1" loading="lazy"></picture>',
+    '<!-- @endvariant -->',
+  ].join('\n')
+);
+
+test('include: 대상 파일이 없으면 잡는다', () => {
+  failsWith(
+    { [CARD]: fragment('<!-- @include common/missing.html -->') },
+    /@include 대상이 없다: common\/missing\.html/
+  );
+});
+
+test('include: 존재하는 변형을 가리키면 통과한다', () => {
+  passes({
+    [COMPONENT]: IMAGE_FRAGMENT,
+    [CARD]: fragment('<article><!-- @include common/image.html#fixed-ratio --></article>'),
+  });
+});
+
+test('include: 없는 변형 이름을 사용 가능 목록과 함께 잡는다', () => {
+  // 변형 오타는 빌드가 아니라 이 관문에서 잡혀야 한다. 페이지가 fragment 를
+  // 참조하기 전까지는 build 가 include 를 해소하지 않아 오타가 조용히 남는다.
+  failsWith(
+    {
+      [COMPONENT]: IMAGE_FRAGMENT,
+      [CARD]: fragment('<article><!-- @include common/image.html#eager --></article>'),
+    },
+    /변형을 찾을 수 없다: common\/image\.html#eager \(사용 가능: fixed-ratio\)/
+  );
+});
+
+test('include: 마커가 닫히지 않은 fragment 를 잡는다', () => {
+  failsWith(
+    {
+      [COMPONENT]: fragment('<!-- @variant fixed-ratio --><picture></picture>'),
+      [CARD]: fragment('<article><!-- @include common/image.html#fixed-ratio --></article>'),
+    },
+    /@variant 가 닫히지 않았다/
+  );
+});
+
+// ---------------------------------------------------------------------------
 // util/ 레이어 (AGENTS.md CRITICAL)
 // ---------------------------------------------------------------------------
 
