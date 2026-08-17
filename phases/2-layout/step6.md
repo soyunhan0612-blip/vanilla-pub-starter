@@ -66,7 +66,7 @@ MO는 사이드 메뉴 대신 **세로 목록**으로 간다.
 ## Acceptance Criteria
 
 ```bash
-node --test src/__tests__
+node --test "src/__tests__/**/*.test.js"
 node tools/build.js
 node tools/check.js
 node tools/serve.js --smoke

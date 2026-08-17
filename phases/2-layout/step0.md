@@ -87,7 +87,7 @@ export function initGnb(root)   // 이벤트 위임
 ## Acceptance Criteria
 
 ```bash
-node --test src/__tests__
+node --test "src/__tests__/**/*.test.js"
 node tools/build.js
 node tools/check.js
 node tools/serve.js --smoke

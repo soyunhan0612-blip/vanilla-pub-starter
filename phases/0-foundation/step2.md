@@ -101,7 +101,7 @@ export class ApiError extends Error {}        // status, code 를 갖는다
 ## Acceptance Criteria
 
 ```bash
-node --test src/__tests__
+node --test "src/__tests__/**/*.test.js"
 node tools/check.js
 ```
 

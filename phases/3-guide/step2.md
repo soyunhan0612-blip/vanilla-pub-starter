@@ -102,7 +102,7 @@ node tools/build.js
 node tools/build.js
 node tools/check.js
 node tools/serve.js --smoke
-node --test src/__tests__
+node --test "src/__tests__/**/*.test.js"
 ```
 
 그리고 **위 2번의 걷어내기 리허설이 실제로 수행되어 전부 통과**해야 한다.

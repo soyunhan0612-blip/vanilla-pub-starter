@@ -65,7 +65,7 @@ MO 하단 고정 네비 (홈 / 카테고리 / 검색 / 찜 / 마이).
 ## Acceptance Criteria
 
 ```bash
-node --test src/__tests__
+node --test "src/__tests__/**/*.test.js"
 node tools/build.js
 node tools/check.js
 node tools/serve.js --smoke
