@@ -46,10 +46,9 @@
         <div class="product-card__price">
           <!-- @include ecommerce/price.html#discount -->
         </div>
-        <!-- 다음 step의 review 컴포넌트로 교체할 자리 -->
-        <p class="product-card__review" data-review-placeholder data-bind="product.reviewSummary">
-          <span class="sr-only">평점 5점 만점에 </span><span aria-hidden="true">★</span> 4.8 (125)
-        </p>
+        <div class="product-card__review">
+          <!-- @include ecommerce/review.html#summary -->
+        </div>
       </div>
     </article>
 
@@ -93,10 +92,9 @@
         <div class="product-card__price">
           <!-- @include ecommerce/price.html#default -->
         </div>
-        <!-- 다음 step의 review 컴포넌트로 교체할 자리 -->
-        <p class="product-card__review" data-review-placeholder data-bind="product.reviewSummary">
-          <span class="sr-only">평점 5점 만점에 </span><span aria-hidden="true">★</span> 4.6 (999+)
-        </p>
+        <div class="product-card__review">
+          <!-- @include ecommerce/review.html#summary -->
+        </div>
         <div class="product-card__quantity">
           <!-- @include ecommerce/stepper.html -->
         </div>

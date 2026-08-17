@@ -1,0 +1,290 @@
+<!-- @component 상품 필터·정렬
+     @category ecommerce
+     @variant  pc | mo
+     @a11y     필터 그룹은 fieldset·legend로 연결하고, 정렬 select에 label을 제공하며, 결과 개수는 role=status로 갱신
+     @integration data-bind와 data-bind-event 지점에서 서버 렌더링 또는 개발사 필터 로직을 연결
+     @snippet  filter-bar
+-->
+<section class="filter-bar-showcase" aria-labelledby="filter-bar-showcase-title">
+  <h2 id="filter-bar-showcase-title">상품 필터·정렬</h2>
+
+  <!-- @variant pc -->
+  <section class="filter-bar filter-bar--pc" aria-labelledby="filter-bar-pc-title">
+    <header class="filter-bar__header">
+      <div>
+        <h3 id="filter-bar-pc-title" class="filter-bar__title">상품 필터</h3>
+        <p
+          class="filter-bar__result-count"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          data-bind="products.countMessage"
+        >
+          총 123개 상품
+        </p>
+      </div>
+      <div class="form-field filter-bar__sort">
+        <label class="form-field__label" for="filter-pc-sort">정렬 기준</label>
+        <select
+          class="form-control"
+          id="filter-pc-sort"
+          name="sort"
+          data-bind="products.sort"
+          data-bind-event="change-sort"
+        >
+          <option value="recommended">추천순</option>
+          <option value="newest">신상품순</option>
+          <option value="price-low">낮은 가격순</option>
+          <option value="price-high">높은 가격순</option>
+          <option value="review">리뷰 많은순</option>
+        </select>
+      </div>
+    </header>
+
+    <div class="filter-bar__layout">
+      <aside class="filter-bar__panel" aria-label="상품 필터 조건">
+        <form class="filter-bar__groups" data-bind-event="product-filters">
+          <fieldset class="filter-bar__group">
+            <legend class="filter-bar__legend">카테고리</legend>
+            <div class="choice-list">
+              <label class="choice" for="filter-pc-category-top">
+                <input class="choice__control" id="filter-pc-category-top" name="category" type="checkbox" value="top">
+                <span>상의</span>
+              </label>
+              <label class="choice" for="filter-pc-category-bottom">
+                <input class="choice__control" id="filter-pc-category-bottom" name="category" type="checkbox" value="bottom">
+                <span>하의</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="filter-bar__group">
+            <legend class="filter-bar__legend">가격대</legend>
+            <div class="choice-list">
+              <label class="choice" for="filter-pc-price-all">
+                <input class="choice__control" id="filter-pc-price-all" name="price" type="radio" value="all" checked>
+                <span>전체</span>
+              </label>
+              <label class="choice" for="filter-pc-price-under-50000">
+                <input class="choice__control" id="filter-pc-price-under-50000" name="price" type="radio" value="under-50000">
+                <span>5만원 미만</span>
+              </label>
+              <label class="choice" for="filter-pc-price-over-50000">
+                <input class="choice__control" id="filter-pc-price-over-50000" name="price" type="radio" value="over-50000">
+                <span>5만원 이상</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="filter-bar__group">
+            <legend class="filter-bar__legend">브랜드</legend>
+            <div class="choice-list">
+              <label class="choice" for="filter-pc-brand-a">
+                <input class="choice__control" id="filter-pc-brand-a" name="brand" type="checkbox" value="brand-a" checked>
+                <span>브랜드 A</span>
+              </label>
+              <label class="choice" for="filter-pc-brand-b">
+                <input class="choice__control" id="filter-pc-brand-b" name="brand" type="checkbox" value="brand-b">
+                <span>브랜드 B</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="filter-bar__group">
+            <legend class="filter-bar__legend">색상</legend>
+            <div class="choice-list">
+              <label class="choice" for="filter-pc-color-black">
+                <input class="choice__control" id="filter-pc-color-black" name="color" type="checkbox" value="black" checked>
+                <span>블랙</span>
+              </label>
+              <label class="choice" for="filter-pc-color-white">
+                <input class="choice__control" id="filter-pc-color-white" name="color" type="checkbox" value="white">
+                <span>화이트</span>
+              </label>
+            </div>
+          </fieldset>
+        </form>
+      </aside>
+
+      <div class="filter-bar__applied">
+        <strong class="filter-bar__applied-title">적용된 필터</strong>
+        <ul class="filter-bar__chips" aria-label="적용된 필터 목록" data-bind-list="products.appliedFilters">
+          <li class="filter-chip">
+            <span data-bind="filter.label">브랜드 A</span>
+            <button type="button" class="filter-chip__remove" aria-label="브랜드 A 제거" data-bind-event="remove-filter">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+              </svg>
+            </button>
+          </li>
+          <li class="filter-chip">
+            <span data-bind="filter.label">블랙</span>
+            <button type="button" class="filter-chip__remove" aria-label="블랙 제거" data-bind-event="remove-filter">
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+              </svg>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+  <!-- @endvariant -->
+
+  <!-- @variant mo -->
+  <section class="filter-bar filter-bar--mo" aria-labelledby="filter-bar-mo-title">
+    <header class="filter-bar__header">
+      <div>
+        <h3 id="filter-bar-mo-title" class="filter-bar__title">상품 필터</h3>
+        <p
+          class="filter-bar__result-count"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+          data-bind="products.countMessage"
+        >
+          총 123개 상품
+        </p>
+      </div>
+      <div class="filter-bar__triggers">
+        <button
+          type="button"
+          class="btn btn--outline btn--md filter-bar__trigger"
+          data-modal-open="product-filter-bottom-sheet"
+          aria-controls="product-filter-bottom-sheet"
+        >
+          필터
+          <span class="filter-bar__badge" aria-hidden="true" data-bind="products.appliedFilterCount">2</span>
+          <span class="sr-only" data-bind="products.appliedFilterCountMessage">2개 적용됨</span>
+        </button>
+        <button
+          type="button"
+          class="btn btn--outline btn--md filter-bar__trigger"
+          data-modal-open="product-filter-bottom-sheet"
+          aria-controls="product-filter-bottom-sheet"
+        >
+          정렬
+        </button>
+      </div>
+    </header>
+
+    <!-- common/modal.html의 bottom-sheet 마크업·동작 계약을 그대로 재사용한다. -->
+    <div
+      id="product-filter-bottom-sheet"
+      class="modal modal--bottom-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="product-filter-bottom-sheet-title"
+      aria-describedby="product-filter-bottom-sheet-description"
+      data-modal="product-filter-bottom-sheet"
+      tabindex="-1"
+      hidden
+    >
+      <div class="modal__dialog">
+        <header class="modal__header">
+          <h4 id="product-filter-bottom-sheet-title" class="modal__title">필터·정렬</h4>
+          <button type="button" class="modal__close" data-modal-close aria-label="필터·정렬 닫기">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+            </svg>
+          </button>
+        </header>
+        <div class="modal__body">
+          <p id="product-filter-bottom-sheet-description" class="sr-only">
+            상품 정렬 기준과 카테고리, 가격대, 브랜드, 색상 필터를 선택합니다.
+          </p>
+          <form class="filter-bar__sheet-form" data-bind-event="product-filters">
+            <div class="form-field filter-bar__sort">
+              <label class="form-field__label" for="filter-mo-sort">정렬 기준</label>
+              <select
+                class="form-control"
+                id="filter-mo-sort"
+                name="sort"
+                data-bind="products.sort"
+                data-bind-event="change-sort"
+              >
+                <option value="recommended">추천순</option>
+                <option value="newest">신상품순</option>
+                <option value="price-low">낮은 가격순</option>
+                <option value="price-high">높은 가격순</option>
+                <option value="review">리뷰 많은순</option>
+              </select>
+            </div>
+
+            <fieldset class="filter-bar__group">
+              <legend class="filter-bar__legend">카테고리</legend>
+              <div class="choice-list">
+                <label class="choice" for="filter-mo-category-top">
+                  <input class="choice__control" id="filter-mo-category-top" name="category" type="checkbox" value="top">
+                  <span>상의</span>
+                </label>
+                <label class="choice" for="filter-mo-category-bottom">
+                  <input class="choice__control" id="filter-mo-category-bottom" name="category" type="checkbox" value="bottom">
+                  <span>하의</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="filter-bar__group">
+              <legend class="filter-bar__legend">가격대</legend>
+              <div class="choice-list">
+                <label class="choice" for="filter-mo-price-all">
+                  <input class="choice__control" id="filter-mo-price-all" name="price" type="radio" value="all" checked>
+                  <span>전체</span>
+                </label>
+                <label class="choice" for="filter-mo-price-under-50000">
+                  <input class="choice__control" id="filter-mo-price-under-50000" name="price" type="radio" value="under-50000">
+                  <span>5만원 미만</span>
+                </label>
+                <label class="choice" for="filter-mo-price-over-50000">
+                  <input class="choice__control" id="filter-mo-price-over-50000" name="price" type="radio" value="over-50000">
+                  <span>5만원 이상</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="filter-bar__group">
+              <legend class="filter-bar__legend">브랜드</legend>
+              <div class="choice-list">
+                <label class="choice" for="filter-mo-brand-a">
+                  <input class="choice__control" id="filter-mo-brand-a" name="brand" type="checkbox" value="brand-a" checked>
+                  <span>브랜드 A</span>
+                </label>
+                <label class="choice" for="filter-mo-brand-b">
+                  <input class="choice__control" id="filter-mo-brand-b" name="brand" type="checkbox" value="brand-b">
+                  <span>브랜드 B</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <fieldset class="filter-bar__group">
+              <legend class="filter-bar__legend">색상</legend>
+              <div class="choice-list">
+                <label class="choice" for="filter-mo-color-black">
+                  <input class="choice__control" id="filter-mo-color-black" name="color" type="checkbox" value="black" checked>
+                  <span>블랙</span>
+                </label>
+                <label class="choice" for="filter-mo-color-white">
+                  <input class="choice__control" id="filter-mo-color-white" name="color" type="checkbox" value="white">
+                  <span>화이트</span>
+                </label>
+              </div>
+            </fieldset>
+          </form>
+        </div>
+        <footer class="modal__actions">
+          <button type="button" class="btn btn--outline btn--md" data-bind-event="reset-filters">초기화</button>
+          <button
+            type="button"
+            class="btn btn--primary btn--md"
+            data-modal-close="product-filter-bottom-sheet"
+            data-bind-event="apply-filters"
+          >
+            123개 상품 보기
+          </button>
+        </footer>
+      </div>
+    </div>
+  </section>
+  <!-- @endvariant -->
+</section>

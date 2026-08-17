@@ -1,0 +1,179 @@
+<!-- @component 리뷰
+     @category ecommerce
+     @variant  summary | item | input
+     @a11y     표시용 별은 aria-hidden으로 숨기고 평점은 텍스트로 제공하며, 별점 입력은 키보드 조작 가능한 radio 그룹 사용
+     @snippet  review
+-->
+<section class="review-showcase" aria-labelledby="review-showcase-title">
+  <h2 id="review-showcase-title">리뷰</h2>
+
+  <section class="review-showcase__section" aria-labelledby="review-summary-title">
+    <h3 id="review-summary-title">별점 요약</h3>
+    <!-- @variant summary -->
+    <div class="review-rating review-rating--summary" data-bind="product.reviewSummary">
+      <!-- 부분 별은 마지막 SVG의 채움 path를 --star-empty 비율만큼 오른쪽에서 잘라 표현한다. 4.3점은 다섯 번째 별을 30% 채운다. -->
+      <span class="review-rating__visible" aria-hidden="true">
+        <span class="review-rating__stars">
+          <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+            <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+          </svg>
+          <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+            <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+          </svg>
+          <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+            <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+          </svg>
+          <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+            <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+          </svg>
+          <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="--star-empty: 70%;">
+            <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+            <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+          </svg>
+        </span>
+        <strong class="review-rating__score" data-bind="product.rating">4.3</strong>
+        <span class="review-rating__count" data-bind="product.reviewCount">리뷰 128개</span>
+      </span>
+      <span class="sr-only" data-bind="product.reviewSummaryText">5점 만점에 4.3점, 리뷰 128개</span>
+    </div>
+    <!-- @endvariant -->
+  </section>
+
+  <section class="review-showcase__section" aria-labelledby="review-item-title">
+    <h3 id="review-item-title">리뷰 목록 아이템</h3>
+    <!-- @variant item -->
+    <article class="review-item" data-bind-list="reviews">
+      <header class="review-item__header">
+        <strong class="review-item__author" data-bind="review.maskedAuthor">김**</strong>
+        <time class="review-item__date" datetime="2026-08-12" data-bind="review.createdAt">2026.08.12</time>
+      </header>
+
+      <div class="review-rating review-rating--compact">
+        <span class="review-rating__visible" aria-hidden="true">
+          <span class="review-rating__stars">
+            <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+              <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+            </svg>
+            <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+              <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+            </svg>
+            <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+              <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+            </svg>
+            <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+              <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+            </svg>
+            <svg class="review-rating__star" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" style="--star-empty: 100%;">
+              <path class="review-rating__star-outline" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" stroke="currentColor" stroke-width="1.5"></path>
+              <path class="review-rating__star-fill" d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z" fill="currentColor"></path>
+            </svg>
+          </span>
+          <strong class="review-rating__score" data-bind="review.rating">4.0</strong>
+        </span>
+        <span class="sr-only" data-bind="review.ratingText">5점 만점에 4점</span>
+      </div>
+
+      <div class="review-item__content">
+        <p class="review-item__excerpt" data-bind="review.bodyPreview">
+          원단이 탄탄하고 핏이 깔끔합니다. 평소 입던 사이즈를 선택하니 잘 맞았고 배송도 빨랐어요.
+        </p>
+        <div class="review-item__expand" data-accordion data-accordion-mode="multiple">
+          <button
+            type="button"
+            class="review-item__toggle"
+            id="review-item-toggle"
+            data-accordion-trigger
+            aria-expanded="false"
+            aria-controls="review-item-continuation"
+          >
+            <span class="review-item__toggle-label review-item__toggle-label--collapsed">리뷰 더보기</span>
+            <span class="review-item__toggle-label review-item__toggle-label--expanded">리뷰 접기</span>
+            <svg class="review-item__toggle-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5"></path>
+            </svg>
+          </button>
+          <div
+            class="review-item__continuation"
+            id="review-item-continuation"
+            role="region"
+            aria-labelledby="review-item-toggle"
+            hidden
+          >
+            <p data-bind="review.bodyContinuation">
+              여러 번 세탁한 뒤에도 형태가 잘 유지됩니다. 실제 색상은 상품 이미지와 거의 같았습니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="review-item__attachments" aria-label="리뷰 첨부 이미지" data-bind="review.images">
+        <!-- @include common/image.html#fixed-ratio -->
+      </div>
+
+      <button
+        type="button"
+        class="review-item__helpful"
+        aria-pressed="false"
+        data-bind="review.helpful"
+        data-bind-event="toggle-helpful"
+      >
+        도움돼요 <span data-bind="review.helpfulCount">12</span>
+      </button>
+    </article>
+    <!-- @endvariant -->
+  </section>
+
+  <section class="review-showcase__section" aria-labelledby="review-input-title">
+    <h3 id="review-input-title">별점 입력</h3>
+    <!-- @variant input -->
+    <fieldset class="review-rating-input" data-bind="review.rating">
+      <legend class="review-rating-input__legend">상품 별점 선택</legend>
+      <div class="review-rating-input__options">
+        <label class="review-rating-input__option">
+          <input name="review-rating" type="radio" value="1">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+            <path d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z"></path>
+          </svg>
+          <span class="sr-only">1점</span>
+        </label>
+        <label class="review-rating-input__option">
+          <input name="review-rating" type="radio" value="2">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+            <path d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z"></path>
+          </svg>
+          <span class="sr-only">2점</span>
+        </label>
+        <label class="review-rating-input__option">
+          <input name="review-rating" type="radio" value="3">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+            <path d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z"></path>
+          </svg>
+          <span class="sr-only">3점</span>
+        </label>
+        <label class="review-rating-input__option">
+          <input name="review-rating" type="radio" value="4" checked>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+            <path d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z"></path>
+          </svg>
+          <span class="sr-only">4점</span>
+        </label>
+        <label class="review-rating-input__option">
+          <input name="review-rating" type="radio" value="5">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+            <path d="m12 2.8 2.8 5.7 6.3.9-4.6 4.5 1.1 6.3-5.6-3-5.6 3 1.1-6.3-4.6-4.5 6.3-.9L12 2.8Z"></path>
+          </svg>
+          <span class="sr-only">5점</span>
+        </label>
+      </div>
+    </fieldset>
+    <!-- @endvariant -->
+  </section>
+</section>

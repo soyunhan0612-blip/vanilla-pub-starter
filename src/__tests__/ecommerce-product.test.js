@@ -151,7 +151,8 @@ test('상품 컴포넌트 fragment가 include·가격 의미·접근성 계약�
   assert.match(card, />세일</);
   assert.match(card, />품절</);
   assert.match(card, /품절된 상품입니다/);
-  assert.match(card, /data-review-placeholder/);
+  assert.match(card, /@include\s+ecommerce\/review\.html#summary/);
+  assert.doesNotMatch(card, /data-review-placeholder/);
   for (const anchor of card.matchAll(/<a\b[\s\S]*?<\/a>/gi)) {
     assert.doesNotMatch(anchor[0], /<button\b/i);
   }
@@ -167,4 +168,39 @@ test('상품 컴포넌트 fragment가 include·가격 의미·접근성 계약�
   assert.match(stepper, /<button[^>]*data-stepper-action="increase"/s);
   assert.match(stepper, /min="1"/);
   assert.match(stepper, /max="99"/);
+});
+
+test('목록 필터와 리뷰 fragment가 적응형·키보드·스크린리더 계약을 제공한다', async () => {
+  const componentUrl = new URL('../assets/components/ecommerce/', import.meta.url);
+  const [filterBar, review] = await Promise.all(
+    ['filter-bar.html', 'review.html'].map((file) => readFile(new URL(file, componentUrl), 'utf8'))
+  );
+
+  assert.match(filterBar, /@variant\s+pc\s+\|\s+mo/);
+  assert.match(filterBar, /class="filter-bar filter-bar--pc"/);
+  assert.match(filterBar, /class="filter-bar filter-bar--mo"/);
+  assert.equal((filterBar.match(/<fieldset\b/g) || []).length, 8);
+  assert.equal((filterBar.match(/<legend\b/g) || []).length, 8);
+  assert.equal((filterBar.match(/role="status"/g) || []).length, 2);
+  assert.match(filterBar, /class="modal modal--bottom-sheet"/);
+  assert.match(filterBar, /data-modal="product-filter-bottom-sheet"/);
+  assert.equal((filterBar.match(/data-modal-open="product-filter-bottom-sheet"/g) || []).length, 2);
+  assert.match(filterBar, /aria-label="브랜드 A 제거"/);
+  assert.match(filterBar, /<label[^>]*for="filter-pc-sort"/);
+  assert.match(filterBar, /<label[^>]*for="filter-mo-sort"/);
+
+  assert.match(review, /@variant\s+summary\s+\|\s+item\s+\|\s+input/);
+  const summary = review.match(/<!-- @variant summary -->([\s\S]*?)<!-- @endvariant -->/)[1];
+  assert.equal((summary.match(/<svg\b/g) || []).length, 5);
+  assert.equal((summary.match(/<svg\b[^>]*aria-hidden="true"/g) || []).length, 5);
+  assert.match(summary, /5점 만점에 4\.3점, 리뷰 128개/);
+  assert.match(summary, /--star-empty:\s*70%/);
+  assert.match(review, /<time[^>]*datetime="2026-08-12"/);
+  assert.match(review, /data-accordion-trigger/);
+  assert.match(review, /@include\s+common\/image\.html#fixed-ratio/);
+  assert.match(review, /data-bind-event="toggle-helpful"/);
+  const input = review.match(/<!-- @variant input -->([\s\S]*?)<!-- @endvariant -->/)[1];
+  assert.equal((input.match(/<input[^>]*type="radio"/g) || []).length, 5);
+  assert.equal((input.match(/<label\b/g) || []).length, 5);
+  assert.doesNotMatch(input, /:hover|mouseover|mouseenter/);
 });
