@@ -1,0 +1,21 @@
+{
+  "name": "ecommerce-publishing-boilerplate",
+  "private": true,
+  "scripts": {
+    "check": "node tools/check.js",
+    "build": "node tools/build.js",
+    "serve": "node tools/serve.js",
+    "test": "node --test \"src/__tests__/**/*.test.js\" \"scripts/hooks/**/*.test.js\" \"tools/**/*.test.js\"",
+    "lint:js": "eslint .",
+    "lint:css": "stylelint \"src/assets/scss/**/*.scss\"",
+    "lint:html": "html-validate \"src/**/*.html\""
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "html-validate": "^8.29.0",
+    "sass": "^1.102.0",
+    "stylelint": "^16.12.0",
+    "vite": "^5.4.0"
+  }
+}
