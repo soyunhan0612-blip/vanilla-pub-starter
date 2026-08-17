@@ -1,0 +1,125 @@
+<!-- @component 탭
+     @category common
+     @variant  default — 자동 활성화형 가로 탭
+     @a11y     선택 탭만 tabindex 0. 좌우 방향키·Home·End로 선택과 포커스 이동
+     @snippet  tab
+-->
+<section class="tab-showcase" aria-labelledby="tab-showcase-title">
+  <h2 id="tab-showcase-title">탭</h2>
+  <p>상품 정보 영역을 한 번의 Tab 정지점과 방향키로 탐색합니다.</p>
+
+  <div class="tabs" data-tabs>
+    <div class="tabs__list" role="tablist" aria-label="상품 정보">
+      <button
+        type="button"
+        class="tabs__tab"
+        role="tab"
+        id="tab-product-info"
+        aria-selected="true"
+        aria-controls="panel-product-info"
+        tabindex="0"
+      >
+        상품정보
+      </button>
+      <button
+        type="button"
+        class="tabs__tab"
+        role="tab"
+        id="tab-product-review"
+        aria-selected="false"
+        aria-controls="panel-product-review"
+        tabindex="-1"
+      >
+        상품리뷰 128
+      </button>
+      <button
+        type="button"
+        class="tabs__tab"
+        role="tab"
+        id="tab-product-inquiry"
+        aria-selected="false"
+        aria-controls="panel-product-inquiry"
+        tabindex="-1"
+      >
+        상품문의 24
+      </button>
+      <button
+        type="button"
+        class="tabs__tab"
+        role="tab"
+        id="tab-product-delivery"
+        aria-selected="false"
+        aria-controls="panel-product-delivery"
+        tabindex="-1"
+      >
+        배송·교환 안내
+      </button>
+      <button
+        type="button"
+        class="tabs__tab"
+        role="tab"
+        id="tab-product-related"
+        aria-selected="false"
+        aria-controls="panel-product-related"
+        tabindex="-1"
+      >
+        함께 본 상품
+      </button>
+    </div>
+
+    <div
+      class="tabs__panel"
+      role="tabpanel"
+      id="panel-product-info"
+      aria-labelledby="tab-product-info"
+      tabindex="0"
+    >
+      <h3>상품정보</h3>
+      <p>상품 상세정보 콘텐츠가 연결되는 패널입니다.</p>
+    </div>
+    <div
+      class="tabs__panel"
+      role="tabpanel"
+      id="panel-product-review"
+      aria-labelledby="tab-product-review"
+      tabindex="0"
+      hidden
+    >
+      <h3>상품리뷰</h3>
+      <p>구매자의 상품리뷰 목록이 연결되는 패널입니다.</p>
+    </div>
+    <div
+      class="tabs__panel"
+      role="tabpanel"
+      id="panel-product-inquiry"
+      aria-labelledby="tab-product-inquiry"
+      tabindex="0"
+      hidden
+    >
+      <h3>상품문의</h3>
+      <p>상품문의 목록과 작성 기능이 연결되는 패널입니다.</p>
+    </div>
+    <div
+      class="tabs__panel"
+      role="tabpanel"
+      id="panel-product-delivery"
+      aria-labelledby="tab-product-delivery"
+      tabindex="0"
+      hidden
+    >
+      <h3>배송·교환 안내</h3>
+      <p>배송, 반품, 교환 기준이 연결되는 패널입니다.</p>
+    </div>
+    <div
+      class="tabs__panel"
+      role="tabpanel"
+      id="panel-product-related"
+      aria-labelledby="tab-product-related"
+      tabindex="0"
+      hidden
+    >
+      <h3>함께 본 상품</h3>
+      <p>연관 상품 목록이 연결되는 패널입니다.</p>
+    </div>
+  </div>
+</section>

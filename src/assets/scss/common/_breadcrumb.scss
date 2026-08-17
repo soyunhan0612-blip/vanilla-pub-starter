@@ -1,0 +1,62 @@
+@use '../abstracts/mixins' as *;
+
+.breadcrumb-showcase {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.breadcrumb,
+.breadcrumb__list,
+.breadcrumb__item {
+  min-width: 0;
+}
+
+.breadcrumb__list,
+.breadcrumb__item {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb__list {
+  gap: var(--space-2);
+}
+
+.breadcrumb__item {
+  gap: var(--space-2);
+}
+
+.breadcrumb__link {
+  color: var(--color-text-weak);
+  font-size: var(--font-size-caption);
+}
+
+.breadcrumb__link:hover {
+  color: var(--color-text-strong);
+}
+
+.breadcrumb__separator {
+  color: var(--color-text-disabled);
+}
+
+.breadcrumb__current {
+  overflow: hidden;
+  color: var(--color-text-strong);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.breadcrumb__item--ellipsis {
+  display: none;
+}
+
+@include respond-mo {
+  .breadcrumb__item--collapse-mo {
+    display: none;
+  }
+
+  .breadcrumb__item--ellipsis {
+    display: flex;
+  }
+}

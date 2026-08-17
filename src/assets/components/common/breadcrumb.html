@@ -1,0 +1,37 @@
+<!-- @component 브레드크럼
+     @category common
+     @variant  default — PC 전체 경로, MO 첫 항목·생략·마지막 항목
+     @a11y     현재 위치 nav 이름과 마지막 항목 aria-current 제공
+     @snippet  breadcrumb
+-->
+<section class="breadcrumb-showcase" aria-labelledby="breadcrumb-showcase-title">
+  <h2 id="breadcrumb-showcase-title">브레드크럼</h2>
+  <nav class="breadcrumb" aria-label="현재 위치">
+    <ol class="breadcrumb__list">
+      <li class="breadcrumb__item">
+        <a class="breadcrumb__link" href="/">홈</a>
+      </li>
+      <li class="breadcrumb__item breadcrumb__item--collapse-mo">
+        <span class="breadcrumb__separator" aria-hidden="true">/</span>
+        <a class="breadcrumb__link" href="/category">여성</a>
+      </li>
+      <li class="breadcrumb__item breadcrumb__item--collapse-mo">
+        <span class="breadcrumb__separator" aria-hidden="true">/</span>
+        <a class="breadcrumb__link" href="/category/outer">아우터</a>
+      </li>
+      <li class="breadcrumb__item breadcrumb__item--collapse-mo">
+        <span class="breadcrumb__separator" aria-hidden="true">/</span>
+        <a class="breadcrumb__link" href="/category/outer/jacket">재킷</a>
+      </li>
+      <li class="breadcrumb__item breadcrumb__item--ellipsis">
+        <span class="breadcrumb__separator" aria-hidden="true">/</span>
+        <span aria-hidden="true">…</span>
+        <span class="sr-only">중간 경로 생략</span>
+      </li>
+      <li class="breadcrumb__item">
+        <span class="breadcrumb__separator" aria-hidden="true">/</span>
+        <span class="breadcrumb__current" aria-current="page">오버핏 코튼 재킷</span>
+      </li>
+    </ol>
+  </nav>
+</section>

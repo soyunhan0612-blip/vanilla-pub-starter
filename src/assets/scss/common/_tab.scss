@@ -1,0 +1,71 @@
+@use '../abstracts/mixins' as *;
+
+.tab-showcase {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.tabs {
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-page);
+}
+
+.tabs__list {
+  display: flex;
+  max-width: 100%;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tabs__tab {
+  min-width: 44px;
+  min-height: 44px;
+  flex: 0 0 auto;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 2px solid transparent;
+  color: var(--color-text-weak);
+  background: var(--color-bg-page);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.tabs__tab:hover {
+  color: var(--color-text-strong);
+  background: var(--color-bg-muted);
+}
+
+.tabs__tab[aria-selected='true'] {
+  border-bottom-color: currentColor;
+  color: var(--color-text-strong);
+}
+
+.tabs__tab:focus-visible {
+  @include focus-ring;
+  outline-offset: -2px;
+}
+
+.tabs__panel {
+  min-height: 160px;
+  padding: var(--space-6);
+}
+
+.tabs__panel[hidden] {
+  display: none;
+}
+
+.tabs__panel p {
+  margin-top: var(--space-2);
+}
+
+@include respond-mo {
+  .tabs__list {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabs__list::-webkit-scrollbar {
+    display: none;
+  }
+}

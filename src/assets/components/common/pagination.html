@@ -1,0 +1,64 @@
+<!-- @component 페이지네이션
+     @category common
+     @variant  default — 페이지 링크와 생략 규칙
+     @variant  more — 모바일 상품목록 더보기
+     @a11y     nav 이름과 현재 페이지 aria-current 제공. 이전·다음은 보이는 텍스트 레이블 사용
+     @snippet  pagination
+-->
+<section class="pagination-showcase" aria-labelledby="pagination-showcase-title">
+  <h2 id="pagination-showcase-title">페이지네이션</h2>
+
+  <section class="pagination-showcase__section" aria-labelledby="pagination-default-title">
+    <h3 id="pagination-default-title">페이지 링크</h3>
+    <nav class="pagination" aria-label="페이지 탐색">
+      <ul class="pagination__list">
+        <li>
+          <a class="pagination__link pagination__link--direction" href="?page=4">
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="m15 18-6-6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+            <span>이전</span>
+          </a>
+        </li>
+        <li><a class="pagination__link" href="?page=1">1</a></li>
+        <li class="pagination__omission">
+          <span class="pagination__ellipsis" aria-hidden="true">…</span>
+          <span class="sr-only">중간 페이지 생략</span>
+        </li>
+        <li><a class="pagination__link" href="?page=4">4</a></li>
+        <li><a class="pagination__link" href="?page=5" aria-current="page">5</a></li>
+        <li><a class="pagination__link" href="?page=6">6</a></li>
+        <li class="pagination__omission">
+          <span class="pagination__ellipsis" aria-hidden="true">…</span>
+          <span class="sr-only">중간 페이지 생략</span>
+        </li>
+        <li><a class="pagination__link" href="?page=20">20</a></li>
+        <li>
+          <a class="pagination__link pagination__link--direction" href="?page=6">
+            <span>다음</span>
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </section>
+
+  <section class="pagination-showcase__section" aria-labelledby="pagination-more-title">
+    <h3 id="pagination-more-title">모바일 더보기</h3>
+    <nav class="pagination pagination--more" aria-label="상품 더 보기">
+      <button
+        type="button"
+        class="btn btn--outline btn--lg pagination__more-button"
+        aria-describedby="pagination-more-status"
+      >
+        상품 더보기
+      </button>
+      <p id="pagination-more-status" class="pagination__status" aria-live="polite">
+        전체 <span data-bind="total-count">120</span>개 중
+        <span data-bind="visible-count">40</span>개 표시
+      </p>
+    </nav>
+  </section>
+</section>

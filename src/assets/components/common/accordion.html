@@ -1,0 +1,153 @@
+<!-- @component 아코디언
+     @category common
+     @variant  multiple — 여러 항목 동시 열림
+     @variant  single — 한 항목만 열림
+     @a11y     button의 Enter·Space 기본 동작 사용. aria-expanded와 본문 hidden 상태 동기화
+     @snippet  accordion
+-->
+<section class="accordion-showcase" aria-labelledby="accordion-showcase-title">
+  <h2 id="accordion-showcase-title">아코디언</h2>
+
+  <section class="accordion-showcase__section" aria-labelledby="accordion-multiple-title">
+    <h3 id="accordion-multiple-title">여러 개 동시 열림</h3>
+    <div class="accordion" data-accordion data-accordion-mode="multiple">
+      <section class="accordion__item">
+        <h4 class="accordion__heading">
+          <button
+            type="button"
+            class="accordion__trigger"
+            id="accordion-multiple-trigger-1"
+            data-accordion-trigger
+            aria-expanded="true"
+            aria-controls="accordion-multiple-panel-1"
+          >
+            <span>상품 소재와 세탁 방법</span>
+            <svg class="accordion__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </button>
+        </h4>
+        <div
+          class="accordion__panel"
+          id="accordion-multiple-panel-1"
+          role="region"
+          aria-labelledby="accordion-multiple-trigger-1"
+        >
+          <p>상품 소재와 취급 주의사항이 연결되는 영역입니다.</p>
+        </div>
+      </section>
+
+      <section class="accordion__item">
+        <h4 class="accordion__heading">
+          <button
+            type="button"
+            class="accordion__trigger"
+            id="accordion-multiple-trigger-2"
+            data-accordion-trigger
+            aria-expanded="false"
+            aria-controls="accordion-multiple-panel-2"
+          >
+            <span>배송 안내</span>
+            <svg class="accordion__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </button>
+        </h4>
+        <div
+          class="accordion__panel"
+          id="accordion-multiple-panel-2"
+          role="region"
+          aria-labelledby="accordion-multiple-trigger-2"
+          hidden
+        >
+          <p>주문 이후 배송 일정과 배송비 안내가 연결되는 영역입니다.</p>
+        </div>
+      </section>
+
+      <section class="accordion__item">
+        <h4 class="accordion__heading">
+          <button
+            type="button"
+            class="accordion__trigger"
+            id="accordion-multiple-trigger-3"
+            data-accordion-trigger
+            aria-expanded="false"
+            aria-controls="accordion-multiple-panel-3"
+          >
+            <span>교환·반품 안내</span>
+            <svg class="accordion__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </button>
+        </h4>
+        <div
+          class="accordion__panel"
+          id="accordion-multiple-panel-3"
+          role="region"
+          aria-labelledby="accordion-multiple-trigger-3"
+          hidden
+        >
+          <p>교환과 반품이 가능한 기간과 절차가 연결되는 영역입니다.</p>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <section class="accordion-showcase__section" aria-labelledby="accordion-single-title">
+    <h3 id="accordion-single-title">하나만 열림</h3>
+    <div class="accordion" data-accordion data-accordion-mode="single">
+      <section class="accordion__item">
+        <h4 class="accordion__heading">
+          <button
+            type="button"
+            class="accordion__trigger"
+            id="accordion-single-trigger-1"
+            data-accordion-trigger
+            aria-expanded="true"
+            aria-controls="accordion-single-panel-1"
+          >
+            <span>회원이 아니어도 주문할 수 있나요?</span>
+            <svg class="accordion__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </button>
+        </h4>
+        <div
+          class="accordion__panel"
+          id="accordion-single-panel-1"
+          role="region"
+          aria-labelledby="accordion-single-trigger-1"
+        >
+          <p>비회원 주문 가능 여부와 조회 방법을 안내합니다.</p>
+        </div>
+      </section>
+
+      <section class="accordion__item">
+        <h4 class="accordion__heading">
+          <button
+            type="button"
+            class="accordion__trigger"
+            id="accordion-single-trigger-2"
+            data-accordion-trigger
+            aria-expanded="false"
+            aria-controls="accordion-single-panel-2"
+          >
+            <span>결제 수단을 변경할 수 있나요?</span>
+            <svg class="accordion__icon" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" />
+            </svg>
+          </button>
+        </h4>
+        <div
+          class="accordion__panel"
+          id="accordion-single-panel-2"
+          role="region"
+          aria-labelledby="accordion-single-trigger-2"
+          hidden
+        >
+          <p>주문 상태별 결제 수단 변경 가능 여부를 안내합니다.</p>
+        </div>
+      </section>
+    </div>
+  </section>
+</section>

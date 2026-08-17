@@ -1,0 +1,65 @@
+@use '../abstracts/mixins' as *;
+
+.accordion-showcase,
+.accordion-showcase__section {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.accordion-showcase {
+  gap: var(--space-8);
+}
+
+.accordion {
+  border-top: 1px solid var(--color-border-strong);
+}
+
+.accordion__item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.accordion__heading {
+  font-size: var(--font-size-body);
+}
+
+.accordion__trigger {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-2);
+  color: var(--color-text-strong);
+  background: var(--color-bg-page);
+  font-weight: var(--font-weight-semibold);
+  text-align: left;
+}
+
+.accordion__trigger:hover {
+  background: var(--color-bg-muted);
+}
+
+.accordion__trigger:focus-visible {
+  @include focus-ring;
+  outline-offset: -2px;
+}
+
+.accordion__icon {
+  flex: none;
+  transform: rotate(0);
+  transition: transform 200ms ease-out;
+}
+
+.accordion__trigger[aria-expanded='true'] .accordion__icon {
+  transform: rotate(180deg);
+}
+
+.accordion__panel {
+  padding: var(--space-2) var(--space-2) var(--space-5);
+  color: var(--color-text-body);
+}
+
+.accordion__panel[hidden] {
+  display: none;
+}

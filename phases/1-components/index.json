@@ -21,7 +21,10 @@
     {
       "step": 2,
       "name": "common-nav",
-      "status": "pending"
+      "status": "completed",
+      "started_at": "2026-08-17T11:19:12+0900",
+      "summary": "접근성 탭·단일/복수 아코디언·페이지네이션/더보기·MO 축약 브레드크럼을 위임형 키보드 동작과 공통 SCSS로 구현",
+      "completed_at": "2026-08-17T11:30:27+0900"
     },
     {
       "step": 3,
