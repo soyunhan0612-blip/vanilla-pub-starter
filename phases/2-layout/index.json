@@ -7,7 +7,8 @@
       "name": "shell-pc",
       "status": "completed",
       "summary": "PC 헤더·키보드 메가메뉴·공용 푸터·리플로 대응 레이아웃 셸을 구현했다.",
-      "started_at": "2026-08-17T13:58:31+0900"
+      "started_at": "2026-08-17T13:58:31+0900",
+      "completed_at": "2026-08-17T14:15:40+0900"
     },
     {
       "step": 1,
