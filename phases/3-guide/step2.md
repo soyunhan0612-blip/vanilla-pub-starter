@@ -55,8 +55,9 @@ node tools/serve.js --smoke  # 서버 기동
 node tools/check.js          # 검증 통과
 node --test "src/__tests__/**/*.test.js"   # 테스트 통과 (디렉토리를 넘기면 조용히 건너뛴다)
 
-# 4. 브라우저 확인
-node tools/serve.js
+# 4. 브라우저 확인 — bare `node tools/serve.js` 는 스스로 끝나지 않는다.
+#    이 AC 블록을 그대로 실행하면 여기서 영원히 멈추므로 반드시 --timeout 을 준다.
+node tools/serve.js --timeout=120
 #   /pc/index.html, /mo/index.html, /guide.html 이 정상 렌더되는가
 
 # 5. 결과 기록 후 원복

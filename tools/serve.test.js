@@ -58,6 +58,37 @@ test('HTML 응답에서 include를 실시간 해소한다', () => {
   }
 });
 
+test('--timeout 은 초 단위로 파싱하고 기본값은 없다', () => {
+  assert.equal(parseArgs([]).timeout, null);
+  assert.equal(parseArgs(['--timeout=5']).timeout, 5);
+  assert.equal(parseArgs(['--timeout', '5']).timeout, 5);
+});
+
+test('--timeout 은 양수만 받는다', () => {
+  assert.throws(() => parseArgs(['--timeout=0']), /timeout/);
+  assert.throws(() => parseArgs(['--timeout=-1']), /timeout/);
+  assert.throws(() => parseArgs(['--timeout=abc']), /timeout/);
+});
+
+// bare `serve.js` 는 리스닝 소켓이 이벤트 루프를 붙잡아 스스로 끝나지 않는다.
+// 자동화가 띄운 서버가 그대로 남으면 포트를 문 채 쌓여 다음 기동이 EADDRINUSE 로
+// 실패한다. --timeout 은 그 서버가 구조적으로 불멸일 수 없게 만드는 자리다.
+test('--timeout 이 지나면 서버가 스스로 종료한다', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'serve-timeout-'));
+  try {
+    const result = spawnSync(
+      process.execPath,
+      [SERVE, '--port=0', '--timeout=1', `--root=${root}`],
+      { encoding: 'utf8', timeout: 15000 }
+    );
+    const output = `${result.stdout || ''}${result.stderr || ''}`;
+    assert.equal(result.status, 0, output);
+    assert.equal(result.signal, null, `시간 안에 스스로 끝나지 않았다: ${output}`);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 test('--smoke는 빈 문서 루트의 HTTP 404 응답도 성공으로 처리한다', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'serve-smoke-'));
   try {

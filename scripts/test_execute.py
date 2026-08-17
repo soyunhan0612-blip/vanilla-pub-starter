@@ -3,9 +3,11 @@ execute.py 리팩터링 안전망 테스트.
 리팩터링 전후 동작이 동일한지 검증한다.
 """
 
+import contextlib
 import io
 import json
 import os
+import signal
 import subprocess
 import sys
 import textwrap
@@ -74,6 +76,27 @@ def top_index(tmp_project):
     p = tmp_project / "phases" / "index.json"
     p.write_text(json.dumps(top, indent=2), encoding="utf-8")
     return p
+
+
+@pytest.fixture(autouse=True)
+def never_launch_real_codex(monkeypatch):
+    """테스트가 실수로 진짜 codex 를 띄우지 못하게 막는다.
+
+    `_invoke_codex` 를 대역 없이 부르면 TIMEOUT(1800초)짜리 codex 세션이 실제로 뜬다.
+    한 번 겪으면 pytest 가 멈춘 이유를 찾기 어렵고, 그 사이 codex 가 작업 트리를
+    건드린다. 대역을 깜빡한 테스트는 매달리는 대신 여기서 즉시 실패해야 한다.
+    """
+    real_popen = subprocess.Popen
+
+    def guard(argv, *args, **kwargs):
+        if argv and str(argv[0]) == "codex":
+            raise AssertionError(
+                "테스트가 실제 codex 를 띄우려 했다 — executor._codex_argv 를 대역으로 "
+                "바꾸거나 subprocess.Popen 을 patch 하라"
+            )
+        return real_popen(argv, *args, **kwargs)
+
+    monkeypatch.setattr(subprocess, "Popen", guard)
 
 
 @pytest.fixture
@@ -537,14 +560,28 @@ class TestDirtyPaths:
 # _invoke_codex (mocked)
 # ---------------------------------------------------------------------------
 
+@pytest.fixture
+def mock_popen():
+    """subprocess.Popen 대역. (patcher, proc) 을 준다.
+
+    stdout/stderr 은 실제 자식이 파일에 쓰는 것이므로 대역에서는 빈 문자열이 된다.
+    출력이 제대로 잡히는지는 실제 프로세스를 쓰는 아래 테스트들이 본다.
+    """
+    proc = MagicMock()
+    proc.wait.return_value = 0
+    proc.pid = -1
+    proc._handle = 0  # Job Object 부착은 실패하고 조용히 넘어간다
+    with patch("subprocess.Popen", return_value=proc) as patcher:
+        yield patcher, proc
+
+
 class TestInvokeCodex:
-    def test_invokes_codex_with_correct_args(self, executor):
-        mock_result = MagicMock(returncode=0, stdout='{"result": "ok"}', stderr="")
+    def test_invokes_codex_with_correct_args(self, executor, mock_popen):
+        mock_run, _ = mock_popen
         step = {"step": 2, "name": "ui"}
         preamble = "PREAMBLE\n"
 
-        with patch("subprocess.run", return_value=mock_result) as mock_run:
-            executor._invoke_codex(step, preamble)
+        executor._invoke_codex(step, preamble)
 
         cmd = mock_run.call_args[0][0]
         assert cmd[0] == "codex"
@@ -586,32 +623,35 @@ class TestInvokeCodex:
         assert argv[-1] == "-"
         assert "--dangerously-bypass-hook-trust" in argv
 
-    def test_hook_trust_bypass_is_passed(self, executor):
+    def test_hook_trust_bypass_is_passed(self, executor, mock_popen):
         """이 플래그가 빠지면 .codex/hooks.json 의 훅이 경고 없이 통째로 빠진다."""
-        mock_result = MagicMock(returncode=0, stdout="{}", stderr="")
-        with patch("subprocess.run", return_value=mock_result) as mock_run:
-            executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+        mock_run, _ = mock_popen
+        executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
 
         assert "--dangerously-bypass-hook-trust" in mock_run.call_args[0][0]
 
-    def test_prompt_goes_to_stdin_not_argv(self, executor):
-        """Codex 는 `-` 로 stdin 에서 프롬프트를 읽는다. argv 로 넘기면 안 된다."""
-        mock_result = MagicMock(returncode=0, stdout="{}", stderr="")
-        with patch("subprocess.run", return_value=mock_result) as mock_run:
-            executor._invoke_codex({"step": 2, "name": "ui"}, "PREAMBLE\n")
+    def test_streams_are_not_pipes(self, executor, mock_popen):
+        """세 스트림 모두 파이프가 아니어야 한다.
 
-        sent = mock_run.call_args[1]["input"]
-        assert "PREAMBLE" in sent
-        assert "UI를 구현하세요" in sent
-        # input= 과 stdin= 은 동시에 못 쓴다 (ValueError). stdin 을 넘기면 안 된다.
-        assert "stdin" not in mock_run.call_args[1]
+        파이프는 codex 의 자손에게 상속된다. 스스로 끝나지 않는 손자가 하나라도
+        남으면 codex 가 죽은 뒤에도 읽기가 리턴하지 않아 하네스가 조용히 멈춘다
+        (2-layout step 3 에서 15분 47초). 파일에는 붙잡을 파이프가 없다.
+        """
+        mock_run, _ = mock_popen
+        executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
 
-    def test_saves_output_json(self, executor):
-        mock_result = MagicMock(returncode=0, stdout='{"ok": true}', stderr="")
+        kwargs = mock_run.call_args[1]
+        for name in ("stdin", "stdout", "stderr"):
+            assert kwargs[name] is not subprocess.PIPE, f"{name} 이 파이프다"
+            assert hasattr(kwargs[name], "fileno"), f"{name} 이 파일이 아니다"
+        # input= 은 파이프를 쓰므로 같이 쓰면 안 된다.
+        assert "input" not in kwargs
+        assert "capture_output" not in kwargs
+
+    def test_saves_output_json(self, executor, mock_popen):
         step = {"step": 2, "name": "ui"}
 
-        with patch("subprocess.run", return_value=mock_result):
-            executor._invoke_codex(step, "preamble")
+        executor._invoke_codex(step, "preamble")
 
         output_file = executor._phase_dir / "step2-output.json"
         assert output_file.exists()
@@ -626,14 +666,11 @@ class TestInvokeCodex:
             executor._invoke_codex(step, "preamble")
         assert exc_info.value.code == 1
 
-    def test_timeout_is_1800(self, executor):
-        mock_result = MagicMock(returncode=0, stdout="{}", stderr="")
-        step = {"step": 2, "name": "ui"}
+    def test_timeout_is_1800(self, executor, mock_popen):
+        _, proc = mock_popen
+        executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
 
-        with patch("subprocess.run", return_value=mock_result) as mock_run:
-            executor._invoke_codex(step, "preamble")
-
-        assert mock_run.call_args[1]["timeout"] == 1800
+        assert proc.wait.call_args[1]["timeout"] == 1800
 
 
 # ---------------------------------------------------------------------------
@@ -642,54 +679,166 @@ class TestInvokeCodex:
 # ---------------------------------------------------------------------------
 
 class TestInvokeCodexTimeout:
-    @staticmethod
-    def _timeout(stdout=None, stderr=None):
-        return subprocess.TimeoutExpired(
-            cmd=["codex", "exec"], timeout=1800, output=stdout, stderr=stderr
-        )
+    @pytest.fixture
+    def timed_out(self, mock_popen):
+        """첫 wait 는 타임아웃, kill 뒤의 두 번째 wait 는 정상 회수."""
+        _, proc = mock_popen
+        proc.wait.side_effect = [
+            subprocess.TimeoutExpired(cmd=["codex", "exec"], timeout=1800),
+            0,
+        ]
+        return proc
 
-    def test_timeout_does_not_propagate(self, executor):
-        with patch("subprocess.run", side_effect=self._timeout()):
-            output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+    def test_timeout_does_not_propagate(self, executor, timed_out):
+        output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
 
         assert output["exitCode"] != 0
 
-    def test_timeout_records_failure_reason(self, executor):
-        with patch("subprocess.run", side_effect=self._timeout()):
-            output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+    def test_timeout_records_failure_reason(self, executor, timed_out):
+        output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
 
         assert "timeout" in output["failure"]
         assert "1800" in output["failure"]
 
-    def test_timeout_still_writes_output_json(self, executor):
-        with patch("subprocess.run", side_effect=self._timeout()):
-            executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+    def test_timeout_still_writes_output_json(self, executor, timed_out):
+        executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
 
         data = json.loads((executor._phase_dir / "step2-output.json").read_text(encoding="utf-8"))
         assert data["exitCode"] != 0
         assert "timeout" in data["failure"]
 
-    def test_timeout_keeps_partial_output(self, executor):
-        with patch("subprocess.run", side_effect=self._timeout(stdout="부분 출력", stderr="경고")):
+    def test_timeout_kills_the_process(self, executor, timed_out):
+        """죽이지 않으면 codex 가 계속 돌면서 작업 트리를 건드린다."""
+        executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+
+        timed_out.kill.assert_called_once()
+
+    def test_timeout_handles_missing_streams(self, executor, timed_out):
+        output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+
+        assert output["stdout"] == ""
+        assert output["stderr"] == ""
+
+
+# ---------------------------------------------------------------------------
+# 타임아웃 시 부분 출력 보존 — 실제 프로세스로 본다.
+# 여기가 비면 재시도 프롬프트가 원인을 못 알려주고 자가 교정이 헛돈다.
+# ---------------------------------------------------------------------------
+
+class TestInvokeCodexTimeoutKeepsOutput:
+    def test_partial_output_survives_timeout(self, executor):
+        executor._codex_argv = lambda: [
+            sys.executable, "-c",
+            "import sys, time;"
+            " sys.stdout.buffer.write('부분 출력'.encode('utf-8')); sys.stdout.flush();"
+            " sys.stderr.buffer.write('경고'.encode('utf-8')); sys.stderr.flush();"
+            " time.sleep(60)",
+        ]
+
+        with patch.object(ex.StepExecutor, "TIMEOUT", 2):
             output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
 
         assert output["stdout"] == "부분 출력"
         assert output["stderr"] == "경고"
+        assert "timeout" in output["failure"]
+        assert output["exitCode"] == -1
 
-    def test_timeout_decodes_bytes_output(self, executor):
-        """TimeoutExpired 는 text 모드에서도 bytes 를 물고 나올 수 있다."""
-        raw = "부분 출력".encode("utf-8")
-        with patch("subprocess.run", side_effect=self._timeout(stdout=raw)):
-            output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
 
-        assert output["stdout"] == "부분 출력"
+# ---------------------------------------------------------------------------
+# _invoke_codex 가 고아 손자 프로세스에 붙잡히지 않는가 (실제 프로세스)
+#
+# 2-layout step 3 에서 하네스가 15분 47초 동안 에러 없이 멈췄다. codex 가 검증용으로
+# `node tools/serve.js` 를 띄웠는데 그 서버가 종료되지 않았고, capture_output=True 가
+# 만든 stdout 파이프의 쓰기단을 손자가 상속한 채 살아 있어 codex 가 죽은 뒤에도
+# subprocess.run 이 리턴하지 못했다. 파이프 대신 파일로 받으면 붙잡을 것이 없다.
+#
+# 증상이 "실패" 가 아니라 "안 끝남" 이라 로그로는 정상 진행과 구분되지 않는다.
+# 그래서 mock 이 아니라 실제 프로세스로 검증한다.
+# ---------------------------------------------------------------------------
 
-    def test_timeout_handles_missing_streams(self, executor):
-        with patch("subprocess.run", side_effect=self._timeout()):
-            output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+class TestInvokeCodexSurvivingGrandchild:
+    GRANDCHILD_LIFETIME = 30
 
-        assert output["stdout"] == ""
-        assert output["stderr"] == ""
+    @pytest.fixture
+    def fake_codex(self, executor, tmp_path):
+        """손자를 남기고 즉시 끝나는 가짜 codex. 손자는 부모의 stdout 을 물려받는다.
+
+        손자의 cwd 를 시스템 임시 폴더로 못 박고, 끝나면 반드시 죽인다. 둘 다
+        빠뜨리면 이 테스트가 **다음 pytest 실행을 통째로 망친다** — 손자가 상속한
+        cwd(pytest 임시 디렉토리)를 살아 있는 동안 잠그고 있어, 다음 실행의 정리
+        단계가 PermissionError 로 죽기 때문이다. 고아를 검증하는 테스트가 고아를
+        남기는 셈이라 실제로 한 번 당했다.
+        """
+        pidfile = tmp_path / "grandchild.pid"
+        executor._codex_argv = lambda: [
+            sys.executable, "-c",
+            "import subprocess, sys, tempfile;"
+            " g = subprocess.Popen("
+            f"[sys.executable, '-c', 'import time; time.sleep({self.GRANDCHILD_LIFETIME})'],"
+            " cwd=tempfile.gettempdir());"
+            f" open(r'{pidfile}', 'w').write(str(g.pid));"
+            " sys.stdout.write('codex-done');"
+            " sys.stderr.write('codex-warn')",
+        ]
+
+        yield executor
+
+        if pidfile.exists():
+            with contextlib.suppress(OSError):
+                os.kill(int(pidfile.read_text().strip()), signal.SIGTERM)
+
+    def test_returns_before_grandchild_dies(self, fake_codex):
+        """손자가 살아 있어도 codex 가 끝나면 바로 리턴해야 한다."""
+        t0 = time.monotonic()
+        output = fake_codex._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+        elapsed = time.monotonic() - t0
+
+        assert elapsed < self.GRANDCHILD_LIFETIME / 2, (
+            f"손자 프로세스에 붙잡혀 {elapsed:.1f}초 걸렸다 — 파이프를 상속시키고 있다"
+        )
+        assert output["exitCode"] == 0
+
+    def test_still_captures_streams(self, fake_codex):
+        """붙잡히지 않는 것과 별개로 출력은 그대로 잡혀야 한다."""
+        output = fake_codex._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+
+        assert "codex-done" in output["stdout"]
+        assert "codex-warn" in output["stderr"]
+
+
+# ---------------------------------------------------------------------------
+# 프롬프트 전달 경로 — 터미널 stdin 을 대체하되 파이프를 쓰지 않는다
+# ---------------------------------------------------------------------------
+
+class TestInvokeCodexStdin:
+    def test_prompt_reaches_codex_stdin(self, executor):
+        """프롬프트는 argv 가 아니라 stdin 으로 간다 (codex 는 `-` 로 읽는다)."""
+        # 바이트 그대로 되돌린다 — 파이프/파일의 locale 디코딩에 결과가 흔들리면
+        # 이 테스트가 프롬프트 전달이 아니라 인코딩을 재는 셈이 된다.
+        executor._codex_argv = lambda: [
+            sys.executable, "-c",
+            "import sys; sys.stdout.buffer.write(sys.stdin.buffer.read())",
+        ]
+
+        output = executor._invoke_codex({"step": 2, "name": "ui"}, "PREAMBLE\n")
+
+        assert "PREAMBLE" in output["stdout"]
+        assert "UI를 구현하세요" in output["stdout"]
+
+    def test_terminal_stdin_is_not_inherited(self, executor):
+        """확인 게이트에 미리 타이핑해 둔 입력이 codex 로 새면 안 된다.
+
+        stdin 을 대체하지 않으면 사용자가 게이트에 친 문자가 codex 프롬프트 뒤에
+        그대로 딸려 들어간다.
+        """
+        executor._codex_argv = lambda: [
+            sys.executable, "-c",
+            "import sys; sys.stdout.write(str(sys.stdin.isatty()))",
+        ]
+
+        output = executor._invoke_codex({"step": 2, "name": "ui"}, "preamble")
+
+        assert output["stdout"].strip() == "False"
 
 
 # ---------------------------------------------------------------------------

@@ -93,7 +93,13 @@ function createServer(opts = {}) {
 }
 
 function parseArgs(argv) {
-  const options = { port: DEFAULT_PORT, portExplicit: false, root: DEFAULT_ROOT, smoke: false };
+  const options = {
+    port: DEFAULT_PORT,
+    portExplicit: false,
+    root: DEFAULT_ROOT,
+    smoke: false,
+    timeout: null,
+  };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === '--smoke') {
@@ -104,6 +110,10 @@ function parseArgs(argv) {
     } else if (arg.startsWith('--port=')) {
       options.port = Number(arg.slice('--port='.length));
       options.portExplicit = true;
+    } else if (arg === '--timeout') {
+      options.timeout = Number(argv[++i]);
+    } else if (arg.startsWith('--timeout=')) {
+      options.timeout = Number(arg.slice('--timeout='.length));
     } else if (arg.startsWith('--root=')) {
       options.root = path.resolve(arg.slice('--root='.length));
     } else {
@@ -112,6 +122,9 @@ function parseArgs(argv) {
   }
   if (!Number.isInteger(options.port) || options.port < 0 || options.port > 65535) {
     throw new Error(`유효하지 않은 포트: ${options.port}`);
+  }
+  if (options.timeout !== null && (!Number.isInteger(options.timeout) || options.timeout <= 0)) {
+    throw new Error(`유효하지 않은 timeout: ${options.timeout}`);
   }
   return options;
 }
@@ -148,6 +161,13 @@ async function main(argv = process.argv.slice(2)) {
   const address = server.address();
   if (!options.smoke) {
     console.log(`개발 서버: http://127.0.0.1:${address.port}`);
+    // 리스닝 소켓이 이벤트 루프를 붙잡으므로 이 프로세스는 스스로 끝나지 않는다.
+    // 사람이 쓰는 개발 서버는 그것이 맞지만, 자동화가 띄우고 잊으면 포트를 문 채
+    // 남아 다음 기동이 EADDRINUSE 로 실패한다. --timeout 을 준 호출만 끝을 갖는다.
+    if (options.timeout !== null) {
+      console.log(`${options.timeout}초 후 자동 종료한다`);
+      setTimeout(() => server.close(), options.timeout * 1000);
+    }
     return;
   }
 

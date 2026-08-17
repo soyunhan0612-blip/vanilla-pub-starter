@@ -99,7 +99,7 @@ node tools/serve.js --smoke
 
 1. 위 AC 커맨드를 실행한다.
 2. **생성된 `src/guide.html` 을 `file://` 로 직접 열어본다** (서버 없이). 컴포넌트 카탈로그와 토큰 표가 보여야 한다. 깨지면 fetch 방식을 쓴 것이므로 인라인으로 고쳐라.
-3. `node tools/serve.js` 로 띄우고 확인한다:
+3. `node tools/serve.js --timeout=120` 으로 띄우고 확인한다 (**bare `node tools/serve.js` 를 쓰지 마라** — 스스로 끝나지 않아 하네스가 그 프로세스에 붙잡힌다):
    - 레이아웃 iframe 14개가 보이는가
    - 뷰포트 토글이 동작하는가
    - axe 결과가 화면에 표시되는가

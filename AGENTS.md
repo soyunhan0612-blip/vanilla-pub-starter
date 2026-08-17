@@ -48,8 +48,14 @@
 
 ```bash
 node tools/build.js      # SCSS 컴파일 + include 해소 + guide/스니펫 생성
-node tools/serve.js      # 의존성 0 개발 서버
+node tools/serve.js      # 의존성 0 개발 서버 — 사람이 Ctrl+C 로 끝낸다
 node tools/check.js      # 전체 검증 (Stop 훅 · pre-commit · AC 공통)
+
+# 자동화(에이전트·AC·스크립트)는 bare serve.js 를 쓰지 마라. 리스닝 소켓이 이벤트
+# 루프를 붙잡아 스스로 끝나지 않으므로 호출한 쪽이 거기서 멈춘다. 기동 확인만이면
+# --smoke, 잠깐 띄워야 하면 --timeout 을 준다.
+node tools/serve.js --smoke        # 기동 확인 후 즉시 종료
+node tools/serve.js --timeout=120  # 120초 후 자동 종료
 
 # 테스트만. 디렉토리를 넘기면 Node 가 그것을 모듈로 resolve 해 대부분을 조용히
 # 건너뛰므로, 반드시 glob 으로 넘긴다.

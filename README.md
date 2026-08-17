@@ -18,6 +18,8 @@ node tools/serve.js
 node tools/check.js
 ```
 
+`node tools/serve.js` 는 개발 서버라 **Ctrl+C 로 끝낼 때까지 종료되지 않습니다.** 스크립트나 배치 파일 안에서 부르면 그 자리에서 멈추므로, 기동 확인만 필요하면 `--smoke`(한 번 요청하고 즉시 종료), 잠깐 띄워야 하면 `--timeout=120`(120초 후 자동 종료)을 씁니다.
+
 동봉된 dart-sass 바이너리는 Windows x64 기준입니다. 다른 운영체제에서는 [dart-sass releases](https://github.com/sass/dart-sass/releases)에서 해당 플랫폼 아카이브를 받아 `tools/vendor/sass/`에 풀어야 합니다. 바이너리가 없어도 커밋된 CSS를 사용하므로 빌드 자체는 실패하지 않습니다.
 
 ## Tier 1 — npm 사용 가능 시

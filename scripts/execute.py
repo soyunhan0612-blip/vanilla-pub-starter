@@ -15,6 +15,7 @@ import json
 import os
 import subprocess
 import sys
+import tempfile
 import threading
 import time
 from datetime import datetime, timezone, timedelta
@@ -457,40 +458,61 @@ class StepExecutor:
         prompt = preamble + step_file.read_text(encoding="utf-8")
         failure = None
 
-        # Codex CLI 는 UTF-8 로 출력한다. encoding 을 명시하지 않으면 Windows 에서
-        # locale(cp949)로 디코딩되어 한글이 깨지고, 그 깨진 문자열이 재시도 프롬프트의
-        # error_message 로 다시 들어가 오염이 누적된다.
-        #
         # --dangerously-bypass-hook-trust: Codex 는 신뢰가 등록되지 않은 훅을 실행하지
         # 않는데, exec 는 비대화형이라 신뢰를 물을 수 없다. 이 플래그가 없으면
         # .codex/hooks.json 의 안전·TDD·검증 훅이 경고 없이 통째로 빠진 채 step 이
         # 돌아간다. 훅 소스는 이 저장소 안에 있고 tools/check.js 로 검증되므로
         # 자동화 한정으로 신뢰를 우회한다.
         #
-        # 프롬프트는 `-` 로 stdin 에 넘긴다. stdin=DEVNULL 을 같이 줄 수는 없다 —
-        # subprocess 가 ValueError 를 낸다. input= 을 주면 subprocess 가 자체 파이프를
-        # 열어 stdin 을 대체하므로, 터미널 입력 버퍼는 그대로 남는다. 즉 확인 게이트에
-        # 미리 타이핑해 둔 응답이 CLI 에 먹히지 않는다는 목적은 그대로 달성된다.
-        try:
-            result = subprocess.run(
+        # 세 스트림 모두 파이프가 아니라 **임시 파일**로 연결한다. capture_output=True
+        # 가 만드는 파이프는 codex 의 자손에게도 상속되는데, codex 가 띄운
+        # `node tools/serve.js` 처럼 스스로 끝나지 않는 손자가 하나라도 남으면 쓰기단이
+        # 닫히지 않아 **codex 가 죽은 뒤에도 읽기가 리턴하지 않는다.** 2-layout step 3 이
+        # 이렇게 15분 47초를 멈췄고, 증상이 "실패" 가 아니라 "안 끝남" 이라 로그로는
+        # 정상 진행과 구분되지 않았다. 파일에는 붙잡을 파이프가 없다.
+        #
+        # 프롬프트도 같은 이유로 파일로 넘긴다. `input=` 은 파이프를 쓰는 데다
+        # 프롬프트가 파이프 버퍼보다 크면 codex 가 읽기 전까지 쓰기가 막힌다.
+        # 파일이어도 터미널 stdin 을 대체한다는 목적(확인 게이트에 미리 타이핑해 둔
+        # 응답이 codex 로 새지 않는 것)은 그대로 달성된다.
+        # codex 가 남긴 고아 프로세스 자체는 여기서 죽이지 않는다. Windows 에서
+        # Job Object 로 자손을 묶어 정리하는 방식을 시도했으나 실경로에서 일관되게
+        # 실패했고 원인을 규명하지 못했다. 되지 않는 정리를 남겨 두면 정리가 된다고
+        # 믿게 만들 뿐이라 걷어냈다. 고아를 만들지 않는 쪽(`serve.js --timeout`,
+        # step 문서에서 bare serve.js 금지)이 실제 방어선이다.
+        with tempfile.TemporaryFile() as fin, \
+                tempfile.TemporaryFile() as fout, \
+                tempfile.TemporaryFile() as ferr:
+            fin.write(prompt.encode("utf-8"))
+            fin.seek(0)
+
+            proc = subprocess.Popen(
                 self._codex_argv(),
-                cwd=self._root, capture_output=True, text=True, timeout=self.TIMEOUT,
-                input=prompt, encoding="utf-8", errors="replace",
+                cwd=self._root, stdin=fin, stdout=fout, stderr=ferr,
             )
-            returncode, stdout, stderr = result.returncode, result.stdout, result.stderr
-            if returncode != 0:
-                print(f"\n  WARN: Codex가 비정상 종료됨 (code {returncode})")
-                if stderr:
-                    print(f"  stderr: {stderr[:500]}")
-        except subprocess.TimeoutExpired as e:
-            # 잡지 않으면 트레이스백으로 하네스가 통째로 죽고, index.json 에는
-            # started_at 만 남아 다음 실행이 pending 으로 잘못 재개한다. 다른 실패와
-            # 같은 경로(재시도 → MAX_RETRIES 회 후 error)로 흘려보낸다.
-            failure = f"Codex 가 {self.TIMEOUT}초 안에 끝나지 않아 중단했다 (timeout)"
-            returncode = -1
-            stdout = self._decode_stream(e.stdout)
-            stderr = self._decode_stream(e.stderr)
-            print(f"\n  WARN: {failure}")
+            try:
+                returncode = proc.wait(timeout=self.TIMEOUT)
+            except subprocess.TimeoutExpired:
+                # 잡지 않으면 트레이스백으로 하네스가 통째로 죽고, index.json 에는
+                # started_at 만 남아 다음 실행이 pending 으로 잘못 재개한다. 다른 실패와
+                # 같은 경로(재시도 → MAX_RETRIES 회 후 error)로 흘려보낸다.
+                proc.kill()
+                proc.wait()
+                failure = f"Codex 가 {self.TIMEOUT}초 안에 끝나지 않아 중단했다 (timeout)"
+                returncode = -1
+                print(f"\n  WARN: {failure}")
+
+            # 타임아웃이어도 그때까지 쓰인 내용은 그대로 남아 있다.
+            # Codex CLI 는 UTF-8 로 출력한다. 명시하지 않으면 Windows 에서 locale(cp949)
+            # 로 디코딩되어 한글이 깨지고, 그 깨진 문자열이 재시도 프롬프트의
+            # error_message 로 다시 들어가 오염이 누적된다.
+            stdout = self._read_stream(fout)
+            stderr = self._read_stream(ferr)
+
+        if failure is None and returncode != 0:
+            print(f"\n  WARN: Codex가 비정상 종료됨 (code {returncode})")
+            if stderr:
+                print(f"  stderr: {stderr[:500]}")
 
         output = {
             "step": step_num, "name": step_name,
@@ -506,13 +528,15 @@ class StepExecutor:
         return output
 
     @staticmethod
-    def _decode_stream(raw) -> str:
-        """TimeoutExpired 가 물고 나온 부분 출력. text 모드라도 bytes 일 수 있다."""
-        if raw is None:
-            return ""
-        if isinstance(raw, bytes):
-            return raw.decode("utf-8", errors="replace")
-        return raw
+    def _read_stream(fh) -> str:
+        """codex 출력을 받아 둔 임시 파일을 처음부터 읽는다.
+
+        errors="replace" 인 이유: codex 가 중간에 죽으면 멀티바이트 문자가 잘린 채
+        끝날 수 있는데, 여기서 UnicodeDecodeError 가 나면 실패 원인을 기록하는 경로
+        자체가 죽어 step 이 이유 없이 사라진다.
+        """
+        fh.seek(0)
+        return fh.read().decode("utf-8", errors="replace")
 
     # --- 헤더 & 검증 ---
 
